@@ -1,0 +1,68 @@
+---
+layout: post
+title: "git 运用技巧"
+date: 2015-10-03 23:37:39 +0800
+comments: true
+categories: git
+---
+#git 运用技巧
+
+最新在学ios开发，正在练习一些实战项目，今天学到一些git的运用技巧，来这里和大家分享下
+
+（1）git配置
+git config --global user.name "......."
+git config --global user.email "........"
+
+（2）下载代码
+git clone http://git.oschina.net/bbycnzi/newreader(github代码的下载地址)
+
+（3）添加文件
+cd newsreader(文件夹)
+git add code.md(文件名)
+git add
+
+（4）本地提交
+git commit -am "提交测试代码"
+
+（5）将提交推送到服务器
+git push origin master
+
+（6）更新本地代码
+git pull
+
+（7）创建分支
+分支相当于你项目的一个副本，一般修改项目得先在分支修改再整合到原项目中
+git branch v2
+
+（8）将分支同步到服务器
+git push origin v2
+
+（9）切换分支
+git checkout v2
+
+（10）修改v2分支，提交本地修改
+git commit -am "v2修改"
+
+（11）将提交推送到服务器
+git push origin v2
+
+（12）将v2分支合并到主干上
+git checkout master
+git merge v2
+git push
+
+（13）版本还原
+git checkout v2
+
+git revert HEAD
+填写描述信息
+
+查看本地内容是否修改
+
+git push origin v2
+还原到指定版本
+
+ps:vim命令：
+i 插入
+esc-> shift+: ->:wq  保存退出
+
