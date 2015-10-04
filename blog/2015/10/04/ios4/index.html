@@ -5,12 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Hello - Cool Guy</title>
+  <title>ios多线程（NSOperation）(swift) - Cool Guy</title>
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="Hello world
-">
+  <meta name="description" content="NSOperation 相比于gcd，它更好地控制和处理大量的并发操作.
+NSOperation 封装了需要的代码,NSOperation是抽象基类，一般我们使用系统提供的子类或者自定义子类来继承它.
+NSOperationQueue是操作队列，专门用来调度和管理NSOperation. 1、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/03/hello/">
+  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/04/ios4/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
@@ -70,7 +71,7 @@
   
   <header>
     
-      <h1 class="entry-title">Hello</h1>
+      <h1 class="entry-title">ios多线程（NSOperation）(swift)</h1>
     
     
       <p class="meta">
@@ -79,14 +80,100 @@
 
 
 
-<time class='entry-date' datetime='2015-10-03T23:23:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>11:23 pm</span></time>
+<time class='entry-date' datetime='2015-10-04T11:29:28+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:29 am</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><h1>Hello world</h1>
+<div class="entry-content"><p>NSOperation</p>
+
+<p>相比于gcd，它更好地控制和处理大量的并发操作.
+NSOperation 封装了需要的代码,NSOperation是抽象基类，一般我们使用系统提供的子类或者自定义子类来继承它.
+NSOperationQueue是操作队列，专门用来调度和管理NSOperation.</p>
+
+<p>1、创建一个系统提供的nsoperation</p>
+
+<pre><code>let myoperation = NSBlockOperation { 
+    () -&gt;Voidin
+        //操作
+    }
+</code></pre>
+
+<p>2、创建一个nsoperationqueue,并添加nsoperation,这样nsoperation对象就会执行</p>
+
+<pre><code>NSOperationQueue().addOperation(myoperation)
+</code></pre>
+
+<p>3、不使用nsoperationqueue执行，，也可这样执行，不过这个操作时同步的，一般不推荐这种方法，一般用与nsoperationqueue相结合使用的方法</p>
+
+<pre><code>myoperation.start()
+myoperation.cancel()//取消操作
+</code></pre>
+
+<p>4、nsoperation回调</p>
+
+<pre><code>myoperation.completionBlock = { 
+    }
+</code></pre>
+
+<p>5、在原有的nsoperation再添加操作，nsoperation里面的操作时并行的</p>
+
+<pre><code>myoperation.addExecutionBlock { () -&gt;Voidin
+        //第二个操作
+    }
+</code></pre>
+
+<p>6、自定义nsoperation，即实现main（）方法</p>
+
+<pre><code>import UIKit
+protocol opCompletionDelegate{//代理
+func opCompletion()
+}
+class wkoperation: NSOperation {
+var delegate:opCompletionDelegate?//运用代理通知类中的主线程更新ui
+overridefunc main() {
+    super.main()
+    //操作
+    if let mydelegate =self.delegate{
+        mydelegate.opCompletion()
+    }
+  }
+}
+//调用的类：
+let myoperation1 =wkoperation()
+myoperation1.delegate =self
+NSOperationQueue().addOperation(myoperation1)
+}
+func opCompletion() {
+
+}
+</code></pre>
+
+<p>7、依赖关系</p>
+
+<pre><code>myoperation.addDependency(myoperation1)
+//myoperation依赖于myoperation1，myoperation1执行完再执行myoperation
+
+myoperation.removeDependency(myoperation1)  //移除依赖
+</code></pre>
+
+<p>8、设置优先级，并不一定能保证系统按照优先级的顺序执行，只是让系统分配资源的时候更倾向于优先级高的</p>
+
+<pre><code>myoperation.queuePriority =NSOperationQueuePriority.VeryLow
+</code></pre>
+
+<p>9、设置队列并行的最大操作数，等于1相当于串行</p>
+
+<pre><code>let myoperationqueue =NSOperationQueue()
+    myoperationqueue.maxConcurrentOperationCount =2
+</code></pre>
+
+<p> 10、一直等到操作执行完</p>
+
+<pre><code>myoperation.waitUntilFinished()
+</code></pre>
 </div>
 
 
@@ -102,12 +189,12 @@
 
 
 
-<time class='entry-date' datetime='2015-10-03T23:23:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>11:23 pm</span></time>
+<time class='entry-date' datetime='2015-10-04T11:29:28+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:29 am</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/hello/'>hello</a>
+    <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
   
 </span>
 
@@ -116,7 +203,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/03/hello/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/03/hello/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/04/ios4/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/04/ios4/" >Tweet</a>
   
   
   
@@ -139,8 +226,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2015/10/04/ios3/" title="Previous Post: iOS多线程（GCD)(swift)">&laquo; iOS多线程（GCD)(swift)</a>
       
-        <a class="basic-alignment right" href="/blog/2015/10/03/git/" title="Next Post: git 运用技巧">git 运用技巧 &raquo;</a>
       
     </p>
   </footer>
@@ -149,7 +236,7 @@
   <section>
     <h1>Comments</h1>
     <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="/blog/2015/10/03/hello" data-title="hello" data-url="http://caixindong.github.io/blog/2015/10/03/hello/"></div>
+	<div class="ds-thread" data-thread-key="/blog/2015/10/04/ios4" data-title="ios多线程（NSOperation）(swift)" data-url="http://caixindong.github.io/blog/2015/10/04/ios4/"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
