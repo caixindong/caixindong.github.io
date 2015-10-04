@@ -9,8 +9,8 @@
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="AFNeiworking 用法 1、get post请求 NSString *url1 = @"http://api.openweathermap.org/data/2.5/
-forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10 &hellip;">
+  <meta name="description" content="一、导航栏的创建 UIViewController* firstCon = [[UIViewControlleralloc]init];
+NavigationController* nav = [[NavigationControlleralloc] &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +67,50 @@ forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10 &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/04/ios7/">iOS开发一些零碎的知识点（一）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-04T20:04:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:04 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>一、导航栏的创建</p>
+
+<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
+NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
+firstCon];//指定导航控制器的根视图控制器
+nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
+</code></pre>
+
+<p>二、下拉菜单的创建</p>
+
+<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
+UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
+pvc];//创建下拉菜单
+[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
+UIPopoverArrowDirectionAny animated:YES];//展示出来
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -701,6 +745,10 @@ esc-> shift+: ->:wq  保存退出</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/04/ios7/">iOS开发一些零碎的知识点（一）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/04/ios6/">AFNetworking的用法</a>
       </li>
     
@@ -714,10 +762,6 @@ esc-> shift+: ->:wq  保存退出</p>
     
       <li class="post">
         <a href="/blog/2015/10/04/ios3/">iOS多线程（GCD)(swift)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/04/ios2/">iOS TableView</a>
       </li>
     
   </ul>

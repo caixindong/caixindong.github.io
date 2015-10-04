@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:04:06+08:00</updated>
+  <updated>2015-10-04T20:09:41+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,30 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS开发一些零碎的知识点（一）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/04/ios7/"/>
+    <updated>2015-10-04T20:04:43+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/04/ios7</id>
+    <content type="html"><![CDATA[<p>一、导航栏的创建</p>
+
+<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
+NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
+firstCon];//指定导航控制器的根视图控制器
+nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
+</code></pre>
+
+<p>二、下拉菜单的创建</p>
+
+<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
+UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
+pvc];//创建下拉菜单
+[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
+UIPopoverArrowDirectionAny animated:YES];//展示出来
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AFNetworking的用法]]></title>
@@ -322,17 +346,6 @@ dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
 
 <pre><code>    dispatch_resume(myQueue)
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS TableView]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/04/ios2/"/>
-    <updated>2015-10-04T00:51:03+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/04/ios2</id>
-    <content type="html"><![CDATA[<h1>iOS TableView 的header for section无法加载的问题</h1>
-
-<p>最近在练习的一个项目遇到重写header不加载的问题，在这里提醒下大家，重写的header要被调用，一定要重写delegate的height for header的方法才会被调用</p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:04:06+08:00</updated>
+  <updated>2015-10-04T20:09:41+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,30 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS开发一些零碎的知识点（一）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/04/ios7/"/>
+    <updated>2015-10-04T20:04:43+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/04/ios7</id>
+    <content type="html"><![CDATA[<p>一、导航栏的创建</p>
+
+<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
+NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
+firstCon];//指定导航控制器的根视图控制器
+nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
+</code></pre>
+
+<p>二、下拉菜单的创建</p>
+
+<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
+UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
+pvc];//创建下拉菜单
+[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
+UIPopoverArrowDirectionAny animated:YES];//展示出来
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AFNetworking的用法]]></title>
