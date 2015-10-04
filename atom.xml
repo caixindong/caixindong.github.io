@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:09:41+08:00</updated>
+  <updated>2015-10-04T20:36:36+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[UIBarButtonItem随着屏幕切换变化的问题]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/04/ios8/"/>
+    <updated>2015-10-04T20:11:07+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/04/ios8</id>
+    <content type="html"><![CDATA[<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS开发一些零碎的知识点（一）]]></title>

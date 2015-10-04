@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:09:41+08:00</updated>
+  <updated>2015-10-04T20:36:36+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[UIBarButtonItem随着屏幕切换变化的问题]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/04/ios8/"/>
+    <updated>2015-10-04T20:11:07+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/04/ios8</id>
+    <content type="html"><![CDATA[<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS开发一些零碎的知识点（一）]]></title>
@@ -268,83 +277,6 @@ myoperation.removeDependency(myoperation1)  //移除依赖
 <p> 10、一直等到操作执行完</p>
 
 <pre><code>myoperation.waitUntilFinished()
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS多线程（GCD)(swift)]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/04/ios3/"/>
-    <updated>2015-10-04T11:10:31+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/04/ios3</id>
-    <content type="html"><![CDATA[<h1>实现iOS多线程主要有三种方式</h1>
-
-<p>一、GCD</p>
-
-<p>他是苹果设计的在底层管理线程的方法
-GCD最主要的概念就是队列，可分为两种类型，一为串行队列，二为并行队列，开发时用到的有三种队列：主队列、全局队列、自定义队列</p>
-
-<p>1、创建gcd队列</p>
-
-<pre><code>let myQueue:dispatch_queue_t =dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0)
-
-//第一个参数是优先级
-//用异步方式执行队列里的方法      
-dispatch_async(myQueue, { () -&gt;Void in
-        //任务
-    })
-</code></pre>
-
-<p>2、自定义队列</p>
-
-<pre><code>let myqueue2:dispatch_queue_t = dispatch_queue_create("xindong.com",
-DISPATCH_QUEUE_CONCURRENT)
-//最后一个参数指的是并行的队列，还有一个是DISPATCH_QUEUE_SERIAL(串行)
-</code></pre>
-
-<p>3、延迟执行</p>
-
-<pre><code>let myTime:dispatch_time_t=dispatch_time(DISPATCH_TIME_NOW, 
-(Int64)(NSEC_PER_SEC*2))
-//后面那个参数代表两秒，苹果公司建议这样写，这是转化为gcd能读懂的时间
-
-dispatch_after(myTime,dispatch_get_main_queue(), { () -&gt;Void in
-        //任务
-    })//苹果公司建议用主队列
-
-4、多次执行
-    dispatch_apply(3,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0))
-     { (UInt index) -&gt; Voidin
-        //任务
-    }//执行3次，一般放在并行队列中
-    //他是一个同步操作会阻塞主线程，所以一般放在异步执行的代码里
-</code></pre>
-
-<p>5、调度组</p>
-
-<pre><code>    let mygroup =dispatch_group_create()//创建调度组
-    dispatch_group_async(mygroup, myQueue) { () -&gt;Void in
-    //异步执行调度组里面的内容
-        //加载图片数据
-        dispatch_async(dispatch_get_main_queue(), { () -&gt;Void in
-            //主线程更新ui
-        })
-    }       dispatch_group_notify(mygroup,dispatch_get_main_queue()) { () -&gt;Void in
-        //这个方法在调度组里面的内容全部执行完毕后调用
-    }
-
-dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
-//一直等到调度组执行完，在执行下面的，这是一个同步操作，会阻塞主线程
-</code></pre>
-
-<p>6、暂停队列</p>
-
-<pre><code>dispatch_suspend(myQueue)//不能暂停主队列和系统队列
-</code></pre>
-
-<p>7、恢复队列</p>
-
-<pre><code>    dispatch_resume(myQueue)
 </code></pre>
 ]]></content>
   </entry>
