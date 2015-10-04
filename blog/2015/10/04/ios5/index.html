@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Aboutme - Cool Guy</title>
+  <title>iOS多线程（NSThread）(swift) - Cool Guy</title>
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="Aboutme Oct 4th, 2015 12:29 am About me Author:Xindong Email:458770054@qq.com Oct 4th, 2015 12:29 am Tweet Recent Posts iOS多线程（NSThread）(swift) &hellip;">
+  <meta name="description" content="NSThread
+如果你用到的子线程要长时间使用，就用它 1、创建一个子线程 NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil) func go(){ //操作 } 2、自定义的nsthread &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://caixindong.github.io/aboutme/">
+  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/04/ios5/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
@@ -65,40 +66,83 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Aboutme</h1>
-    <p class="meta">
-
-
-
-
-<time class='entry-date' datetime='2015-10-04T00:29:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:29 am</span></time></p>
-  </header>
-  
-  <h1>About me</h1>
-
-<p>Author:Xindong</p>
-
-<p>Email:458770054@qq.com</p>
-
-  
-    <footer>
+    
+      <h1 class="entry-title">iOS多线程（NSThread）(swift)</h1>
+    
+    
       <p class="meta">
         
-        
 
 
 
 
-<time class='entry-date' datetime='2015-10-04T00:29:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:29 am</span></time>
+<time class='entry-date' datetime='2015-10-04T19:40:17+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:40 pm</span></time>
         
       </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>NSThread
+如果你用到的子线程要长时间使用，就用它</p>
+
+<p>1、创建一个子线程</p>
+
+<pre><code>NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil)
+
+func go(){
+    //操作
+
+}
+</code></pre>
+
+<p>2、自定义的nsthread</p>
+
+<pre><code>import UIKit
+
+class myThread: NSThread {
+//重写main方法，把子线程要做的操作放进去
+    overridefunc main() {
+    //操作
+    println("123")
+    }
+}
+let thread1 =myThread()
+thread1.start()
+</code></pre>
+</div>
+
+
+  <footer>
+    <p class="meta">
       
-        <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/aboutme/index.html" data-via="" data-counturl="http://caixindong.github.io/aboutme/index.html" >Tweet</a>
+
+<span class="byline author vcard">Posted by <span class="fn">Xindong</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-10-04T19:40:17+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:40 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/04/ios5/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/04/ios5/" >Tweet</a>
   
   
   
@@ -118,10 +162,36 @@
   
 </div>
 
+    
+    <p class="meta">
       
-    </footer>
-  
+        <a class="basic-alignment left" href="/blog/2015/10/04/ios4/" title="Previous Post: iOS多线程（NSOperation）(swift)">&laquo; iOS多线程（NSOperation）(swift)</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2015/10/04/ios5" data-title="iOS多线程（NSThread）(swift)" data-url="http://caixindong.github.io/blog/2015/10/04/ios5/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+  </section>
 
 </div>
 

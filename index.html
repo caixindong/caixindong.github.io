@@ -9,9 +9,8 @@
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="NSOperation 相比于gcd，它更好地控制和处理大量的并发操作.
-NSOperation 封装了需要的代码,NSOperation是抽象基类，一般我们使用系统提供的子类或者自定义子类来继承它.
-NSOperationQueue是操作队列，专门用来调度和管理NSOperation. 1、 &hellip;">
+  <meta name="description" content="NSThread
+如果你用到的子线程要长时间使用，就用它 1、创建一个子线程 NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil) func go(){ //操作 } 2、自定义的nsthread &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,6 +67,61 @@ NSOperationQueue是操作队列，专门用来调度和管理NSOperation. 1、 &
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/04/ios5/">iOS多线程（NSThread）(swift)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-04T19:40:17+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:40 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>NSThread
+如果你用到的子线程要长时间使用，就用它</p>
+
+<p>1、创建一个子线程</p>
+
+<pre><code>NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil)
+
+func go(){
+    //操作
+
+}
+</code></pre>
+
+<p>2、自定义的nsthread</p>
+
+<pre><code>import UIKit
+
+class myThread: NSThread {
+//重写main方法，把子线程要做的操作放进去
+    overridefunc main() {
+    //操作
+    println("123")
+    }
+}
+let thread1 =myThread()
+thread1.start()
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -522,6 +576,10 @@ esc-> shift+: ->:wq  保存退出</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/04/ios5/">iOS多线程（NSThread）(swift)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/04/ios4/">iOS多线程（NSOperation）(swift)</a>
       </li>
     
@@ -535,10 +593,6 @@ esc-> shift+: ->:wq  保存退出</p>
     
       <li class="post">
         <a href="/blog/2015/10/04/ios1/">iOS OC知识点</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/03/git/">Git 运用技巧</a>
       </li>
     
   </ul>
