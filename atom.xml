@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:36:36+08:00</updated>
+  <updated>2015-10-04T20:47:08+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,31 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS开发一些零碎的小知识（二）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/04/ios9/"/>
+    <updated>2015-10-04T20:45:04+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/04/ios9</id>
+    <content type="html"><![CDATA[<p>关于收键盘
+在viewDidLoad里添加以下代码</p>
+
+<pre><code>self.view.userInteractionEnabled =YES;
+UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
+initWithTarget:selfaction:@selector(touchView:)];
+[self.viewaddGestureRecognizer:guest];
+</code></pre>
+
+<p>然后在外部定义一个名为touchView的方法</p>
+
+<pre><code>-(void)touchView:(UITapGestureRecognizer*) recognizer{
+[self.viewendEditing:YES];
+}
+</code></pre>
+
+<p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[UIBarButtonItem随着屏幕切换变化的问题]]></title>

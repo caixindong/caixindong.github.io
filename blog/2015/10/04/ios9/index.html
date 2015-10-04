@@ -5,12 +5,14 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>iOS开发一些零碎的知识点（一） - Cool Guy</title>
+  <title>iOS开发一些零碎的小知识（二） - Cool Guy</title>
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="一、导航栏的创建 UIViewController* firstCon = [[UIViewControlleralloc]init];
-NavigationController* nav = [[NavigationControlleralloc] &hellip;">
+  <meta name="description" content="关于收键盘
+在viewDidLoad里添加以下代码 self.view.userInteractionEnabled =YES;
+UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
+initWithTarget: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +21,7 @@ NavigationController* nav = [[NavigationControlleralloc] &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/04/ios7/">
+  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/04/ios9/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
@@ -70,7 +72,7 @@ NavigationController* nav = [[NavigationControlleralloc] &hellip;">
   
   <header>
     
-      <h1 class="entry-title">iOS开发一些零碎的知识点（一）</h1>
+      <h1 class="entry-title">iOS开发一些零碎的小知识（二）</h1>
     
     
       <p class="meta">
@@ -79,29 +81,30 @@ NavigationController* nav = [[NavigationControlleralloc] &hellip;">
 
 
 
-<time class='entry-date' datetime='2015-10-04T20:04:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:04 pm</span></time>
+<time class='entry-date' datetime='2015-10-04T20:45:04+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:45 pm</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>一、导航栏的创建</p>
+<div class="entry-content"><p>关于收键盘
+在viewDidLoad里添加以下代码</p>
 
-<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
-NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
-firstCon];//指定导航控制器的根视图控制器
-nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
+<pre><code>self.view.userInteractionEnabled =YES;
+UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
+initWithTarget:selfaction:@selector(touchView:)];
+[self.viewaddGestureRecognizer:guest];
 </code></pre>
 
-<p>二、下拉菜单的创建</p>
+<p>然后在外部定义一个名为touchView的方法</p>
 
-<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
-UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
-pvc];//创建下拉菜单
-[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
-UIPopoverArrowDirectionAny animated:YES];//展示出来
+<pre><code>-(void)touchView:(UITapGestureRecognizer*) recognizer{
+[self.viewendEditing:YES];
+}
 </code></pre>
+
+<p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
 </div>
 
 
@@ -117,7 +120,7 @@ UIPopoverArrowDirectionAny animated:YES];//展示出来
 
 
 
-<time class='entry-date' datetime='2015-10-04T20:04:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:04 pm</span></time>
+<time class='entry-date' datetime='2015-10-04T20:45:04+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:45 pm</span></time>
       
 
 <span class="categories">
@@ -131,7 +134,7 @@ UIPopoverArrowDirectionAny animated:YES];//展示出来
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/04/ios7/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/04/ios7/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/04/ios9/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/04/ios9/" >Tweet</a>
   
   
   
@@ -154,10 +157,8 @@ UIPopoverArrowDirectionAny animated:YES];//展示出来
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/10/04/ios6/" title="Previous Post: AFNetworking的用法">&laquo; AFNetworking的用法</a>
+        <a class="basic-alignment left" href="/blog/2015/10/04/ios8/" title="Previous Post: UIBarButtonItem随着屏幕切换变化的问题">&laquo; UIBarButtonItem随着屏幕切换变化的问题</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/10/04/ios8/" title="Next Post: UIBarButtonItem随着屏幕切换变化的问题">UIBarButtonItem随着屏幕切换变化的问题 &raquo;</a>
       
     </p>
   </footer>
@@ -166,7 +167,7 @@ UIPopoverArrowDirectionAny animated:YES];//展示出来
   <section>
     <h1>Comments</h1>
     <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="/blog/2015/10/04/ios7" data-title="iOS开发一些零碎的知识点（一）" data-url="http://caixindong.github.io/blog/2015/10/04/ios7/"></div>
+	<div class="ds-thread" data-thread-key="/blog/2015/10/04/ios9" data-title="iOS开发一些零碎的小知识（二）" data-url="http://caixindong.github.io/blog/2015/10/04/ios9/"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">

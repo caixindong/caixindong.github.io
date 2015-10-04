@@ -9,8 +9,10 @@
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化
-">
+  <meta name="description" content="关于收键盘
+在viewDidLoad里添加以下代码 self.view.userInteractionEnabled =YES;
+UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
+initWithTarget: &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,6 +69,51 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/04/ios9/">iOS开发一些零碎的小知识（二）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-04T20:45:04+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:45 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>关于收键盘
+在viewDidLoad里添加以下代码</p>
+
+<pre><code>self.view.userInteractionEnabled =YES;
+UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
+initWithTarget:selfaction:@selector(touchView:)];
+[self.viewaddGestureRecognizer:guest];
+</code></pre>
+
+<p>然后在外部定义一个名为touchView的方法</p>
+
+<pre><code>-(void)touchView:(UITapGestureRecognizer*) recognizer{
+[self.viewendEditing:YES];
+}
+</code></pre>
+
+<p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -732,36 +779,9 @@ esc-> shift+: ->:wq  保存退出</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/03/hello/">Hello</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-03T23:23:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>11:23 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>Hello world</h1>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/posts/2">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -772,6 +792,10 @@ esc-> shift+: ->:wq  保存退出</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/10/04/ios9/">iOS开发一些零碎的小知识（二）</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2015/10/04/ios8/">UIBarButtonItem随着屏幕切换变化的问题</a>
@@ -787,10 +811,6 @@ esc-> shift+: ->:wq  保存退出</p>
     
       <li class="post">
         <a href="/blog/2015/10/04/ios5/">iOS多线程（NSThread）(swift)</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/04/ios4/">iOS多线程（NSOperation）(swift)</a>
       </li>
     
   </ul>
