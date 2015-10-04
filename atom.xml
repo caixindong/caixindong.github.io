@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:02:04+08:00</updated>
+  <updated>2015-10-04T20:04:06+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -42,7 +42,7 @@ manager.requestSerializer = [AFHTTPRequestSerializer serializer];
 manager.responseSerializer = [AFXMLParserResponseSerializer serializer];
 
 //get请求
-[manager GET:url1parameters:nil success:^(AFHTTPRequestOperation *operation,
+[manager GET:url1 parameters:nil success:^(AFHTTPRequestOperation *operation,
 id responseObject) {
     NSLog(@"%@",responseObject);
 
@@ -51,7 +51,7 @@ id responseObject) {
 }];
 
 //post请求，参数不显示在正文（一个网址？后面就是正文，内容就是参数），参数设置在parameters里
-[manager POST:url2parameters:@{@"mobileCode":@"15910514636",@"userID":@""}
+[manager POST:url2 parameters:@{@"mobileCode":@"15910514636",@"userID":@""}
 success:^(AFHTTPRequestOperation *operation,id responseObject) {
     NSLog(@"%@",responseObject);
 
