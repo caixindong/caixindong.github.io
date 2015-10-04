@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T19:53:12+08:00</updated>
+  <updated>2015-10-04T19:56:56+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -30,6 +30,7 @@ WebServices/MobileCodeWS.asmx/getMobileCodeInfo";//测试post请求
 
 //创建一个请求管理类对象
 AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+//注意：此行不加也可以   
 manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer. 
 acceptableContentTypes setByAddingObject:@"text/html"];
 

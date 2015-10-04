@@ -98,6 +98,7 @@ WebServices/MobileCodeWS.asmx/getMobileCodeInfo";//测试post请求
 
 //创建一个请求管理类对象
 AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+//注意：此行不加也可以   
 manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer. 
 acceptableContentTypes setByAddingObject:@"text/html"];
 
