@@ -145,7 +145,7 @@ manager.responseSerializer = [AFJSONResponseSerializer serializer];
 manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.
 acceptableContentTypes   setByAddingObject:@"text/html"];
 AFHTTPRequestOperation *httpoperation = 
-[managerPOST:urlparameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+[manager POST:url parameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
 //构造数据，上传的数据
     [formData appendPartWithFileData:dataname:@"upload"fileName:@"image1.jpg"mimeType:nil];
 

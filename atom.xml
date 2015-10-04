@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T19:56:56+08:00</updated>
+  <updated>2015-10-04T20:02:04+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -77,7 +77,7 @@ manager.responseSerializer = [AFJSONResponseSerializer serializer];
 manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.
 acceptableContentTypes   setByAddingObject:@"text/html"];
 AFHTTPRequestOperation *httpoperation = 
-[managerPOST:urlparameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+[manager POST:url parameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
 //构造数据，上传的数据
     [formData appendPartWithFileData:dataname:@"upload"fileName:@"image1.jpg"mimeType:nil];
 
