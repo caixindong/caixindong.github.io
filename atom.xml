@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T11:37:16+08:00</updated>
+  <updated>2015-10-04T11:43:30+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[ios多线程（NSOperation）(swift)]]></title>
+    <title type="html"><![CDATA[iOS多线程（NSOperation）(swift)]]></title>
     <link href="http://caixindong.github.io/blog/2015/10/04/ios4/"/>
     <updated>2015-10-04T11:29:28+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/04/ios4</id>
@@ -186,22 +186,22 @@ dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Ios tableView]]></title>
+    <title type="html"><![CDATA[iOS TableView]]></title>
     <link href="http://caixindong.github.io/blog/2015/10/04/ios2/"/>
     <updated>2015-10-04T00:51:03+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/04/ios2</id>
-    <content type="html"><![CDATA[<h1>ios tableView 的header for section无法加载的问题</h1>
+    <content type="html"><![CDATA[<h1>iOS TableView 的header for section无法加载的问题</h1>
 
 <p>最近在练习的一个项目遇到重写header不加载的问题，在这里提醒下大家，重写的header要被调用，一定要重写delegate的height for header的方法才会被调用</p>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Ios Oc知识点]]></title>
+    <title type="html"><![CDATA[iOS OC知识点]]></title>
     <link href="http://caixindong.github.io/blog/2015/10/04/ios1/"/>
     <updated>2015-10-04T00:46:33+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/04/ios1</id>
-    <content type="html"><![CDATA[<h1>oc知识点</h1>
+    <content type="html"><![CDATA[<h1>OC知识点</h1>
 
 <p>1、类的设计</p>
 
