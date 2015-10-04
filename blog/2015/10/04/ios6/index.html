@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>iOS OC知识点 - Cool Guy</title>
+  <title>AFNetworking的用法 - Cool Guy</title>
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="OC知识点 1、类的设计 @property （nonatomic ，strong）NSString* __(NSString用strong，跟oc有关的夜用strong) @property （nonatomic ，assign）int age (其他用assign) 2、封装 3、继承 4、 &hellip;">
+  <meta name="description" content="AFNeiworking 用法 1、get post请求 NSString *url1 = @"http://api.openweathermap.org/data/2.5/
+forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/04/ios1/">
+  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/04/ios6/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
@@ -69,7 +70,7 @@
   
   <header>
     
-      <h1 class="entry-title">iOS OC知识点</h1>
+      <h1 class="entry-title">AFNetworking的用法</h1>
     
     
       <p class="meta">
@@ -78,65 +79,109 @@
 
 
 
-<time class='entry-date' datetime='2015-10-04T00:46:33+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:46 am</span></time>
+<time class='entry-date' datetime='2015-10-04T19:45:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:45 pm</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><h1>OC知识点</h1>
+<div class="entry-content"><p>AFNeiworking 用法</p>
 
-<p>1、类的设计</p>
+<p>1、get post请求</p>
 
-<p>@property （nonatomic ，strong）NSString* __(NSString用strong，跟oc有关的夜用strong)</p>
+<pre><code>NSString *url1 = @"http://api.openweathermap.org/data/2.5/
+forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10";//测试get请求
 
-<p>@property （nonatomic ，assign）int age (其他用assign)</p>
+NSString *url2 =@"http://webservice.webxml.com.cn/
+WebServices/MobileCodeWS.asmx/getMobileCodeInfo";//测试post请求
 
-<p>2、封装</p>
+//创建一个请求管理类对象
+AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer. 
+acceptableContentTypes setByAddingObject:@"text/html"];
 
-<p>3、继承</p>
+//设置请求类型
+manager.requestSerializer = [AFHTTPRequestSerializer serializer];
 
-<p>4、重写</p>
+//设置返回类型 json AFXMLParserResponseSerializer:xml类型 AFHTTPResponseSerializer:二进制类型
+//manager.responseSerializer = [AFJSONResponseSerializer serializer];
+manager.responseSerializer = [AFXMLParserResponseSerializer serializer];
 
-<p>5、self指针（类似java的this）</p>
+//get请求
+[manager GET:url1parameters:nil success:^(AFHTTPRequestOperation *operation,
+id responseObject) {
+    NSLog(@"%@",responseObject);
 
-<p>6、类别（区别于继承）</p>
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    NSLog(@"%@",error);
+}];
 
-<p>相同目的：都是无法满足需求，需要更新属性或方法拓展</p>
+//post请求，参数不显示在正文（一个网址？后面就是正文，内容就是参数），参数设置在parameters里
+[manager POST:url2parameters:@{@"mobileCode":@"15910514636",@"userID":@""}
+success:^(AFHTTPRequestOperation *operation,id responseObject) {
+    NSLog(@"%@",responseObject);
 
-<p>不同点：继承即能拓展成员变量，成员属性，也能够添加方法；类别，只能添加方法</p>
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    NSLog(@"%@",error);
 
-<p>继承添加的新方法新属性，都是在子类对象中调用，而类别添加的新方法可以在原类对象直接调用</p>
+}];
+</code></pre>
 
-<p>7、内存管理（mrc模式和arc模式）</p>
+<p>2、上传</p>
 
-<p>8、代理（delegate委托，类似java的接口）</p>
+<pre><code>NSString* url = @"";
 
-<p>9、copy（浅拷贝和深拷贝）</p>
+//参数
+NSDictionary* paras =@{};
 
-<p>浅拷贝还是指向原来的内存空间，而深拷贝则另外开辟新的空间</p>
+//获得的数据
+NSDate* data =nil;
+AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+manager.responseSerializer = [AFJSONResponseSerializer serializer];
 
-<p>10、单例设计模式（全局变量）</p>
+manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.
+acceptableContentTypes   setByAddingObject:@"text/html"];
+AFHTTPRequestOperation *httpoperation = 
+[managerPOST:urlparameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+//构造数据，上传的数据
+    [formData appendPartWithFileData:dataname:@"upload"fileName:@"image1.jpg"mimeType:nil];
 
-<p>遇到多线程时要加锁@synchronized（self）｛</p>
+} success:^(AFHTTPRequestOperation *operation,id responseObject) {
 
-<p>｝</p>
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
 
-<p>只执行一次可以加上dispatch_once(&hellip;,&hellip;.)</p>
+}];
+</code></pre>
 
-<p>11、通知中心设计模式（broadcost）</p>
+<p>3、监听网络状态</p>
 
-<p>一般用单例实现广播栈</p>
+<pre><code>//开启网络状态指示器
+[[AFNetworkActivityIndicatorManager sharedManager]setEnabled:YES];
+//初始化监听
+AFHTTPRequestOperationManager* manager =  [[AFHTTPRequestOperationManager alloc]
+initWithBaseURL:[NSURL URLWithString:@"http://www.baidu.com"]];
+NSOperationQueue* queue = manager.operationQueue;
 
-<p>NSNotificationCenter</p>
-
-<p>12、block（代码块）</p>
-
-<p>int(^myblock) = ^(int a,int b){</p>
-
-<p>};
-myblock(3,5);</p>
+//监听结果回调
+[manager.reachabilityManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+    switch (status) {
+        caseAFNetworkReachabilityStatusReachableViaWiFi:
+        caseAFNetworkReachabilityStatusReachableViaWWAN:
+            [queue setSuspended:NO];//设置是否挂起该进程
+            NSLog(@"have net");
+            break;
+        caseAFNetworkReachabilityStatusNotReachable:
+        default:
+            [queue setSuspended:YES];
+            NSLog(@"no");
+            break;
+    }
+}];
+//开始监听
+[manager.reachabilityManager startMonitoring];
+</code></pre>
 </div>
 
 
@@ -152,7 +197,7 @@ myblock(3,5);</p>
 
 
 
-<time class='entry-date' datetime='2015-10-04T00:46:33+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:46 am</span></time>
+<time class='entry-date' datetime='2015-10-04T19:45:43+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>7:45 pm</span></time>
       
 
 <span class="categories">
@@ -166,7 +211,7 @@ myblock(3,5);</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/04/ios1/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/04/ios1/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/04/ios6/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/04/ios6/" >Tweet</a>
   
   
   
@@ -189,10 +234,8 @@ myblock(3,5);</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/10/03/git/" title="Previous Post: git 运用技巧">&laquo; git 运用技巧</a>
+        <a class="basic-alignment left" href="/blog/2015/10/04/ios5/" title="Previous Post: iOS多线程（NSThread）(swift)">&laquo; iOS多线程（NSThread）(swift)</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/10/04/ios2/" title="Next Post: iOS TableView">iOS TableView &raquo;</a>
       
     </p>
   </footer>
@@ -201,7 +244,7 @@ myblock(3,5);</p>
   <section>
     <h1>Comments</h1>
     <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="/blog/2015/10/04/ios1" data-title="iOS OC知识点" data-url="http://caixindong.github.io/blog/2015/10/04/ios1/"></div>
+	<div class="ds-thread" data-thread-key="/blog/2015/10/04/ios6" data-title="AFNetworking的用法" data-url="http://caixindong.github.io/blog/2015/10/04/ios6/"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
