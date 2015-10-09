@@ -9,7 +9,7 @@
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="About Me Oct 4th, 2015 12:29 am Author:Xindong Email:458770054@qq.com import &ldquo;ViewController.h&rdquo; import &ldquo;ViewController1.h&rdquo; &hellip;">
+  <meta name="description" content="About Me Oct 4th, 2015 12:29 am Author:Xindong Email:458770054@qq.com Oct 4th, 2015 12:29 am Tweet Recent Posts iOS开发一些零碎的小知识（三） iOS开发一些零碎的小知识（二） &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,97 +80,6 @@
   <p>Author:Xindong</p>
 
 <p>Email:458770054@qq.com</p>
-
-<h1>import &ldquo;ViewController.h&rdquo;</h1>
-
-<h1>import &ldquo;ViewController1.h&rdquo;</h1>
-
-<h1>import &ldquo;ViewController2.h&rdquo;</h1>
-
-<h1>import &ldquo;ViewController3.h&rdquo;</h1>
-
-<h1>import &ldquo;AppDelegate.h&rdquo;</h1>
-
-<p>//NSString<em> USERNAME = @&ldquo;userName&rdquo;;
-//NSString</em> PASSWORD = @&ldquo;passWord&rdquo;;
-@interface ViewController ()<UITextFieldDelegate>
-@property (weak, nonatomic) IBOutlet UITextField <em>usernameTextField;
-@property (weak, nonatomic) IBOutlet UITextField </em>passwordTextField;
-@property (weak, nonatomic) IBOutlet UIButton *loginButton;</p>
-
-<p>@end</p>
-
-<p>@implementation ViewController</p>
-
-<ul>
-<li>(void)viewDidLoad {
-  [super viewDidLoad];</li>
-</ul>
-
-
-<p>}</p>
-
-<ul>
-<li>(void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];</li>
-</ul>
-
-
-<p>}
-- (IBAction)LoginButtonClick:(UIButton *)sender {
-    if ([self.usernameTextField.text isEqual:@&ldquo;&rdquo;]||[self.passwordTextField.text isEqual:@&ldquo;&rdquo;]) {
-        return;
-    }</p>
-
-<pre><code>NSString* trimUsername = [self.usernameTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
-NSString* name = [NSString stringWithFormat:@"%@@458770054.local",trimUsername];
-[[NSUserDefaults standardUserDefaults] setValue:name forKey:@"username"];
-
-NSString* trimPassword = [self.passwordTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
-[[NSUserDefaults standardUserDefaults] setValue:trimPassword forKey:@"passWord"];
-[[NSUserDefaults standardUserDefaults] synchronize];
-
-
-
-[self dismissViewControllerAnimated:YES completion:nil];
-
-[(AppDelegate *)[UIApplication sharedApplication].delegate login];
-</code></pre>
-
-<p>//    UITabBarController<em> tb = [[UITabBarController alloc]init];
-//  <br/>
-//    ViewController1</em> c1 = [[ViewController1 alloc]init];
-//  <br/>
-//    c1.tabBarItem = [[UITabBarItem alloc]initWithTabBarSystemItem:UITabBarSystemItemTopRated tag:1];
-//  <br/>
-//    ViewController2<em> c2 = [[ViewController2 alloc]init];
-//  <br/>
-//    c2.tabBarItem = [[UITabBarItem alloc]initWithTabBarSystemItem:UITabBarSystemItemContacts tag:2];
-//  <br/>
-//    ViewController3</em> c3 = [[ViewController3 alloc]init];
-//  <br/>
-//    c3.tabBarItem = [[UITabBarItem alloc]initWithTabBarSystemItem:UITabBarSystemItemMore tag:3];
-//  <br/>
-//    tb.viewControllers = @[c1,c2,c3];
-//  <br/>
-//    self.navigationController.navigationBarHidden = YES;
-//    [self.navigationController pushViewController:tb animated:YES];</p>
-
-<p>}</p>
-
-<p>-(BOOL)textFieldShouldReturn:(UITextField *)textField{
-    if(textField == self.usernameTextField){
-        [self.usernameTextField resignFirstResponder];
-        [self.passwordTextField becomeFirstResponder];
-    }else{
-        [self.passwordTextField resignFirstResponder];
-        [self LoginButtonClick:self.loginButton];
-    }
-    return false;
-}
-@end</p>
 
   
     <footer>
