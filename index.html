@@ -9,10 +9,8 @@
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="关于收键盘
-在viewDidLoad里添加以下代码 self.view.userInteractionEnabled =YES;
-UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
-initWithTarget: &hellip;">
+  <meta name="description" content="在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
+Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated. 遇到这类错误的时候， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -69,6 +67,66 @@ initWithTarget: &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/10/09/ios10/">iOS开发一些零碎的小知识（三）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-10-09T15:17:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:17 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
+Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated.</p>
+
+<p>遇到这类错误的时候，是同时对同一个数组进行了操作</p>
+
+<p>错误例子：</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx;   
+
+for (NSDictionary * dic in arrayTemp) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+
+<p>数组在遍历的同时，也对它进行移除操作，这样做程序在运行的时候会崩溃</p>
+
+<p>所以应改为</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx; 
+
+NSArray * array = [NSArray arrayWithArray: arrayTemp];  
+
+for (NSDictionary * dic in array) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -691,94 +749,6 @@ myblock(3,5);</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/10/03/git/">Git 运用技巧</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-10-03T23:37:39+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>11:37 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h1>git 运用技巧</h1>
-
-<p>最新在学ios开发，正在练习一些实战项目，今天学到一些git的运用技巧，来这里和大家分享下</p>
-
-<p>（1）git配置
-git config &ndash;global user.name &ldquo;&hellip;&hellip;.&rdquo;
-git config &ndash;global user.email &ldquo;&hellip;&hellip;..&rdquo;</p>
-
-<p>（2）下载代码
-git clone <a href="http://git.oschina.net/bbycnzi/newreader">http://git.oschina.net/bbycnzi/newreader</a>(github代码的下载地址)</p>
-
-<p>（3）添加文件
-cd newsreader(文件夹)
-git add code.md(文件名)
-git add</p>
-
-<p>（4）本地提交
-git commit -am &ldquo;提交测试代码&rdquo;</p>
-
-<p>（5）将提交推送到服务器
-git push origin master</p>
-
-<p>（6）更新本地代码
-git pull</p>
-
-<p>（7）创建分支
-分支相当于你项目的一个副本，一般修改项目得先在分支修改再整合到原项目中
-git branch v2</p>
-
-<p>（8）将分支同步到服务器
-git push origin v2</p>
-
-<p>（9）切换分支
-git checkout v2</p>
-
-<p>（10）修改v2分支，提交本地修改
-git commit -am &ldquo;v2修改&rdquo;</p>
-
-<p>（11）将提交推送到服务器
-git push origin v2</p>
-
-<p>（12）将v2分支合并到主干上
-git checkout master
-git merge v2
-git push</p>
-
-<p>（13）版本还原
-git checkout v2</p>
-
-<p>git revert HEAD
-填写描述信息</p>
-
-<p>查看本地内容是否修改</p>
-
-<p>git push origin v2
-还原到指定版本</p>
-
-<p>ps:vim命令：
-i 插入
-esc-> shift+: ->:wq  保存退出</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -794,6 +764,10 @@ esc-> shift+: ->:wq  保存退出</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/10/09/ios10/">iOS开发一些零碎的小知识（三）</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/10/04/ios9/">iOS开发一些零碎的小知识（二）</a>
       </li>
     
@@ -807,10 +781,6 @@ esc-> shift+: ->:wq  保存退出</p>
     
       <li class="post">
         <a href="/blog/2015/10/04/ios6/">AFNetworking的用法</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/10/04/ios5/">iOS多线程（NSThread）(swift)</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-04T20:52:28+08:00</updated>
+  <updated>2015-10-09T15:26:44+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,46 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS开发一些零碎的小知识（三）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/09/ios10/"/>
+    <updated>2015-10-09T15:17:29+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/09/ios10</id>
+    <content type="html"><![CDATA[<p>在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
+Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated.</p>
+
+<p>遇到这类错误的时候，是同时对同一个数组进行了操作</p>
+
+<p>错误例子：</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx;   
+
+for (NSDictionary * dic in arrayTemp) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+
+<p>数组在遍历的同时，也对它进行移除操作，这样做程序在运行的时候会崩溃</p>
+
+<p>所以应改为</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx; 
+
+NSArray * array = [NSArray arrayWithArray: arrayTemp];  
+
+for (NSDictionary * dic in array) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS开发一些零碎的小知识（二）]]></title>
@@ -172,41 +212,6 @@ NSOperationQueue* queue = manager.operationQueue;
 }];
 //开始监听
 [manager.reachabilityManager startMonitoring];
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS多线程（NSThread）(swift)]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/04/ios5/"/>
-    <updated>2015-10-04T19:40:17+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/04/ios5</id>
-    <content type="html"><![CDATA[<p>NSThread
-如果你用到的子线程要长时间使用，就用它</p>
-
-<p>1、创建一个子线程</p>
-
-<pre><code>NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil)
-
-func go(){
-    //操作
-
-}
-</code></pre>
-
-<p>2、自定义的nsthread</p>
-
-<pre><code>import UIKit
-
-class myThread: NSThread {
-//重写main方法，把子线程要做的操作放进去
-    overridefunc main() {
-    //操作
-    println("123")
-    }
-}
-let thread1 =myThread()
-thread1.start()
 </code></pre>
 ]]></content>
   </entry>

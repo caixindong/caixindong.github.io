@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Hello - Cool Guy</title>
+  <title>iOS开发一些零碎的小知识（三） - Cool Guy</title>
   <meta name="author" content="Xindong">
 
   
-  <meta name="description" content="Hello world
-">
+  <meta name="description" content="在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
+Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated. 遇到这类错误的时候， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/03/hello/">
+  <link rel="canonical" href="http://caixindong.github.io/blog/2015/10/09/ios10/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
@@ -70,7 +70,7 @@
   
   <header>
     
-      <h1 class="entry-title">Hello</h1>
+      <h1 class="entry-title">iOS开发一些零碎的小知识（三）</h1>
     
     
       <p class="meta">
@@ -79,14 +79,45 @@
 
 
 
-<time class='entry-date' datetime='2015-10-03T23:23:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>11:23 pm</span></time>
+<time class='entry-date' datetime='2015-10-09T15:17:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:17 pm</span></time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><h1>Hello world</h1>
+<div class="entry-content"><p>在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
+Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated.</p>
+
+<p>遇到这类错误的时候，是同时对同一个数组进行了操作</p>
+
+<p>错误例子：</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx;   
+
+for (NSDictionary * dic in arrayTemp) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+
+<p>数组在遍历的同时，也对它进行移除操作，这样做程序在运行的时候会崩溃</p>
+
+<p>所以应改为</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx; 
+
+NSArray * array = [NSArray arrayWithArray: arrayTemp];  
+
+for (NSDictionary * dic in array) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
 </div>
 
 
@@ -102,12 +133,12 @@
 
 
 
-<time class='entry-date' datetime='2015-10-03T23:23:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>11:23 pm</span></time>
+<time class='entry-date' datetime='2015-10-09T15:17:29+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:17 pm</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/hello/'>hello</a>
+    <a class='category' href='/blog/categories/ios/'>ios</a>
   
 </span>
 
@@ -116,7 +147,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/03/hello/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/03/hello/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://caixindong.github.io/blog/2015/10/09/ios10/" data-via="" data-counturl="http://caixindong.github.io/blog/2015/10/09/ios10/" >Tweet</a>
   
   
   
@@ -139,8 +170,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2015/10/04/ios9/" title="Previous Post: iOS开发一些零碎的小知识（二）">&laquo; iOS开发一些零碎的小知识（二）</a>
       
-        <a class="basic-alignment right" href="/blog/2015/10/03/git/" title="Next Post: git 运用技巧">git 运用技巧 &raquo;</a>
       
     </p>
   </footer>
@@ -149,7 +180,7 @@
   <section>
     <h1>Comments</h1>
     <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="/blog/2015/10/03/hello" data-title="hello" data-url="http://caixindong.github.io/blog/2015/10/03/hello/"></div>
+	<div class="ds-thread" data-thread-key="/blog/2015/10/09/ios10" data-title="iOS开发一些零碎的小知识（三）" data-url="http://caixindong.github.io/blog/2015/10/09/ios10/"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
