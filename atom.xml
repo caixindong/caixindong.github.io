@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-13T19:22:04+08:00</updated>
+  <updated>2015-10-13T23:57:10+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -443,9 +443,9 @@ dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
 
 <p>1、类的设计</p>
 
-<p>@property （nonatomic ，strong）NSString* __(NSString用strong，跟oc有关的夜用strong)</p>
+<p>@property （nonatomic ，strong）NSString* __</p>
 
-<p>@property （nonatomic ，assign）int age (其他用assign)</p>
+<p>@property （nonatomic ，assign）int age (值类型用assign)</p>
 
 <p>2、封装</p>
 
