@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-09T15:31:27+08:00</updated>
+  <updated>2015-10-13T13:06:47+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -495,7 +495,7 @@ myblock(3,5);</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Git 运用技巧]]></title>
+    <title type="html"><![CDATA[git 运用技巧]]></title>
     <link href="http://caixindong.github.io/blog/2015/10/03/git/"/>
     <updated>2015-10-03T23:37:39+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/03/git</id>
@@ -563,7 +563,7 @@ esc-> shift+: ->:wq  保存退出</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Hello]]></title>
+    <title type="html"><![CDATA[hello]]></title>
     <link href="http://caixindong.github.io/blog/2015/10/03/hello/"/>
     <updated>2015-10-03T23:23:29+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/03/hello</id>
