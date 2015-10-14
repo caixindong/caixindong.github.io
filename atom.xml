@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-13T23:57:10+08:00</updated>
+  <updated>2015-10-14T19:24:40+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,36 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[抽屉视图（MMDrawerController使用）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/14/ios11/"/>
+    <updated>2015-10-14T19:06:18+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/14/ios11</id>
+    <content type="html"><![CDATA[<p>1、初始化MMDrawerController，用这个controller装载我们的不同视图控制器</p>
+
+<pre><code>MMDrawerController* drawerController = [[MMDrawerController alloc]
+initWithCenterViewController:controller1 leftDrawerViewController:controller2];
+</code></pre>
+
+<p>controller1是主视图，controller2是左侧视图</p>
+
+<p>2、为drawerController添加打开抽屉和关闭抽屉的手势</p>
+
+<pre><code>drawerController.openDrawerGestureModeMask = MMOpenDrawerGestureModePanningCenterView;
+drawerController.closeDrawerGestureModeMask = MMCloseDrawerGestureModePanningCenterView;
+</code></pre>
+
+<p>3、打开抽屉</p>
+
+<pre><code>[drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
+</code></pre>
+
+<p>执行这个方法可以打开左侧抽屉视图，一般用作点击事件</p>
+
+<p>详细使用：<a href="https://github.com/mutualmobile/MMDrawerController">https://github.com/mutualmobile/MMDrawerController</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS开发一些零碎的小知识（三）]]></title>

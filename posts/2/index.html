@@ -7,9 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="git Git 运用技巧 git 运用技巧 最新在学ios开发，正在练习一些实战项目，今天学到一些git的运用技巧，来这里和大家分享下 （1）git配置
-git config &ndash;global user.name &ldquo;&hellip;&hellip;.&rdquo;
-git &hellip;">
+	<meta name="description" content="ios iOS OC知识点 OC知识点 1、类的设计 @property （nonatomic ，strong）NSString* __ @property （nonatomic ，assign）int age (值类型用assign) 2、封装 3、继承 4、重写 5、self指针（ &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +83,92 @@ git &hellip;">
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T00:46:33+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios1/" itemprop="url">iOS OC知识点</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h1>OC知识点</h1>
+
+<p>1、类的设计</p>
+
+<p>@property （nonatomic ，strong）NSString* __</p>
+
+<p>@property （nonatomic ，assign）int age (值类型用assign)</p>
+
+<p>2、封装</p>
+
+<p>3、继承</p>
+
+<p>4、重写</p>
+
+<p>5、self指针（类似java的this）</p>
+
+<p>6、类别（区别于继承）</p>
+
+<p>相同目的：都是无法满足需求，需要更新属性或方法拓展</p>
+
+<p>不同点：继承即能拓展成员变量，成员属性，也能够添加方法；类别，只能添加方法</p>
+
+<p>继承添加的新方法新属性，都是在子类对象中调用，而类别添加的新方法可以在原类对象直接调用</p>
+
+<p>7、内存管理（mrc模式和arc模式）</p>
+
+<p>8、代理（delegate委托，类似java的接口）</p>
+
+<p>9、copy（浅拷贝和深拷贝）</p>
+
+<p>浅拷贝还是指向原来的内存空间，而深拷贝则另外开辟新的空间</p>
+
+<p>10、单例设计模式（全局变量）</p>
+
+<p>遇到多线程时要加锁@synchronized（self）｛</p>
+
+<p>｝</p>
+
+<p>只执行一次可以加上dispatch_once(&hellip;,&hellip;.)</p>
+
+<p>11、通知中心设计模式（broadcost）</p>
+
+<p>一般用单例实现广播栈</p>
+
+<p>NSNotificationCenter</p>
+
+<p>12、block（代码块）</p>
+
+<p>int(^myblock) = ^(int a,int b){</p>
+
+<p>};
+myblock(3,5);</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
