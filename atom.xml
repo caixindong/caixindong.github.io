@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-15T16:58:13+08:00</updated>
+  <updated>2015-10-15T17:00:12+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -18,14 +18,17 @@
     <link href="http://caixindong.github.io/blog/2015/10/15/ios12/"/>
     <updated>2015-10-15T16:26:52+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/15/ios12</id>
-    <content type="html"><![CDATA[<p>一、什么是Parse?
-Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
+    <content type="html"><![CDATA[<p>一、什么是Parse?</p>
 
-<p>二、如何导入Parse的iOS SDK?
-可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
+<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
 
-<p>三、如何使用Parse为我们app实现登录注册功能
-1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
+<p>二、如何导入Parse的iOS SDK?</p>
+
+<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
+
+<p>三、如何使用Parse为我们app实现登录注册功能</p>
+
+<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
 
 <pre><code>#import &lt;Parse/Parse.h&gt;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
