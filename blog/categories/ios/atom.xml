@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-10-15T10:41:58+08:00</updated>
+  <updated>2015-10-15T16:58:13+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,61 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[利用Parse为我们的app构建后台服务]]></title>
+    <link href="http://caixindong.github.io/blog/2015/10/15/ios12/"/>
+    <updated>2015-10-15T16:26:52+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/10/15/ios12</id>
+    <content type="html"><![CDATA[<p>一、什么是Parse?
+Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
+
+<p>二、如何导入Parse的iOS SDK?
+可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
+
+<p>三、如何使用Parse为我们app实现登录注册功能
+1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
+
+<pre><code>#import &lt;Parse/Parse.h&gt;
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
+- (NSDictionary *)launchOptions {
+// Initialize Parse.
+[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
+              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
+return YES;
+}
+</code></pre>
+
+<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
+
+<pre><code>PFUser* myuser = [[PFUser alloc]init];
+myuser.username = userPhoneNum;//用户名
+myuser.password = userPassword;//密码
+myuser.email = userEmail;//邮箱
+
+[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (!succeeded) {
+        //注册失败
+    }else{
+        //注册成功
+   }
+}];
+</code></pre>
+
+<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
+
+<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
+    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+    //username和password是你提交的登录信息
+    if (user!=nil) {
+        //登录成功
+    }else{
+        //登录失败
+    }
+}];
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[抽屉视图（MMDrawerController使用）]]></title>
@@ -114,30 +169,6 @@ initWithTarget:selfaction:@selector(touchView:)];
     <updated>2015-10-04T20:11:07+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/10/04/ios8</id>
     <content type="html"><![CDATA[<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS开发一些零碎的知识点（一）]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/04/ios7/"/>
-    <updated>2015-10-04T20:04:43+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/04/ios7</id>
-    <content type="html"><![CDATA[<p>一、导航栏的创建</p>
-
-<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
-NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
-firstCon];//指定导航控制器的根视图控制器
-nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
-</code></pre>
-
-<p>二、下拉菜单的创建</p>
-
-<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
-UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
-pvc];//创建下拉菜单
-[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
-UIPopoverArrowDirectionAny animated:YES];//展示出来
-</code></pre>
 ]]></content>
   </entry>
   
