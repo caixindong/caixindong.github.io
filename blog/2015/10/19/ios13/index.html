@@ -3,11 +3,11 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>利用Parse为我们的app构建后台服务 - Cool Guy</title>
+	<title>MKLocalSearch附近兴趣点的搜索 - Cool Guy</title>
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="利用Parse为我们的app构建后台服务 一、什么是Parse? Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。 二、如何导入Parse的iOS SDK &hellip;">
+	<meta name="description" content="MKLocalSearch附近兴趣点的搜索 现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。 //实例化一个搜索请求 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -17,7 +17,7 @@
 
 	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
 	
-	<link rel="canonical" href="http://caixindong.github.io/blog/2015/10/15/ios12/">
+	<link rel="canonical" href="http://caixindong.github.io/blog/2015/10/19/ios13/">
 	<link href="/favicon.png" rel="shortcut icon">
 	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -84,51 +84,29 @@
 			
 			<div class="mid-col-container">
 				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-	<h1 class="title" itemprop="name">利用Parse为我们的app构建后台服务</h1>
-	<div class="entry-content" itemprop="articleBody"><p>一、什么是Parse?</p>
+	<h1 class="title" itemprop="name">MKLocalSearch附近兴趣点的搜索</h1>
+	<div class="entry-content" itemprop="articleBody"><p>现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。</p>
 
-<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
+<pre><code>//实例化一个搜索请求
+MKLocalSearchRequest* request = [[MKLocalSearchRequest alloc]init];
 
-<p>二、如何导入Parse的iOS SDK?</p>
+//searchStr：搜索的内容
+request.naturalLanguageQuery = searchStr;
 
-<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
+//指定搜索范围，如果用的是模拟器，可以模拟一个经纬度(23.071123, 113.404434)
+request.region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(23.071123, 113.404434),
+ 1000, 1000);
 
-<p>三、如何使用Parse为我们app实现登录注册功能</p>
+//实例化 MKLocalSearch
+MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
 
-<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作
- #import &lt;Parse/Parse.h>
-    - (BOOL)application:(UIApplication <em>)application didFinishLaunchingWithOptions:
-    - (NSDictionary </em>)launchOptions {
-    // Initialize Parse.
-    [Parse setApplicationId:@&ldquo;omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt&rdquo;
-                  clientKey:@&ldquo;hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy&rdquo;];
-    return YES;
-    } ```
-2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
-
-<pre><code>PFUser* myuser = [[PFUser alloc]init];
-myuser.username = userPhoneNum;//用户名
-myuser.password = userPassword;//密码
-myuser.email = userEmail;//邮箱
-
-[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-    if (!succeeded) {
-        //注册失败
+//开始搜索
+[localSearch startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response,
+ NSError * _Nullable error) {
+    if (response.mapItems.count==0||error!=nil) {
+        NSLog(@"error : %@",error);
     }else{
-        //注册成功
-   }
-}];
-</code></pre>
-
-<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
-
-<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
-    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-    //username和password是你提交的登录信息
-    if (user!=nil) {
-        //登录成功
-    }else{
-        //登录失败
+        //取得搜索后的结果 response.mapItems
     }
 }];
 </code></pre>
@@ -159,7 +137,7 @@ myuser.email = userEmail;//邮箱
 <section id="comment">
     <h1 class="title">Comments</h1>
     <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="/blog/2015/10/15/ios12" data-title="利用Parse为我们的app构建后台服务" data-url="http://caixindong.github.io/blog/2015/10/15/ios12/"></div>
+	<div class="ds-thread" data-thread-key="/blog/2015/10/19/ios13" data-title="MKLocalSearch附近兴趣点的搜索" data-url="http://caixindong.github.io/blog/2015/10/19/ios13/"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">

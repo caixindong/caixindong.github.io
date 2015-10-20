@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 利用Parse为我们的app构建后台服务 一、什么是Parse? Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。 二、如何导入Parse的iOS &hellip;">
+	<meta name="description" content="ios MKLocalSearch附近兴趣点的搜索 现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。 // &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -101,6 +101,65 @@
   
 
 
+<time datetime="2015-10-19T23:42:39+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/19/ios13/" itemprop="url">MKLocalSearch附近兴趣点的搜索</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。</p>
+
+<pre><code>//实例化一个搜索请求
+MKLocalSearchRequest* request = [[MKLocalSearchRequest alloc]init];
+
+//searchStr：搜索的内容
+request.naturalLanguageQuery = searchStr;
+
+//指定搜索范围，如果用的是模拟器，可以模拟一个经纬度(23.071123, 113.404434)
+request.region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(23.071123, 113.404434),
+ 1000, 1000);
+
+//实例化 MKLocalSearch
+MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
+
+//开始搜索
+[localSearch startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response,
+ NSError * _Nullable error) {
+    if (response.mapItems.count==0||error!=nil) {
+        NSLog(@"error : %@",error);
+    }else{
+        //取得搜索后的结果 response.mapItems
+    }
+}];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2015-10-15T16:26:52+08:00" data-updated="true" itemprop="datePublished"></time></div>
 		<div class="tags">
 
@@ -123,19 +182,16 @@
 
 <p>三、如何使用Parse为我们app实现登录注册功能</p>
 
-<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
-
-<pre><code>#import &lt;Parse/Parse.h&gt;
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
-- (NSDictionary *)launchOptions {
-// Initialize Parse.
-[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
-              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
-return YES;
-}
-</code></pre>
-
-<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
+<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作
+ #import &lt;Parse/Parse.h>
+    - (BOOL)application:(UIApplication <em>)application didFinishLaunchingWithOptions:
+    - (NSDictionary </em>)launchOptions {
+    // Initialize Parse.
+    [Parse setApplicationId:@&ldquo;omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt&rdquo;
+                  clientKey:@&ldquo;hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy&rdquo;];
+    return YES;
+    } ```
+2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
 
 <pre><code>PFUser* myuser = [[PFUser alloc]init];
 myuser.username = userPhoneNum;//用户名
@@ -733,109 +789,6 @@ myoperation.removeDependency(myoperation1)  //移除依赖
 <p> 10、一直等到操作执行完</p>
 
 <pre><code>myoperation.waitUntilFinished()
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T11:10:31+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios3/" itemprop="url">iOS多线程（GCD)(swift)</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>实现iOS多线程主要有三种方式</h1>
-
-<p>一、GCD</p>
-
-<p>他是苹果设计的在底层管理线程的方法
-GCD最主要的概念就是队列，可分为两种类型，一为串行队列，二为并行队列，开发时用到的有三种队列：主队列、全局队列、自定义队列</p>
-
-<p>1、创建gcd队列</p>
-
-<pre><code>let myQueue:dispatch_queue_t =dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0)
-
-//第一个参数是优先级
-//用异步方式执行队列里的方法      
-dispatch_async(myQueue, { () -&gt;Void in
-        //任务
-    })
-</code></pre>
-
-<p>2、自定义队列</p>
-
-<pre><code>let myqueue2:dispatch_queue_t = dispatch_queue_create("xindong.com",
-DISPATCH_QUEUE_CONCURRENT)
-//最后一个参数指的是并行的队列，还有一个是DISPATCH_QUEUE_SERIAL(串行)
-</code></pre>
-
-<p>3、延迟执行</p>
-
-<pre><code>let myTime:dispatch_time_t=dispatch_time(DISPATCH_TIME_NOW, 
-(Int64)(NSEC_PER_SEC*2))
-//后面那个参数代表两秒，苹果公司建议这样写，这是转化为gcd能读懂的时间
-
-dispatch_after(myTime,dispatch_get_main_queue(), { () -&gt;Void in
-        //任务
-    })//苹果公司建议用主队列
-
-4、多次执行
-    dispatch_apply(3,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0))
-     { (UInt index) -&gt; Voidin
-        //任务
-    }//执行3次，一般放在并行队列中
-    //他是一个同步操作会阻塞主线程，所以一般放在异步执行的代码里
-</code></pre>
-
-<p>5、调度组</p>
-
-<pre><code>    let mygroup =dispatch_group_create()//创建调度组
-    dispatch_group_async(mygroup, myQueue) { () -&gt;Void in
-    //异步执行调度组里面的内容
-        //加载图片数据
-        dispatch_async(dispatch_get_main_queue(), { () -&gt;Void in
-            //主线程更新ui
-        })
-    }       dispatch_group_notify(mygroup,dispatch_get_main_queue()) { () -&gt;Void in
-        //这个方法在调度组里面的内容全部执行完毕后调用
-    }
-
-dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
-//一直等到调度组执行完，在执行下面的，这是一个同步操作，会阻塞主线程
-</code></pre>
-
-<p>6、暂停队列</p>
-
-<pre><code>dispatch_suspend(myQueue)//不能暂停主队列和系统队列
-</code></pre>
-
-<p>7、恢复队列</p>
-
-<pre><code>    dispatch_resume(myQueue)
 </code></pre>
 
 		
