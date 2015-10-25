@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios MKLocalSearch附近兴趣点的搜索 现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。 // &hellip;">
+	<meta name="description" content="ios 为项目添加定位和导航功能 现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。 1、添加MapView并且实例化它 MKMapView* myMapView &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,175 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-25T10:10:17+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/25/ios14/" itemprop="url">为项目添加定位和导航功能</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。</p>
+
+<p>1、添加MapView并且实例化它</p>
+
+<pre><code>MKMapView* myMapView = = [[MKMapView alloc]initWithFrame:self.view.frame];
+
+//让MapView显示当前位置
+[myMapView setShowsUserLocation:YES];
+
+//设置代理（MKMapViewDelegate）
+myMapView.delegate = self;
+[self.view addSubview:myMapView];
+</code></pre>
+
+<p>2、声明CLLocationManager并且实例化它，实现定位功能</p>
+
+<pre><code>CLLocationManager* manager;
+if (manager==nil) {
+    manager = [[CLLocationManager alloc]init];
+    if ([manager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+        [_manager requestWhenInUseAuthorization];
+
+        //设置代理（CLLocationManagerDelegate）
+        manager.delegate = self;
+
+        //设置定位精度
+        manager.desiredAccuracy = kCLLocationAccuracyBest;
+
+        //设置距离筛选
+        manager.distanceFilter = 100;
+    }
+}
+//开始定位
+[manager startUpdatingLocation];
+</code></pre>
+
+<p>注意：使用定位时记得在Info.plist添加NSLocationWhenInUseUsageDescription这个键值</p>
+
+<p>3、实现CLLocationManagerDelegate的方法</p>
+
+<pre><code>//定位成功的回调
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray&lt;CLLocation *&gt; *)locations{
+    //获取定位成功的经纬度
+    CLLocation* location1 = locations.firstObject;
+    CLLocationCoordinate2D centerCoordinate2D = location1.coordinate;
+
+    //为MapView添加大头针
+     MKPointAnnotation* localAnnotstion = [[MKPointAnnotation alloc]init];
+    localAnnotstion.coordinate = centerCoordinate2D;
+    localAnnotstion.title = @"当前位置";
+    [_myMapView addAnnotation:localAnnotstion];
+
+    //设置MapView的显示区域
+    MKCoordinateRegion region1 = MKCoordinateRegionMakeWithDistance(centerCoordinate2D, 500, 500);
+    [myMapView setRegion:[myMapView regionThatFits:region1] animated:YES];
+
+    //定位成功就导航，设置导航路线的起点
+    MKPlacemark* localPlacemark = [[MKPlacemark alloc]initWithCoordinate:centerCoordinate2D addressDictionary:nil];
+    MKMapItem* fromItem = [[MKMapItem alloc]initWithPlacemark:localPlacemark];
+
+    //createLineFromCurrentSite是我自己写的方法，用来获取导航路线和获取导航步骤
+    //myItem指导航的终点，它实例化参考上面fromItem的实例化
+    [self createLineFromCurrentSite:fromItem to:myItem];
+
+    //停止定位
+    [manager stopUpdatingLocation];
+
+}
+
+//定位失败的回调
+-(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
+NSLog(@"guide error is %@",error);
+}
+</code></pre>
+
+<p>4、createLineFromCurrentSite方法的实现，用来用来获取导航路线和获取导航步骤</p>
+
+<pre><code>-(void)createLineFromCurrentSite:(MKMapItem*) fromItem to:(MKMapItem*)toItem{
+    //实例化导航请求
+    MKDirectionsRequest* request = [[MKDirectionsRequest alloc]init];
+
+    //设置导航的起点和终点
+    request.source = fromItem;
+    request.destination = toItem;
+
+    //为no时只显示一条导航路线
+    request.requestsAlternateRoutes = NO;
+
+    //实例化MKDirections
+    MKDirections* directions = [[MKDirections alloc]initWithRequest:request];
+
+    //如果当前导航好没结束，就取消下一次导航请求
+    if (directions.calculating) {
+        [directions cancel];
+    }
+
+    //开始导航，在block里面写回调的方法
+    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse * _Nullable response, NSError * _Nullable error) {
+        if (response.routes.count==0|| error) {
+        //导航失败
+            NSLog(@"directions error is %@",error);
+        }else{
+        //导航成功
+            for (MKRoute* route in response.routes) {
+                for (MKRouteStep* step in route.steps) {
+               //打印导航的步骤
+                NSLog(@"导航:%@", step.instructions);
+            }
+        //将导航路线添加到MapView上面
+        [myMapView addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
+        }
+    }
+    }];
+}
+</code></pre>
+
+<p>5、实现MKMapViewDelegate的方法</p>
+
+<pre><code>//通过这个方法来帮我们绘制导航路线
+-(MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id&lt;MKOverlay&gt;)overlay{
+    if ([overlay isKindOfClass:[MKPolyline class]]) {
+        //设置渲染器
+        MKPolylineRenderer* renderer = [[MKPolylineRenderer alloc]initWithPolyline:overlay];
+
+        //设置线的长度
+        [renderer setLineWidth:2];
+
+        //设置线的颜色
+        [renderer setStrokeColor:[UIColor redColor]];
+        return renderer;
+}
+    return nil;
+
+}
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -668,127 +837,6 @@ class myThread: NSThread {
 }
 let thread1 =myThread()
 thread1.start()
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T11:29:28+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios4/" itemprop="url">iOS多线程（NSOperation）(swift)</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>NSOperation</p>
-
-<p>相比于gcd，它更好地控制和处理大量的并发操作.
-NSOperation 封装了需要的代码,NSOperation是抽象基类，一般我们使用系统提供的子类或者自定义子类来继承它.
-NSOperationQueue是操作队列，专门用来调度和管理NSOperation.</p>
-
-<p>1、创建一个系统提供的nsoperation</p>
-
-<pre><code>let myoperation = NSBlockOperation { 
-    () -&gt;Voidin
-        //操作
-    }
-</code></pre>
-
-<p>2、创建一个nsoperationqueue,并添加nsoperation,这样nsoperation对象就会执行</p>
-
-<pre><code>NSOperationQueue().addOperation(myoperation)
-</code></pre>
-
-<p>3、不使用nsoperationqueue执行，，也可这样执行，不过这个操作时同步的，一般不推荐这种方法，一般用与nsoperationqueue相结合使用的方法</p>
-
-<pre><code>myoperation.start()
-myoperation.cancel()//取消操作
-</code></pre>
-
-<p>4、nsoperation回调</p>
-
-<pre><code>myoperation.completionBlock = { 
-    }
-</code></pre>
-
-<p>5、在原有的nsoperation再添加操作，nsoperation里面的操作时并行的</p>
-
-<pre><code>myoperation.addExecutionBlock { () -&gt;Voidin
-        //第二个操作
-    }
-</code></pre>
-
-<p>6、自定义nsoperation，即实现main（）方法</p>
-
-<pre><code>import UIKit
-protocol opCompletionDelegate{//代理
-func opCompletion()
-}
-class wkoperation: NSOperation {
-var delegate:opCompletionDelegate?//运用代理通知类中的主线程更新ui
-overridefunc main() {
-    super.main()
-    //操作
-    if let mydelegate =self.delegate{
-        mydelegate.opCompletion()
-    }
-  }
-}
-//调用的类：
-let myoperation1 =wkoperation()
-myoperation1.delegate =self
-NSOperationQueue().addOperation(myoperation1)
-}
-func opCompletion() {
-
-}
-</code></pre>
-
-<p>7、依赖关系</p>
-
-<pre><code>myoperation.addDependency(myoperation1)
-//myoperation依赖于myoperation1，myoperation1执行完再执行myoperation
-
-myoperation.removeDependency(myoperation1)  //移除依赖
-</code></pre>
-
-<p>8、设置优先级，并不一定能保证系统按照优先级的顺序执行，只是让系统分配资源的时候更倾向于优先级高的</p>
-
-<pre><code>myoperation.queuePriority =NSOperationQueuePriority.VeryLow
-</code></pre>
-
-<p>9、设置队列并行的最大操作数，等于1相当于串行</p>
-
-<pre><code>let myoperationqueue =NSOperationQueue()
-    myoperationqueue.maxConcurrentOperationCount =2
-</code></pre>
-
-<p> 10、一直等到操作执行完</p>
-
-<pre><code>myoperation.waitUntilFinished()
 </code></pre>
 
 		

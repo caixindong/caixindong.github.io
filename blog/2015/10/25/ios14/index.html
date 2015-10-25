@@ -1,0 +1,292 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>为项目添加定位和导航功能 - Cool Guy</title>
+	<meta name="author" content="Xindong">
+
+	
+	<meta name="description" content="为项目添加定位和导航功能 现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。 1、添加MapView并且实例化它 MKMapView* myMapView = = [[ &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://caixindong.github.io/blog/2015/10/25/ios14/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img alt='Profile Picture' src='/images/touxiang.jpeg' style='width: 160px;'>");
+	</script>
+</div>
+<h1><a href="/">Cool Guy</a></h1>
+<p class="subtitle">Blog like a hacker.</p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/aboutme">AboutMe</a></li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/3872004666/profile?topnav=1&wvr=6" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="http://git.oschina.net/xindong" title="GitHub">GitHub</a>
+		
+		
+		<a class="dribbble" href="http://www.dribbble.com/allenhsu" title="Dribbble">Dribbble</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+<hgroup>
+
+</hgroup>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">为项目添加定位和导航功能</h1>
+	<div class="entry-content" itemprop="articleBody"><p>现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。</p>
+
+<p>1、添加MapView并且实例化它</p>
+
+<pre><code>MKMapView* myMapView = = [[MKMapView alloc]initWithFrame:self.view.frame];
+
+//让MapView显示当前位置
+[myMapView setShowsUserLocation:YES];
+
+//设置代理（MKMapViewDelegate）
+myMapView.delegate = self;
+[self.view addSubview:myMapView];
+</code></pre>
+
+<p>2、声明CLLocationManager并且实例化它，实现定位功能</p>
+
+<pre><code>CLLocationManager* manager;
+if (manager==nil) {
+    manager = [[CLLocationManager alloc]init];
+    if ([manager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+        [_manager requestWhenInUseAuthorization];
+
+        //设置代理（CLLocationManagerDelegate）
+        manager.delegate = self;
+
+        //设置定位精度
+        manager.desiredAccuracy = kCLLocationAccuracyBest;
+
+        //设置距离筛选
+        manager.distanceFilter = 100;
+    }
+}
+//开始定位
+[manager startUpdatingLocation];
+</code></pre>
+
+<p>注意：使用定位时记得在Info.plist添加NSLocationWhenInUseUsageDescription这个键值</p>
+
+<p>3、实现CLLocationManagerDelegate的方法</p>
+
+<pre><code>//定位成功的回调
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray&lt;CLLocation *&gt; *)locations{
+    //获取定位成功的经纬度
+    CLLocation* location1 = locations.firstObject;
+    CLLocationCoordinate2D centerCoordinate2D = location1.coordinate;
+
+    //为MapView添加大头针
+     MKPointAnnotation* localAnnotstion = [[MKPointAnnotation alloc]init];
+    localAnnotstion.coordinate = centerCoordinate2D;
+    localAnnotstion.title = @"当前位置";
+    [_myMapView addAnnotation:localAnnotstion];
+
+    //设置MapView的显示区域
+    MKCoordinateRegion region1 = MKCoordinateRegionMakeWithDistance(centerCoordinate2D, 500, 500);
+    [myMapView setRegion:[myMapView regionThatFits:region1] animated:YES];
+
+    //定位成功就导航，设置导航路线的起点
+    MKPlacemark* localPlacemark = [[MKPlacemark alloc]initWithCoordinate:centerCoordinate2D addressDictionary:nil];
+    MKMapItem* fromItem = [[MKMapItem alloc]initWithPlacemark:localPlacemark];
+
+    //createLineFromCurrentSite是我自己写的方法，用来获取导航路线和获取导航步骤
+    //myItem指导航的终点，它实例化参考上面fromItem的实例化
+    [self createLineFromCurrentSite:fromItem to:myItem];
+
+    //停止定位
+    [manager stopUpdatingLocation];
+
+}
+
+//定位失败的回调
+-(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
+NSLog(@"guide error is %@",error);
+}
+</code></pre>
+
+<p>4、createLineFromCurrentSite方法的实现，用来用来获取导航路线和获取导航步骤</p>
+
+<pre><code>-(void)createLineFromCurrentSite:(MKMapItem*) fromItem to:(MKMapItem*)toItem{
+    //实例化导航请求
+    MKDirectionsRequest* request = [[MKDirectionsRequest alloc]init];
+
+    //设置导航的起点和终点
+    request.source = fromItem;
+    request.destination = toItem;
+
+    //为no时只显示一条导航路线
+    request.requestsAlternateRoutes = NO;
+
+    //实例化MKDirections
+    MKDirections* directions = [[MKDirections alloc]initWithRequest:request];
+
+    //如果当前导航好没结束，就取消下一次导航请求
+    if (directions.calculating) {
+        [directions cancel];
+    }
+
+    //开始导航，在block里面写回调的方法
+    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse * _Nullable response, NSError * _Nullable error) {
+        if (response.routes.count==0|| error) {
+        //导航失败
+            NSLog(@"directions error is %@",error);
+        }else{
+        //导航成功
+            for (MKRoute* route in response.routes) {
+                for (MKRouteStep* step in route.steps) {
+               //打印导航的步骤
+                NSLog(@"导航:%@", step.instructions);
+            }
+        //将导航路线添加到MapView上面
+        [myMapView addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
+        }
+    }
+    }];
+}
+</code></pre>
+
+<p>5、实现MKMapViewDelegate的方法</p>
+
+<pre><code>//通过这个方法来帮我们绘制导航路线
+-(MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id&lt;MKOverlay&gt;)overlay{
+    if ([overlay isKindOfClass:[MKPolyline class]]) {
+        //设置渲染器
+        MKPolylineRenderer* renderer = [[MKPolylineRenderer alloc]initWithPolyline:overlay];
+
+        //设置线的长度
+        [renderer setLineWidth:2];
+
+        //设置线的颜色
+        [renderer setStrokeColor:[UIColor redColor]];
+        return renderer;
+}
+    return nil;
+
+}
+</code></pre>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+ 
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2015/10/25/ios14" data-title="为项目添加定位和导航功能" data-url="http://caixindong.github.io/blog/2015/10/25/ios14/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2015 - Xindong -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>
