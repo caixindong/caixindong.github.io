@@ -95,16 +95,19 @@
 
 <p>三、如何使用Parse为我们app实现登录注册功能</p>
 
-<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作
- #import &lt;Parse/Parse.h>
-    - (BOOL)application:(UIApplication <em>)application didFinishLaunchingWithOptions:
-    - (NSDictionary </em>)launchOptions {
-    // Initialize Parse.
-    [Parse setApplicationId:@&ldquo;omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt&rdquo;
-                  clientKey:@&ldquo;hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy&rdquo;];
-    return YES;
-    } ```
-2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
+<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
+
+<pre><code>#import &lt;Parse/Parse.h&gt;
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
+- (NSDictionary *)launchOptions {
+// Initialize Parse.
+[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
+              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
+return YES;
+} 
+</code></pre>
+
+<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
 
 <pre><code>PFUser* myuser = [[PFUser alloc]init];
 myuser.username = userPhoneNum;//用户名
