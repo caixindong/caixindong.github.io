@@ -392,6 +392,17 @@ myuser.email = userEmail;//邮箱
 }];
 </code></pre>
 
+<p>4、退出当前账号</p>
+
+<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
+    if (error) {
+      //退出失败  
+    }else{
+       //退出成功 
+    }
+}];
+</code></pre>
+
 		
 		
 	</div>

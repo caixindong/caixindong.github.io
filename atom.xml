@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-11-05T09:19:20+08:00</updated>
+  <updated>2015-11-08T00:09:12+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -241,6 +241,17 @@ myuser.email = userEmail;//邮箱
         //登录成功
     }else{
         //登录失败
+    }
+}];
+</code></pre>
+
+<p>4、退出当前账号</p>
+
+<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
+    if (error) {
+      //退出失败  
+    }else{
+       //退出成功 
     }
 }];
 </code></pre>
