@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-11-08T00:09:12+08:00</updated>
+  <updated>2015-11-08T21:37:42+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,25 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[强大的FastCoder]]></title>
+    <link href="http://caixindong.github.io/blog/2015/11/08/ios15/"/>
+    <updated>2015-11-08T21:31:42+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/11/08/ios15</id>
+    <content type="html"><![CDATA[<p>FastCoder是一个Cocoa object和object graph的高性能二进制序列化格式,可以作为Property Lists和JSON的替代选择。通过两个简单的方法就可以实现任意对象和NSData之间的相互转化</p>
+
+<p>1、对象转化为NSData</p>
+
+<pre><code>NSData *data = [FastCoder dataWithRootObject:obj];
+</code></pre>
+
+<p>2、从中NSData取回对象</p>
+
+<pre><code>id obj = [FastCoder objectWithData:data];
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[为项目添加定位和导航功能]]></title>
@@ -285,46 +304,6 @@ drawerController.closeDrawerGestureModeMask = MMCloseDrawerGestureModePanningCen
 <p>执行这个方法可以打开左侧抽屉视图，一般用作点击事件</p>
 
 <p>详细使用：<a href="https://github.com/mutualmobile/MMDrawerController">https://github.com/mutualmobile/MMDrawerController</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS开发一些零碎的小知识（三）]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/09/ios10/"/>
-    <updated>2015-10-09T15:17:29+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/09/ios10</id>
-    <content type="html"><![CDATA[<p>在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
-Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated.</p>
-
-<p>遇到这类错误的时候，是同时对同一个数组进行了操作</p>
-
-<p>错误例子：</p>
-
-<pre><code>NSMutableArray * arrayTemp = xxx;   
-
-for (NSDictionary * dic in arrayTemp) {        
-
-    if (condition){            
-        [arrayTemp removeObject:dic];
-    }       
-}
-</code></pre>
-
-<p>数组在遍历的同时，也对它进行移除操作，这样做程序在运行的时候会崩溃</p>
-
-<p>所以应改为</p>
-
-<pre><code>NSMutableArray * arrayTemp = xxx; 
-
-NSArray * array = [NSArray arrayWithArray: arrayTemp];  
-
-for (NSDictionary * dic in array) {        
-
-    if (condition){            
-        [arrayTemp removeObject:dic];
-    }       
-}
-</code></pre>
 ]]></content>
   </entry>
   
