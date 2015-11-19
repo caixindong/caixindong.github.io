@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-11-19T16:31:02+08:00</updated>
+  <updated>2015-11-19T16:45:27+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,38 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[几个比较有趣的界面过渡动画]]></title>
+    <link href="http://caixindong.github.io/blog/2015/11/19/ios17/"/>
+    <updated>2015-11-19T16:35:49+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/11/19/ios17</id>
+    <content type="html"><![CDATA[<p>动画的类型依次为立方，吸走，翻转，水波，翻页，翻页回，打开相机，关闭相机</p>
+
+<pre><code>NSString *Types[]={@"cube",
+@"suckEffect",
+@"oglFlip",
+@"rippleEffect",
+@"pageCurl",
+@"pageUnCurl",
+@"cameraIrisHollowOpen",
+@"cameraIrisHollowClose"};
+</code></pre>
+
+<p>直接贴代码</p>
+
+<pre><code>CATransition *animation = [CATransition animation];
+[animation setDuration:0.8];
+//设置动画的类型
+[animation setType: @"rippleEffect"];
+//设置动画变化快慢得函数
+[animation setTimingFunction:[CAMediaTimingFunction functionWithName:
+kCAMediaTimingFunctionLinear]];
+[self.navigationController.view.layer addAnimation:animation forKey:nil];
+[self.navigationController pushViewController:tvc animated:NO];
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[强大的FastCoder]]></title>
@@ -274,36 +306,6 @@ myuser.email = userEmail;//邮箱
     }
 }];
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[抽屉视图（MMDrawerController使用）]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/14/ios11/"/>
-    <updated>2015-10-14T19:06:18+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/14/ios11</id>
-    <content type="html"><![CDATA[<p>1、初始化MMDrawerController，用这个controller装载我们的不同视图控制器</p>
-
-<pre><code>MMDrawerController* drawerController = [[MMDrawerController alloc]
-initWithCenterViewController:controller1 leftDrawerViewController:controller2];
-</code></pre>
-
-<p>controller1是主视图，controller2是左侧视图</p>
-
-<p>2、为drawerController添加打开抽屉和关闭抽屉的手势</p>
-
-<pre><code>drawerController.openDrawerGestureModeMask = MMOpenDrawerGestureModePanningCenterView;
-drawerController.closeDrawerGestureModeMask = MMCloseDrawerGestureModePanningCenterView;
-</code></pre>
-
-<p>3、打开抽屉</p>
-
-<pre><code>[drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
-</code></pre>
-
-<p>执行这个方法可以打开左侧抽屉视图，一般用作点击事件</p>
-
-<p>详细使用：<a href="https://github.com/mutualmobile/MMDrawerController">https://github.com/mutualmobile/MMDrawerController</a></p>
 ]]></content>
   </entry>
   
