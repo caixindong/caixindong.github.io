@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-11-08T23:11:21+08:00</updated>
+  <updated>2015-11-19T16:31:02+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS开发过程中遇过的一些小bug（一）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/11/19/ios16/"/>
+    <updated>2015-11-19T16:20:47+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/11/19/ios16</id>
+    <content type="html"><![CDATA[<p>  当我们在使用<code>UITableView</code>的时候或者其他类<code>UIScrollView</code>的UI组件时，我们可能会遇到UITableView顶部留有一段空白区域的情况，那是因为<code>iOS 7</code> viewcontroller新增属性<code>automaticallyAdjustsScrollViewInsets</code>，即是否根据按所在界面的navigationbar与tabbar的高度，自动调整scrollview的 inset。如果我们不想要那段空白，将<code>automaticallyAdjustsScrollViewInsets</code>这个值设为<code>NO</code>就可以解决这个问题了</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[强大的FastCoder]]></title>

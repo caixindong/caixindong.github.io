@@ -7,8 +7,8 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios, swift iOS多线程（NSThread）(swift) NSThread
-如果你用到的子线程要长时间使用，就用它 1、创建一个子线程 NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil) &hellip;">
+	<meta name="description" content="ios AFNetworking的用法 AFNeiworking 用法 1、get post请求 NSString *url1 = @"http://api.openweathermap.org/data/2.5/
+forecast/daily?lat=39.907501&amp;lon=116 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +86,137 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T19:45:43+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios6/" itemprop="url">AFNetworking的用法</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>AFNeiworking 用法</p>
+
+<p>1、get post请求</p>
+
+<pre><code>NSString *url1 = @"http://api.openweathermap.org/data/2.5/
+forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10";//测试get请求
+
+NSString *url2 =@"http://webservice.webxml.com.cn/
+WebServices/MobileCodeWS.asmx/getMobileCodeInfo";//测试post请求
+
+//创建一个请求管理类对象
+AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+//注意：此行不加也可以   
+manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer. 
+acceptableContentTypes setByAddingObject:@"text/html"];
+
+//设置请求类型
+manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+
+//设置返回类型 json AFXMLParserResponseSerializer:xml类型 AFHTTPResponseSerializer:二进制类型
+//manager.responseSerializer = [AFJSONResponseSerializer serializer];
+manager.responseSerializer = [AFXMLParserResponseSerializer serializer];
+
+//get请求
+[manager GET:url1 parameters:nil success:^(AFHTTPRequestOperation *operation,
+id responseObject) {
+    NSLog(@"%@",responseObject);
+
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    NSLog(@"%@",error);
+}];
+
+//post请求，参数不显示在正文（一个网址？后面就是正文，内容就是参数），参数设置在parameters里
+[manager POST:url2 parameters:@{@"mobileCode":@"15910514636",@"userID":@""}
+success:^(AFHTTPRequestOperation *operation,id responseObject) {
+    NSLog(@"%@",responseObject);
+
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    NSLog(@"%@",error);
+
+}];
+</code></pre>
+
+<p>2、上传</p>
+
+<pre><code>NSString* url = @"";
+
+//参数
+NSDictionary* paras =@{};
+
+//获得的数据
+NSDate* data =nil;
+AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+manager.responseSerializer = [AFJSONResponseSerializer serializer];
+
+manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.
+acceptableContentTypes   setByAddingObject:@"text/html"];
+AFHTTPRequestOperation *httpoperation = 
+[manager POST:url parameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+//构造数据，上传的数据
+    [formData appendPartWithFileData:dataname:@"upload"fileName:@"image1.jpg"mimeType:nil];
+
+} success:^(AFHTTPRequestOperation *operation,id responseObject) {
+
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+
+}];
+</code></pre>
+
+<p>3、监听网络状态</p>
+
+<pre><code>//开启网络状态指示器
+[[AFNetworkActivityIndicatorManager sharedManager]setEnabled:YES];
+//初始化监听
+AFHTTPRequestOperationManager* manager =  [[AFHTTPRequestOperationManager alloc]
+initWithBaseURL:[NSURL URLWithString:@"http://www.baidu.com"]];
+NSOperationQueue* queue = manager.operationQueue;
+
+//监听结果回调
+[manager.reachabilityManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+    switch (status) {
+        caseAFNetworkReachabilityStatusReachableViaWiFi:
+        caseAFNetworkReachabilityStatusReachableViaWWAN:
+            [queue setSuspended:NO];//设置是否挂起该进程
+            NSLog(@"have net");
+            break;
+        caseAFNetworkReachabilityStatusNotReachable:
+        default:
+            [queue setSuspended:YES];
+            NSLog(@"no");
+            break;
+    }
+}];
+//开始监听
+[manager.reachabilityManager startMonitoring];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
