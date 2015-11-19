@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-11-19T16:45:27+08:00</updated>
+  <updated>2015-11-19T16:51:26+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -42,6 +42,15 @@ kCAMediaTimingFunctionLinear]];
 [self.navigationController.view.layer addAnimation:animation forKey:nil];
 [self.navigationController pushViewController:tvc animated:NO];
 </code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS开发过程中遇过的一些小bug（一）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/11/19/ios16/"/>
+    <updated>2015-11-19T16:20:47+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/11/19/ios16</id>
+    <content type="html"><![CDATA[<p>  当我们在使用<code>UITableView</code>的时候或者其他类<code>UIScrollView</code>的UI组件时，我们可能会遇到UITableView顶部留有一段空白区域的情况，那是因为<code>iOS 7</code> viewcontroller新增属性<code>automaticallyAdjustsScrollViewInsets</code>，即是否根据按所在界面的navigationbar与tabbar的高度，自动调整scrollview的 inset。如果我们不想要那段空白，将<code>automaticallyAdjustsScrollViewInsets</code>这个值设为<code>NO</code>就可以解决这个问题了</p>
 ]]></content>
   </entry>
   
@@ -234,75 +243,6 @@ MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
         NSLog(@"error : %@",error);
     }else{
         //取得搜索后的结果 response.mapItems
-    }
-}];
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[利用Parse为我们的app构建后台服务]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/15/ios12/"/>
-    <updated>2015-10-15T16:26:52+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/15/ios12</id>
-    <content type="html"><![CDATA[<p>一、什么是Parse?</p>
-
-<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
-
-<p>二、如何导入Parse的iOS SDK?</p>
-
-<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
-
-<p>三、如何使用Parse为我们app实现登录注册功能</p>
-
-<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
-
-<pre><code>#import &lt;Parse/Parse.h&gt;
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
-- (NSDictionary *)launchOptions {
-// Initialize Parse.
-[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
-              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
-return YES;
-} 
-</code></pre>
-
-<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
-
-<pre><code>PFUser* myuser = [[PFUser alloc]init];
-myuser.username = userPhoneNum;//用户名
-myuser.password = userPassword;//密码
-myuser.email = userEmail;//邮箱
-
-[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-    if (!succeeded) {
-        //注册失败
-    }else{
-        //注册成功
-   }
-}];
-</code></pre>
-
-<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
-
-<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
-    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-    //username和password是你提交的登录信息
-    if (user!=nil) {
-        //登录成功
-    }else{
-        //登录失败
-    }
-}];
-</code></pre>
-
-<p>4、退出当前账号</p>
-
-<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
-    if (error) {
-      //退出失败  
-    }else{
-       //退出成功 
     }
 }];
 </code></pre>
