@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-11-19T16:51:26+08:00</updated>
+  <updated>2015-12-18T21:21:19+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,17 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS遇过的bug（一）]]></title>
+    <link href="http://caixindong.github.io/blog/2015/12/18/ios18/"/>
+    <updated>2015-12-18T21:12:27+08:00</updated>
+    <id>http://caixindong.github.io/blog/2015/12/18/ios18</id>
+    <content type="html"><![CDATA[<p>1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候</p>
+
+<p>2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no。苹果文档是这样说的：bitcode是被编译程序的一种中间形式的代码，包含bitcode配置的程序将会在App store上被编译和链接，bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[几个比较有趣的界面过渡动画]]></title>
@@ -212,39 +223,6 @@ NSLog(@"guide error is %@",error);
     return nil;
 
 }
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[MKLocalSearch附近兴趣点的搜索]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/19/ios13/"/>
-    <updated>2015-10-19T23:42:39+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/19/ios13</id>
-    <content type="html"><![CDATA[<p>现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。</p>
-
-<pre><code>//实例化一个搜索请求
-MKLocalSearchRequest* request = [[MKLocalSearchRequest alloc]init];
-
-//searchStr：搜索的内容
-request.naturalLanguageQuery = searchStr;
-
-//指定搜索范围，如果用的是模拟器，可以模拟一个经纬度(23.071123, 113.404434)
-request.region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(23.071123, 113.404434),
- 1000, 1000);
-
-//实例化 MKLocalSearch
-MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
-
-//开始搜索
-[localSearch startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response,
- NSError * _Nullable error) {
-    if (response.mapItems.count==0||error!=nil) {
-        NSLog(@"error : %@",error);
-    }else{
-        //取得搜索后的结果 response.mapItems
-    }
-}];
 </code></pre>
 ]]></content>
   </entry>
