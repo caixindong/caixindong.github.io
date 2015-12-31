@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios iOS遇过的bug（一） 1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候 2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no。 &hellip;">
+	<meta name="description" content="ios iOS图片压缩及上传 1、在工具类定义压缩图片的方法,传入图片和所要压缩的尺寸 +(UIImage *)imageWithImage:(UIImage *)image scaleToSize :(CGSize )newSize{ UIGraphicsBeginImageContext( &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,90 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-31T22:51:47+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/12/31/ios19/" itemprop="url">iOS图片压缩及上传</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>1、在工具类定义压缩图片的方法,传入图片和所要压缩的尺寸</p>
+
+<pre><code>+(UIImage *)imageWithImage:(UIImage *)image scaleToSize :(CGSize )newSize{
+
+UIGraphicsBeginImageContext(newSize);
+
+[image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+
+UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+
+UIGraphicsEndImageContext();
+
+return newImage;
+
+}
+</code></pre>
+
+<p>2、利用AFNetworking做图片上传功能</p>
+
+<pre><code>+(void)POSTToUrl:(NSString *)url WithData:(NSData *)data 
+    WithReturnBlock:(ReturnValueBlock)block         
+    WithErrorCodeBlock:(ErrorCodeBlock)errorBlock       
+    WithFailtureBlock:(FailureBlock)failtureBlock{
+
+    AFHTTPRequestOperationManager* manager = [[AFHTTPRequestOperationManager alloc]init];
+
+    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];     
+
+    //不设置可能会出现404的bug
+    manager.responseSerializer.acceptableContentTypes =     [manager.responseSerializer.acceptableContentTypes   setByAddingObject:@"text/html"];
+
+    [manager POST:url parameters:nil constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+        //以上传的时间为图片名
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"yyyyMMddHHmmss";
+        NSString *str = [formatter stringFromDate:[NSDate date]];
+        NSString *fileName = [NSString stringWithFormat:@"%@.png", str];
+
+        [formData appendPartWithFileData:data 
+        name:@"upload" //upload.php处理文件的字段
+        fileName:fileName //图片名字 
+        mimeType:@"image/png"];
+        }success:^(AFHTTPRequestOperation *operation,id responseObject) {
+        //上传成功
+        }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+        //上传失败
+    }
+}
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -699,57 +783,6 @@ for (NSDictionary * dic in array) {
     }       
 }
 </code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T20:45:04+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios9/" itemprop="url">iOS开发一些零碎的小知识（二）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>关于收键盘
-在viewDidLoad里添加以下代码</p>
-
-<pre><code>self.view.userInteractionEnabled =YES;
-UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
-initWithTarget:selfaction:@selector(touchView:)];
-[self.viewaddGestureRecognizer:guest];
-</code></pre>
-
-<p>然后在外部定义一个名为touchView的方法</p>
-
-<pre><code>-(void)touchView:(UITapGestureRecognizer*) recognizer{
-[self.viewendEditing:YES];
-}
-</code></pre>
-
-<p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
 
 		
 		
