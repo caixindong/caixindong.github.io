@@ -145,7 +145,8 @@ return newImage;
     //不设置可能会出现404的bug
     manager.responseSerializer.acceptableContentTypes =     [manager.responseSerializer.acceptableContentTypes   setByAddingObject:@"text/html"];
 
-    [manager POST:url parameters:nil constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+    [manager POST:url parameters:nil 
+    constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
         //以上传的时间为图片名
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         formatter.dateFormat = @"yyyyMMddHHmmss";
@@ -156,9 +157,10 @@ return newImage;
         name:@"upload" //upload.php处理文件的字段
         fileName:fileName //图片名字 
         mimeType:@"image/png"];
-        }success:^(AFHTTPRequestOperation *operation,id responseObject) {
+
+    }success:^(AFHTTPRequestOperation *operation,id responseObject) {
         //上传成功
-        }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
         //上传失败
     }
 }

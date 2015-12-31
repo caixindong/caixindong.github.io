@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2015-12-31T23:20:33+08:00</updated>
+  <updated>2015-12-31T23:23:49+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -50,7 +50,8 @@ return newImage;
     //不设置可能会出现404的bug
     manager.responseSerializer.acceptableContentTypes =     [manager.responseSerializer.acceptableContentTypes   setByAddingObject:@"text/html"];
 
-    [manager POST:url parameters:nil constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+    [manager POST:url parameters:nil 
+    constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
         //以上传的时间为图片名
         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
         formatter.dateFormat = @"yyyyMMddHHmmss";
@@ -61,9 +62,10 @@ return newImage;
         name:@"upload" //upload.php处理文件的字段
         fileName:fileName //图片名字 
         mimeType:@"image/png"];
-        }success:^(AFHTTPRequestOperation *operation,id responseObject) {
+
+    }success:^(AFHTTPRequestOperation *operation,id responseObject) {
         //上传成功
-        }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
         //上传失败
     }
 }
