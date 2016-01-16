@@ -185,11 +185,11 @@ return YES;
         notifation.repeatInterval = 0;
         notifation.soundName = UILocalNotificationDefaultSoundName;
         //通知弹窗的文本
-        notifation.alertBody = @"活动即将开始啦~\(≧▽≦)/~啦";
+        notifation.alertBody = @"推送的文本";
         //设置icon小红点
         notifation.applicationIconBadgeNumber = 1;
         //设置userinfo 方便在之后需要撤销的时候使用
-        NSDictionary* info = [NSDictionary dictionaryWithObject:@"name" forKey:@"key"];
+        NSDictionary* info = [NSDictionary dictionaryWithObject:@"通知的名字" forKey:@"key"];
         notifation.userInfo = info;
         //添加推送到UIApplication
         UIApplication* app = [UIApplication sharedApplication];
@@ -210,7 +210,7 @@ return YES;
         NSDictionary* userInfo = noti.userInfo;
         if (userInfo) {
             NSString *keyValue = [userInfo objectForKey:@"key"];
-            if ([keyValue isEqualToString:actName]) {
+            if ([keyValue isEqualToString:@"通知的名字"]) {
                 notification = noti;
                 [app cancelLocalNotification:notification];
             }
