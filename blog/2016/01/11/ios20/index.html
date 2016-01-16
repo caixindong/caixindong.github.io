@@ -172,40 +172,23 @@ return YES;
 
 <p>5、解除本地推送</p>
 
-<pre><code>UIApplication *app = [UIApplication sharedApplication];  
-//获取本地推送数组  
-NSArray *localArray = [app scheduledLocalNotifications];  
-//声明本地通知对象  
-UILocalNotification *localNotification;  
-if (localArray) {  
-    for (UILocalNotification *noti in localArray) {  
-        NSDictionary *dict = noti.userInfo;  
-        if (dict) {  
-            NSString *inKey = [dict objectForKey:@"key"];  
-            if ([inKey isEqualToString:@"对应的key值"]) {  
-                if (localNotification){  
-                    [localNotification release];  
-                    localNotification = nil;  
-            }  
-            localNotification = [noti retain];  
-            break;  
-        }  
-    }  
-}  
-
-//判断是否找到已经存在的相同key的推送  
-if (!localNotification) {  
-    //不存在初始化  
-    localNotification = [[UILocalNotification alloc] init];  
-}  
-
-if (localNotification) {  
-    //不推送 取消推送  
-    [app cancelLocalNotification:localNotification];  
-    [localNotification release];  
-    return;  
-    }  
-}  
+<pre><code>-(void)cancleLocalNotifation{
+    UIApplication* app = [UIApplication sharedApplication];
+    //获取所有本地推送
+    NSArray* localArray = [app scheduledLocalNotifications];
+    UILocalNotification* notification;
+    if (localArray) {
+        for(UILocalNotification* noti in localArray){
+        NSDictionary* userInfo = noti.userInfo;
+        if (userInfo) {
+            NSString *keyValue = [userInfo objectForKey:@"key"];
+            if ([keyValue isEqualToString:actName]) {
+                notification = noti;
+                [app cancelLocalNotification:notification];
+            }
+        }
+    }
+}
 </code></pre>
 </div>
 

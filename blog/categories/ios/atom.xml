@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-01-11T18:48:21+08:00</updated>
+  <updated>2016-01-16T17:24:48+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -105,40 +105,23 @@ return YES;
 
 <p>5、解除本地推送</p>
 
-<pre><code>UIApplication *app = [UIApplication sharedApplication];  
-//获取本地推送数组  
-NSArray *localArray = [app scheduledLocalNotifications];  
-//声明本地通知对象  
-UILocalNotification *localNotification;  
-if (localArray) {  
-    for (UILocalNotification *noti in localArray) {  
-        NSDictionary *dict = noti.userInfo;  
-        if (dict) {  
-            NSString *inKey = [dict objectForKey:@"key"];  
-            if ([inKey isEqualToString:@"对应的key值"]) {  
-                if (localNotification){  
-                    [localNotification release];  
-                    localNotification = nil;  
-            }  
-            localNotification = [noti retain];  
-            break;  
-        }  
-    }  
-}  
-
-//判断是否找到已经存在的相同key的推送  
-if (!localNotification) {  
-    //不存在初始化  
-    localNotification = [[UILocalNotification alloc] init];  
-}  
-
-if (localNotification) {  
-    //不推送 取消推送  
-    [app cancelLocalNotification:localNotification];  
-    [localNotification release];  
-    return;  
-    }  
-}  
+<pre><code>-(void)cancleLocalNotifation{
+    UIApplication* app = [UIApplication sharedApplication];
+    //获取所有本地推送
+    NSArray* localArray = [app scheduledLocalNotifications];
+    UILocalNotification* notification;
+    if (localArray) {
+        for(UILocalNotification* noti in localArray){
+        NSDictionary* userInfo = noti.userInfo;
+        if (userInfo) {
+            NSString *keyValue = [userInfo objectForKey:@"key"];
+            if ([keyValue isEqualToString:actName]) {
+                notification = noti;
+                [app cancelLocalNotification:notification];
+            }
+        }
+    }
+}
 </code></pre>
 ]]></content>
   </entry>
@@ -204,7 +187,7 @@ return newImage;
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[iOS遇过的bug（一）]]></title>
+    <title type="html"><![CDATA[iOS开发过程中遇过的一些小bug（二）]]></title>
     <link href="http://caixindong.github.io/blog/2015/12/18/ios18/"/>
     <updated>2015-12-18T21:12:27+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/12/18/ios18</id>
