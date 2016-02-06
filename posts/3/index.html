@@ -7,8 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios, swift iOS多线程（NSThread）(swift) NSThread
-如果你用到的子线程要长时间使用，就用它 1、创建一个子线程 NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil) &hellip;">
+	<meta name="description" content="ios MKLocalSearch附近兴趣点的搜索 现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。 // &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +85,549 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-19T23:42:39+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/19/ios13/" itemprop="url">MKLocalSearch附近兴趣点的搜索</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。</p>
+
+<pre><code>//实例化一个搜索请求
+MKLocalSearchRequest* request = [[MKLocalSearchRequest alloc]init];
+
+//searchStr：搜索的内容
+request.naturalLanguageQuery = searchStr;
+
+//指定搜索范围，如果用的是模拟器，可以模拟一个经纬度(23.071123, 113.404434)
+request.region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(23.071123, 113.404434),
+ 1000, 1000);
+
+//实例化 MKLocalSearch
+MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
+
+//开始搜索
+[localSearch startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response,
+ NSError * _Nullable error) {
+    if (response.mapItems.count==0||error!=nil) {
+        NSLog(@"error : %@",error);
+    }else{
+        //取得搜索后的结果 response.mapItems
+    }
+}];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-15T16:26:52+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/15/ios12/" itemprop="url">利用Parse为我们的app构建后台服务</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>一、什么是Parse?</p>
+
+<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
+
+<p>二、如何导入Parse的iOS SDK?</p>
+
+<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
+
+<p>三、如何使用Parse为我们app实现登录注册功能</p>
+
+<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
+
+<pre><code>#import &lt;Parse/Parse.h&gt;
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
+- (NSDictionary *)launchOptions {
+// Initialize Parse.
+[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
+              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
+return YES;
+} 
+</code></pre>
+
+<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
+
+<pre><code>PFUser* myuser = [[PFUser alloc]init];
+myuser.username = userPhoneNum;//用户名
+myuser.password = userPassword;//密码
+myuser.email = userEmail;//邮箱
+
+[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (!succeeded) {
+        //注册失败
+    }else{
+        //注册成功
+   }
+}];
+</code></pre>
+
+<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
+
+<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
+    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+    //username和password是你提交的登录信息
+    if (user!=nil) {
+        //登录成功
+    }else{
+        //登录失败
+    }
+}];
+</code></pre>
+
+<p>4、退出当前账号</p>
+
+<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
+    if (error) {
+      //退出失败  
+    }else{
+       //退出成功 
+    }
+}];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-14T19:06:18+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/14/ios11/" itemprop="url">抽屉视图（MMDrawerController使用）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>1、初始化MMDrawerController，用这个controller装载我们的不同视图控制器</p>
+
+<pre><code>MMDrawerController* drawerController = [[MMDrawerController alloc]
+initWithCenterViewController:controller1 leftDrawerViewController:controller2];
+</code></pre>
+
+<p>controller1是主视图，controller2是左侧视图</p>
+
+<p>2、为drawerController添加打开抽屉和关闭抽屉的手势</p>
+
+<pre><code>drawerController.openDrawerGestureModeMask = MMOpenDrawerGestureModePanningCenterView;
+drawerController.closeDrawerGestureModeMask = MMCloseDrawerGestureModePanningCenterView;
+</code></pre>
+
+<p>3、打开抽屉</p>
+
+<pre><code>[drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
+</code></pre>
+
+<p>执行这个方法可以打开左侧抽屉视图，一般用作点击事件</p>
+
+<p>详细使用：<a href="https://github.com/mutualmobile/MMDrawerController">https://github.com/mutualmobile/MMDrawerController</a></p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-09T15:17:29+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/09/ios10/" itemprop="url">iOS开发一些零碎的小知识（三）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
+Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated.</p>
+
+<p>遇到这类错误的时候，是同时对同一个数组进行了操作</p>
+
+<p>错误例子：</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx;   
+
+for (NSDictionary * dic in arrayTemp) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+
+<p>数组在遍历的同时，也对它进行移除操作，这样做程序在运行的时候会崩溃</p>
+
+<p>所以应改为</p>
+
+<pre><code>NSMutableArray * arrayTemp = xxx; 
+
+NSArray * array = [NSArray arrayWithArray: arrayTemp];  
+
+for (NSDictionary * dic in array) {        
+
+    if (condition){            
+        [arrayTemp removeObject:dic];
+    }       
+}
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T20:45:04+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios9/" itemprop="url">iOS开发一些零碎的小知识（二）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>关于收键盘
+在viewDidLoad里添加以下代码</p>
+
+<pre><code>self.view.userInteractionEnabled =YES;
+UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
+initWithTarget:selfaction:@selector(touchView:)];
+[self.viewaddGestureRecognizer:guest];
+</code></pre>
+
+<p>然后在外部定义一个名为touchView的方法</p>
+
+<pre><code>-(void)touchView:(UITapGestureRecognizer*) recognizer{
+[self.viewendEditing:YES];
+}
+</code></pre>
+
+<p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T20:11:07+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios8/" itemprop="url">UIBarButtonItem随着屏幕切换变化的问题</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T20:04:43+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios7/" itemprop="url">iOS开发一些零碎的知识点（一）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>一、导航栏的创建</p>
+
+<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
+NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
+firstCon];//指定导航控制器的根视图控制器
+nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
+</code></pre>
+
+<p>二、下拉菜单的创建</p>
+
+<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
+UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
+pvc];//创建下拉菜单
+[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
+UIPopoverArrowDirectionAny animated:YES];//展示出来
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T19:45:43+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios6/" itemprop="url">AFNetworking的用法</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>AFNeiworking 用法</p>
+
+<p>1、get post请求</p>
+
+<pre><code>NSString *url1 = @"http://api.openweathermap.org/data/2.5/
+forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10";//测试get请求
+
+NSString *url2 =@"http://webservice.webxml.com.cn/
+WebServices/MobileCodeWS.asmx/getMobileCodeInfo";//测试post请求
+
+//创建一个请求管理类对象
+AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
+//注意：此行不加也可以   
+manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer. 
+acceptableContentTypes setByAddingObject:@"text/html"];
+
+//设置请求类型
+manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+
+//设置返回类型 json AFXMLParserResponseSerializer:xml类型 AFHTTPResponseSerializer:二进制类型
+//manager.responseSerializer = [AFJSONResponseSerializer serializer];
+manager.responseSerializer = [AFXMLParserResponseSerializer serializer];
+
+//get请求
+[manager GET:url1 parameters:nil success:^(AFHTTPRequestOperation *operation,
+id responseObject) {
+    NSLog(@"%@",responseObject);
+
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    NSLog(@"%@",error);
+}];
+
+//post请求，参数不显示在正文（一个网址？后面就是正文，内容就是参数），参数设置在parameters里
+[manager POST:url2 parameters:@{@"mobileCode":@"15910514636",@"userID":@""}
+success:^(AFHTTPRequestOperation *operation,id responseObject) {
+    NSLog(@"%@",responseObject);
+
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+    NSLog(@"%@",error);
+
+}];
+</code></pre>
+
+<p>2、上传</p>
+
+<pre><code>NSString* url = @"";
+
+//参数
+NSDictionary* paras =@{};
+
+//获得的数据
+NSDate* data =nil;
+AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+manager.responseSerializer = [AFJSONResponseSerializer serializer];
+
+manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.
+acceptableContentTypes   setByAddingObject:@"text/html"];
+AFHTTPRequestOperation *httpoperation = 
+[manager POST:url parameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+//构造数据，上传的数据
+    [formData appendPartWithFileData:dataname:@"upload"fileName:@"image1.jpg"mimeType:nil];
+
+} success:^(AFHTTPRequestOperation *operation,id responseObject) {
+
+} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+
+}];
+</code></pre>
+
+<p>3、监听网络状态</p>
+
+<pre><code>//开启网络状态指示器
+[[AFNetworkActivityIndicatorManager sharedManager]setEnabled:YES];
+//初始化监听
+AFHTTPRequestOperationManager* manager =  [[AFHTTPRequestOperationManager alloc]
+initWithBaseURL:[NSURL URLWithString:@"http://www.baidu.com"]];
+NSOperationQueue* queue = manager.operationQueue;
+
+//监听结果回调
+[manager.reachabilityManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+    switch (status) {
+        caseAFNetworkReachabilityStatusReachableViaWiFi:
+        caseAFNetworkReachabilityStatusReachableViaWWAN:
+            [queue setSuspended:NO];//设置是否挂起该进程
+            NSLog(@"have net");
+            break;
+        caseAFNetworkReachabilityStatusNotReachable:
+        default:
+            [queue setSuspended:YES];
+            NSLog(@"no");
+            break;
+    }
+}];
+//开始监听
+[manager.reachabilityManager startMonitoring];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -269,366 +811,13 @@ myoperation.removeDependency(myoperation1)  //移除依赖
 
 </article>
 
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T11:10:31+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios3/" itemprop="url">iOS多线程（GCD)(swift)</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>实现iOS多线程主要有三种方式</h1>
-
-<p>一、GCD</p>
-
-<p>他是苹果设计的在底层管理线程的方法
-GCD最主要的概念就是队列，可分为两种类型，一为串行队列，二为并行队列，开发时用到的有三种队列：主队列、全局队列、自定义队列</p>
-
-<p>1、创建gcd队列</p>
-
-<pre><code>let myQueue:dispatch_queue_t =dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0)
-
-//第一个参数是优先级
-//用异步方式执行队列里的方法      
-dispatch_async(myQueue, { () -&gt;Void in
-        //任务
-    })
-</code></pre>
-
-<p>2、自定义队列</p>
-
-<pre><code>let myqueue2:dispatch_queue_t = dispatch_queue_create("xindong.com",
-DISPATCH_QUEUE_CONCURRENT)
-//最后一个参数指的是并行的队列，还有一个是DISPATCH_QUEUE_SERIAL(串行)
-</code></pre>
-
-<p>3、延迟执行</p>
-
-<pre><code>let myTime:dispatch_time_t=dispatch_time(DISPATCH_TIME_NOW, 
-(Int64)(NSEC_PER_SEC*2))
-//后面那个参数代表两秒，苹果公司建议这样写，这是转化为gcd能读懂的时间
-
-dispatch_after(myTime,dispatch_get_main_queue(), { () -&gt;Void in
-        //任务
-    })//苹果公司建议用主队列
-
-4、多次执行
-    dispatch_apply(3,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0))
-     { (UInt index) -&gt; Voidin
-        //任务
-    }//执行3次，一般放在并行队列中
-    //他是一个同步操作会阻塞主线程，所以一般放在异步执行的代码里
-</code></pre>
-
-<p>5、调度组</p>
-
-<pre><code>    let mygroup =dispatch_group_create()//创建调度组
-    dispatch_group_async(mygroup, myQueue) { () -&gt;Void in
-    //异步执行调度组里面的内容
-        //加载图片数据
-        dispatch_async(dispatch_get_main_queue(), { () -&gt;Void in
-            //主线程更新ui
-        })
-    }       dispatch_group_notify(mygroup,dispatch_get_main_queue()) { () -&gt;Void in
-        //这个方法在调度组里面的内容全部执行完毕后调用
-    }
-
-dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
-//一直等到调度组执行完，在执行下面的，这是一个同步操作，会阻塞主线程
-</code></pre>
-
-<p>6、暂停队列</p>
-
-<pre><code>dispatch_suspend(myQueue)//不能暂停主队列和系统队列
-</code></pre>
-
-<p>7、恢复队列</p>
-
-<pre><code>    dispatch_resume(myQueue)
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T00:51:03+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios2/" itemprop="url">iOS TableView</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>iOS TableView 的header for section无法加载的问题</h1>
-
-<p>最近在练习的一个项目遇到重写header不加载的问题，在这里提醒下大家，重写的header要被调用，一定要重写delegate的height for header的方法才会被调用</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T00:46:33+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios1/" itemprop="url">iOS OC知识点</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>OC知识点</h1>
-
-<p>1、类的设计</p>
-
-<p>@property （nonatomic ，strong）NSString* __</p>
-
-<p>@property （nonatomic ，assign）int age (值类型用assign)</p>
-
-<p>2、封装</p>
-
-<p>3、继承</p>
-
-<p>4、重写</p>
-
-<p>5、self指针（类似java的this）</p>
-
-<p>6、类别（区别于继承）</p>
-
-<p>相同目的：都是无法满足需求，需要更新属性或方法拓展</p>
-
-<p>不同点：继承即能拓展成员变量，成员属性，也能够添加方法；类别，只能添加方法</p>
-
-<p>继承添加的新方法新属性，都是在子类对象中调用，而类别添加的新方法可以在原类对象直接调用</p>
-
-<p>7、内存管理（mrc模式和arc模式）</p>
-
-<p>8、代理（delegate委托，类似java的接口）</p>
-
-<p>9、copy（浅拷贝和深拷贝）</p>
-
-<p>浅拷贝还是指向原来的内存空间，而深拷贝则另外开辟新的空间</p>
-
-<p>10、单例设计模式（全局变量）</p>
-
-<p>遇到多线程时要加锁@synchronized（self）｛</p>
-
-<p>｝</p>
-
-<p>只执行一次可以加上dispatch_once(&hellip;,&hellip;.)</p>
-
-<p>11、通知中心设计模式（broadcost）</p>
-
-<p>一般用单例实现广播栈</p>
-
-<p>NSNotificationCenter</p>
-
-<p>12、block（代码块）</p>
-
-<p>int(^myblock) = ^(int a,int b){</p>
-
-<p>};
-myblock(3,5);</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-03T23:37:39+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/git/'>git</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/03/git/" itemprop="url">Git 运用技巧</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>git 运用技巧</h1>
-
-<p>最新在学ios开发，正在练习一些实战项目，今天学到一些git的运用技巧，来这里和大家分享下</p>
-
-<p>（1）git配置
-git config &ndash;global user.name &ldquo;&hellip;&hellip;.&rdquo;
-git config &ndash;global user.email &ldquo;&hellip;&hellip;..&rdquo;</p>
-
-<p>（2）下载代码
-git clone <a href="http://git.oschina.net/bbycnzi/newreader">http://git.oschina.net/bbycnzi/newreader</a>(github代码的下载地址)</p>
-
-<p>（3）添加文件
-cd newsreader(文件夹)
-git add code.md(文件名)
-git add</p>
-
-<p>（4）本地提交
-git commit -am &ldquo;提交测试代码&rdquo;</p>
-
-<p>（5）将提交推送到服务器
-git push origin master</p>
-
-<p>（6）更新本地代码
-git pull</p>
-
-<p>（7）创建分支
-分支相当于你项目的一个副本，一般修改项目得先在分支修改再整合到原项目中
-git branch v2</p>
-
-<p>（8）将分支同步到服务器
-git push origin v2</p>
-
-<p>（9）切换分支
-git checkout v2</p>
-
-<p>（10）修改v2分支，提交本地修改
-git commit -am &ldquo;v2修改&rdquo;</p>
-
-<p>（11）将提交推送到服务器
-git push origin v2</p>
-
-<p>（12）将v2分支合并到主干上
-git checkout master
-git merge v2
-git push</p>
-
-<p>（13）版本还原
-git checkout v2</p>
-
-<p>git revert HEAD
-填写描述信息</p>
-
-<p>查看本地内容是否修改</p>
-
-<p>git push origin v2
-还原到指定版本</p>
-
-<p>ps:vim命令：
-i 插入
-esc-> shift+: ->:wq  保存退出</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-03T23:23:29+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/hello/'>hello</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/03/hello/" itemprop="url">Hello</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>Hello world</h1>
-
-		
-		
-	</div>
-
-</article>
-
 </div>
 <nav id="pagenavi">
     
         <a href="2" class="prev">Prev</a>
     
+    
+        <a href="4" class="next">Next</a>
     
     <div class="center"><a href="/blog/archives">Blog Archives</a></div>
 </nav></div>

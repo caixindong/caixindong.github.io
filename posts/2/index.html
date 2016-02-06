@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 强大的FastCoder FastCoder是一个Cocoa object和object graph的高性能二进制序列化格式,可以作为Property Lists和JSON的替代选择。通过两个简单的方法就可以实现任意对象和NSData之间的相互转化 1、对象转化为NSData &hellip;">
+	<meta name="description" content="数据结构, 栈与队列 队列的实现(C++版) 队列 我利用链表来实现队列，实现方法： 1. 初始化一个头指针，并创建一个尾指针指向头指针 ； 2. 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点； 3. 出队时，判断队列是否为空，如果为空，则提示队列为空； &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,929 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T11:54:12+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/zhan-yu-dui-lie/'>栈与队列</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios23/" itemprop="url">队列的实现(C++版)</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>队列</h2>
+
+<p>我利用链表来实现队列，实现方法：  <br/>
+<code>1.</code> 初始化一个头指针，并创建一个尾指针指向头指针 ； <br/>
+<code>2.</code> 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点；  <br/>
+<code>3.</code> 出队时，判断队列是否为空，如果为空，则提示队列为空；如果不为空，则取出头指针指向的节点，调整头指针指向该节点指向的下一个节点，再判断此时队列是否为空，如果为空，则调整尾指针指向头指针,返回节点的值，free这个节点；  <br/>
+代码实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="c1">//链表节点</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="p">(</span><span class="n">T</span> <span class="n">x</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">val</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">MyQueue</span><span class="p">{</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">last</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">MyQueue</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="o">~</span><span class="n">MyQueue</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//判断队列是否为空</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">isEmpty</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//入队</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">offer</span><span class="p">(</span><span class="n">T</span> <span class="n">value</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">last</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">newNode</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="n">newNode</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//查看队头元素</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">peek</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;队列为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//出队</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">poll</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;队列为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">T</span> <span class="n">pVal</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">size</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">last</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">pVal</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T11:34:25+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/zhan-yu-dui-lie/'>栈与队列</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios22/" itemprop="url">栈的实现(C++版)</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>栈</h2>
+
+<p>我利用数组来实现栈，实现方法：  <br/>
+<code>1.</code> 创建MAXSIZE大小的数组用于存放数据，MAXSIZE也为栈的最大容量；  <br/>
+<code>2.</code> 当压栈时，判断栈是否满了，如果不满，就往数组里添加数据，如果满了，就提示栈溢出；  <br/>
+<code>3.</code>  当弹栈时，判断栈是否为空，如果不为空，就取出数组末尾的元素，取出后将该位置的值置为NULL，数组指针向前移动一位；如果为
+空，就提示栈为空；  <br/>
+代码实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#define MAXSIZE 4</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">MyStack</span><span class="p">{</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="n">T</span><span class="o">*</span> <span class="n">arr</span><span class="p">;</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'><span class="n">MyStack</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">T</span><span class="p">[</span><span class="n">MAXSIZE</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">~</span><span class="n">MyStack</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">delete</span> <span class="p">[]</span> <span class="n">arr</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">sizeOfStack</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//压栈</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">push</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isFull</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;栈溢出&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//弹栈</span>
+</span><span class='line'><span class="n">T</span> <span class="n">pop</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;栈为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">T</span> <span class="n">t</span> <span class="o">=</span> <span class="n">peek</span><span class="p">();</span>
+</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">t</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//查看栈顶元素</span>
+</span><span class='line'><span class="n">T</span> <span class="n">peek</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;栈为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">arr</span><span class="p">[</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//判断栈是否为空</span>
+</span><span class='line'><span class="kt">bool</span> <span class="n">isEmpty</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//判断栈是否溢出</span>
+</span><span class='line'><span class="kt">bool</span> <span class="n">isFull</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">&gt;=</span><span class="n">MAXSIZE</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T10:47:06+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/zhan-nei-cun-yu-dui-nei-cun/'>栈内存与堆内存</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios21/" itemprop="url">内存栈与内存堆的区别</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>内存栈</h2>
+
+<p>又称为栈内存，它有以下特点：  <br/>
+<code>1.</code> 函数压栈和弹栈符合后进先出的原则；  <br/>
+<code>2.</code> 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域；  <br/>
+<code>3.</code> 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快；  <br/>
+<code>4.</code> 栈内存是由系统自动分配的；</p>
+
+<h2>内存堆</h2>
+
+<p>又称为堆内存，它有一下特点：  <br/>
+<code>1.</code> 他是用静态链表来存储内存的地址；  <br/>
+<code>2.</code> 堆内存是由低地址向高地址拓展，它是一块不连续的内存区域；  <br/>
+<code>3.</code> 内存块有两种状态：已使用和闲置，分配时，将内存块标志为已使用，回收时，将内存块标志为闲置；  <br/>
+<code>4.</code> 分配时，它的时间复杂度为O(n)，因为它需要遍历链表寻找闲置的内存块；  <br/>
+<code>5.</code> 内存回收的方式有两种，一种是手动回收(C,C++),一种是GC线程自动回收(Java)；  <br/>
+<code>6.</code> 标志清除算法是最基本的内存回收算法；  <br/>
+<code>7.</code> 堆内存需要程序员自己申请，并指明大小；</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-11T15:49:33+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/01/11/ios20/" itemprop="url">iOS本地推送功能实现</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>1、首先在AppDelegate注册推送</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="bp">UIApplication</span> <span class="o">*</span><span class="p">)</span><span class="nv">application</span> <span class="nf">didFinishLaunchingWithOptions:</span><span class="p">(</span><span class="bp">NSDictionary</span> <span class="o">*</span><span class="p">)</span><span class="nv">launchOptions</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="p">([</span><span class="n">application</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="nl">registerUserNotificationSettings</span><span class="p">:)])</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//注册推送, iOS 8以上</span>
+</span><span class='line'>    <span class="n">UIUserNotificationSettings</span> <span class="o">*</span><span class="n">settings</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIUserNotificationSettings</span>
+</span><span class='line'>
+</span><span class='line'>                                            <span class="nl">settingsForTypes</span><span class="p">:(</span><span class="n">UIUserNotificationTypeBadge</span> <span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>                                                              <span class="n">UIUserNotificationTypeSound</span> <span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>                                                              <span class="n">UIUserNotificationTypeAlert</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>                                            <span class="nl">categories</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="n">application</span> <span class="nl">registerUserNotificationSettings</span><span class="p">:</span><span class="n">settings</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">application</span> <span class="n">registerForRemoteNotifications</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">//注册推送, 适配系统版本iOS 8以下的手机</span>
+</span><span class='line'>    <span class="n">UIRemoteNotificationType</span> <span class="n">myTypes</span> <span class="o">=</span> <span class="n">UIRemoteNotificationTypeBadge</span> <span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">UIRemoteNotificationTypeAlert</span> <span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">UIRemoteNotificationTypeSound</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="n">application</span> <span class="nl">registerForRemoteNotificationTypes</span><span class="p">:</span><span class="n">myTypes</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="nb">YES</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2、注册成功与否的回调</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="bp">UIApplication</span> <span class="o">*</span><span class="p">)</span><span class="nv">application</span> <span class="nf">didRegisterForRemoteNotificationsWithDeviceToken:</span><span class="p">(</span><span class="bp">NSData</span><span class="o">*</span><span class="p">)</span><span class="nv">deviceToken</span> <span class="p">{</span>
+</span><span class='line'>              <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;device token is %@&quot;</span><span class="p">,</span><span class="n">deviceToken</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="bp">UIApplication</span> <span class="o">*</span><span class="p">)</span><span class="nv">application</span> <span class="nf">didFailToRegisterForRemoteNotificationsWithError:</span><span class="p">(</span><span class="bp">NSError</span> <span class="o">*</span><span class="p">)</span><span class="nv">error</span><span class="p">{</span>
+</span><span class='line'>      <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;push fail error is %@&quot;</span><span class="p">,</span><span class="n">error</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>3、获取本地通知数据回调</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">application:</span><span class="p">(</span><span class="bp">UIApplication</span> <span class="o">*</span><span class="p">)</span><span class="nv">application</span> <span class="nf">didReceiveLocalNotification:</span><span class="p">(</span><span class="bp">UILocalNotification</span> <span class="o">*</span><span class="p">)</span><span class="nv">notification</span><span class="p">{</span>
+</span><span class='line'>      <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;get notification&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="c1">//获取通知后的操作</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>4、发起本地推送</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sendLocalNotifation</span><span class="p">{</span>
+</span><span class='line'>  <span class="bp">UILocalNotification</span><span class="o">*</span> <span class="n">notifation</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">UILocalNotification</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>  <span class="c1">//当前时间5秒后</span>
+</span><span class='line'>  <span class="bp">NSDate</span><span class="o">*</span> <span class="n">pushDate</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSDate</span> <span class="nl">dateWithTimeIntervalSinceNow</span><span class="p">:</span><span class="mi">5</span><span class="p">];</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">notifation</span><span class="o">!=</span><span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//设置推送时间</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">fireDate</span> <span class="o">=</span> <span class="n">pushDate</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">//设置时区</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">timeZone</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSTimeZone</span> <span class="n">defaultTimeZone</span><span class="p">];</span>
+</span><span class='line'>      <span class="c1">//设置重复次数</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">repeatInterval</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">soundName</span> <span class="o">=</span> <span class="n">UILocalNotificationDefaultSoundName</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">//通知弹窗的文本</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">alertBody</span> <span class="o">=</span> <span class="s">@&quot;推送的文本&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">//设置icon小红点</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">applicationIconBadgeNumber</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">//设置userinfo 方便在之后需要撤销的时候使用</span>
+</span><span class='line'>      <span class="bp">NSDictionary</span><span class="o">*</span> <span class="n">info</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSDictionary</span> <span class="nl">dictionaryWithObject</span><span class="p">:</span><span class="s">@&quot;通知的名字&quot;</span> <span class="nl">forKey</span><span class="p">:</span><span class="s">@&quot;key&quot;</span><span class="p">];</span>
+</span><span class='line'>      <span class="n">notifation</span><span class="p">.</span><span class="n">userInfo</span> <span class="o">=</span> <span class="n">info</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">//添加推送到UIApplication</span>
+</span><span class='line'>      <span class="bp">UIApplication</span><span class="o">*</span> <span class="n">app</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIApplication</span> <span class="n">sharedApplication</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">[</span><span class="n">app</span> <span class="nl">scheduleLocalNotification</span><span class="p">:</span><span class="n">notifation</span><span class="p">];</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+5、解除本地推送</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-(</span><span class="kt">void</span><span class="p">)</span><span class="nf">cancleLocalNotifation</span><span class="p">{</span>
+</span><span class='line'>  <span class="bp">UIApplication</span><span class="o">*</span> <span class="n">app</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIApplication</span> <span class="n">sharedApplication</span><span class="p">];</span>
+</span><span class='line'>  <span class="c1">//获取所有本地推送</span>
+</span><span class='line'>  <span class="bp">NSArray</span><span class="o">*</span> <span class="n">localArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">app</span> <span class="n">scheduledLocalNotifications</span><span class="p">];</span>
+</span><span class='line'>  <span class="bp">UILocalNotification</span><span class="o">*</span> <span class="n">notification</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">localArray</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">for</span><span class="p">(</span><span class="bp">UILocalNotification</span><span class="o">*</span> <span class="n">noti</span> <span class="k">in</span> <span class="n">localArray</span><span class="p">){</span>
+</span><span class='line'>          <span class="bp">NSDictionary</span><span class="o">*</span> <span class="n">userInfo</span> <span class="o">=</span> <span class="n">noti</span><span class="p">.</span><span class="n">userInfo</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="n">userInfo</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="bp">NSString</span> <span class="o">*</span><span class="n">keyValue</span> <span class="o">=</span> <span class="p">[</span><span class="n">userInfo</span> <span class="nl">objectForKey</span><span class="p">:</span><span class="s">@&quot;key&quot;</span><span class="p">];</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">([</span><span class="n">keyValue</span> <span class="nl">isEqualToString</span><span class="p">:</span><span class="s">@&quot;通知的名字&quot;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">notification</span> <span class="o">=</span> <span class="n">noti</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">[</span><span class="n">app</span> <span class="nl">cancelLocalNotification</span><span class="p">:</span><span class="n">notification</span><span class="p">];</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-31T22:51:47+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/12/31/ios19/" itemprop="url">iOS图片压缩及上传</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>1、在工具类定义压缩图片的方法,传入图片和所要压缩的尺寸</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">+(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nf">imageWithImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">image</span> <span class="nl">scaleToSize</span> <span class="p">:(</span><span class="bp">CGSize</span> <span class="p">)</span><span class="n">newSize</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">UIGraphicsBeginImageContext</span><span class="p">(</span><span class="n">newSize</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="n">image</span> <span class="nl">drawInRect</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
+</span><span class='line'>
+</span><span class='line'><span class="bp">UIImage</span><span class="o">*</span> <span class="n">newImage</span> <span class="o">=</span> <span class="n">UIGraphicsGetImageFromCurrentImageContext</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">UIGraphicsEndImageContext</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">newImage</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2、利用AFNetworking做图片上传功能</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">+(</span><span class="kt">void</span><span class="p">)</span><span class="nf">POSTToUrl:</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">WithData:</span><span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span>
+</span><span class='line'>  <span class="nf">WithReturnBlock:</span><span class="p">(</span><span class="n">ReturnValueBlock</span><span class="p">)</span><span class="nv">block</span>        
+</span><span class='line'>  <span class="nf">WithErrorCodeBlock:</span><span class="p">(</span><span class="n">ErrorCodeBlock</span><span class="p">)</span><span class="nv">errorBlock</span>      
+</span><span class='line'>  <span class="nf">WithFailtureBlock:</span><span class="p">(</span><span class="n">FailureBlock</span><span class="p">)</span><span class="nv">failtureBlock</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">AFHTTPRequestOperationManager</span><span class="o">*</span> <span class="n">manager</span> <span class="o">=</span> <span class="p">[[</span><span class="n">AFHTTPRequestOperationManager</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">requestSerializer</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFHTTPRequestSerializer</span> <span class="n">serializer</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFJSONResponseSerializer</span> <span class="n">serializer</span><span class="p">];</span>     
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//不设置可能会出现404的bug</span>
+</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span><span class="p">.</span><span class="n">acceptableContentTypes</span> <span class="o">=</span>       <span class="p">[</span><span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span><span class="p">.</span><span class="n">acceptableContentTypes</span>   <span class="nl">setByAddingObject</span><span class="p">:</span><span class="s">@&quot;text/html&quot;</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="p">[</span><span class="n">manager</span> <span class="nl">POST</span><span class="p">:</span><span class="n">url</span> <span class="nl">parameters</span><span class="p">:</span><span class="nb">nil</span>
+</span><span class='line'>  <span class="nl">constructingBodyWithBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span><span class="o">&lt;</span><span class="n">AFMultipartFormData</span><span class="o">&gt;</span> <span class="n">formData</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//以上传的时间为图片名</span>
+</span><span class='line'>      <span class="bp">NSDateFormatter</span> <span class="o">*</span><span class="n">formatter</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSDateFormatter</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>      <span class="n">formatter</span><span class="p">.</span><span class="n">dateFormat</span> <span class="o">=</span> <span class="s">@&quot;yyyyMMddHHmmss&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="bp">NSString</span> <span class="o">*</span><span class="n">str</span> <span class="o">=</span> <span class="p">[</span><span class="n">formatter</span> <span class="nl">stringFromDate</span><span class="p">:[</span><span class="bp">NSDate</span> <span class="n">date</span><span class="p">]];</span>
+</span><span class='line'>      <span class="bp">NSString</span> <span class="o">*</span><span class="n">fileName</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:</span><span class="s">@&quot;%@.png&quot;</span><span class="p">,</span> <span class="n">str</span><span class="p">];</span>
+</span><span class='line'>      
+</span><span class='line'>          <span class="p">[</span><span class="n">formData</span> <span class="nl">appendPartWithFileData</span><span class="p">:</span><span class="n">data</span>
+</span><span class='line'>          <span class="nl">name</span><span class="p">:</span><span class="s">@&quot;upload&quot;</span> <span class="c1">//upload.php处理文件的字段</span>
+</span><span class='line'>          <span class="nl">fileName</span><span class="p">:</span><span class="n">fileName</span> <span class="c1">//图片名字 </span>
+</span><span class='line'>          <span class="nl">mimeType</span><span class="p">:</span><span class="s">@&quot;image/png&quot;</span><span class="p">];</span>
+</span><span class='line'>          
+</span><span class='line'>  <span class="p">}</span><span class="nl">success</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">AFHTTPRequestOperation</span> <span class="o">*</span><span class="n">operation</span><span class="p">,</span><span class="kt">id</span> <span class="n">responseObject</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//上传成功</span>
+</span><span class='line'>  <span class="p">}</span><span class="nl">failure</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">AFHTTPRequestOperation</span> <span class="o">*</span><span class="n">operation</span><span class="p">,</span><span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//上传失败</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-18T21:12:27+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/12/18/ios18/" itemprop="url">iOS开发过程中遇过的一些小bug（二）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候</p>
+
+<p>2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no。苹果文档是这样说的：bitcode是被编译程序的一种中间形式的代码，包含bitcode配置的程序将会在App store上被编译和链接，bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-19T16:35:49+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/11/19/ios17/" itemprop="url">几个比较有趣的界面过渡动画</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>动画的类型依次为立方，吸走，翻转，水波，翻页，翻页回，打开相机，关闭相机</p>
+
+<pre><code>NSString *Types[]={@"cube",
+@"suckEffect",
+@"oglFlip",
+@"rippleEffect",
+@"pageCurl",
+@"pageUnCurl",
+@"cameraIrisHollowOpen",
+@"cameraIrisHollowClose"};
+</code></pre>
+
+<p>直接贴代码</p>
+
+<pre><code>CATransition *animation = [CATransition animation];
+[animation setDuration:0.8];
+//设置动画的类型
+[animation setType: @"rippleEffect"];
+//设置动画变化快慢得函数
+[animation setTimingFunction:[CAMediaTimingFunction functionWithName:
+kCAMediaTimingFunctionLinear]];
+[self.navigationController.view.layer addAnimation:animation forKey:nil];
+[self.navigationController pushViewController:tvc animated:NO];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-19T16:20:47+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/11/19/ios16/" itemprop="url">iOS开发过程中遇过的一些小bug（一）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>  当我们在使用<code>UITableView</code>的时候或者其他类<code>UIScrollView</code>的UI组件时，我们可能会遇到UITableView顶部留有一段空白区域的情况，那是因为<code>iOS 7</code> viewcontroller新增属性<code>automaticallyAdjustsScrollViewInsets</code>，即是否根据按所在界面的navigationbar与tabbar的高度，自动调整scrollview的 inset。如果我们不想要那段空白，将<code>automaticallyAdjustsScrollViewInsets</code>这个值设为<code>NO</code>就可以解决这个问题了</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -292,549 +1215,6 @@ NSLog(@"guide error is %@",error);
     return nil;
 
 }
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-19T23:42:39+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/19/ios13/" itemprop="url">MKLocalSearch附近兴趣点的搜索</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。</p>
-
-<pre><code>//实例化一个搜索请求
-MKLocalSearchRequest* request = [[MKLocalSearchRequest alloc]init];
-
-//searchStr：搜索的内容
-request.naturalLanguageQuery = searchStr;
-
-//指定搜索范围，如果用的是模拟器，可以模拟一个经纬度(23.071123, 113.404434)
-request.region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(23.071123, 113.404434),
- 1000, 1000);
-
-//实例化 MKLocalSearch
-MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
-
-//开始搜索
-[localSearch startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response,
- NSError * _Nullable error) {
-    if (response.mapItems.count==0||error!=nil) {
-        NSLog(@"error : %@",error);
-    }else{
-        //取得搜索后的结果 response.mapItems
-    }
-}];
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-15T16:26:52+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/15/ios12/" itemprop="url">利用Parse为我们的app构建后台服务</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>一、什么是Parse?</p>
-
-<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
-
-<p>二、如何导入Parse的iOS SDK?</p>
-
-<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
-
-<p>三、如何使用Parse为我们app实现登录注册功能</p>
-
-<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
-
-<pre><code>#import &lt;Parse/Parse.h&gt;
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
-- (NSDictionary *)launchOptions {
-// Initialize Parse.
-[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
-              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
-return YES;
-} 
-</code></pre>
-
-<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
-
-<pre><code>PFUser* myuser = [[PFUser alloc]init];
-myuser.username = userPhoneNum;//用户名
-myuser.password = userPassword;//密码
-myuser.email = userEmail;//邮箱
-
-[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-    if (!succeeded) {
-        //注册失败
-    }else{
-        //注册成功
-   }
-}];
-</code></pre>
-
-<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
-
-<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
-    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-    //username和password是你提交的登录信息
-    if (user!=nil) {
-        //登录成功
-    }else{
-        //登录失败
-    }
-}];
-</code></pre>
-
-<p>4、退出当前账号</p>
-
-<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
-    if (error) {
-      //退出失败  
-    }else{
-       //退出成功 
-    }
-}];
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-14T19:06:18+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/14/ios11/" itemprop="url">抽屉视图（MMDrawerController使用）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>1、初始化MMDrawerController，用这个controller装载我们的不同视图控制器</p>
-
-<pre><code>MMDrawerController* drawerController = [[MMDrawerController alloc]
-initWithCenterViewController:controller1 leftDrawerViewController:controller2];
-</code></pre>
-
-<p>controller1是主视图，controller2是左侧视图</p>
-
-<p>2、为drawerController添加打开抽屉和关闭抽屉的手势</p>
-
-<pre><code>drawerController.openDrawerGestureModeMask = MMOpenDrawerGestureModePanningCenterView;
-drawerController.closeDrawerGestureModeMask = MMCloseDrawerGestureModePanningCenterView;
-</code></pre>
-
-<p>3、打开抽屉</p>
-
-<pre><code>[drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
-</code></pre>
-
-<p>执行这个方法可以打开左侧抽屉视图，一般用作点击事件</p>
-
-<p>详细使用：<a href="https://github.com/mutualmobile/MMDrawerController">https://github.com/mutualmobile/MMDrawerController</a></p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-09T15:17:29+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/09/ios10/" itemprop="url">iOS开发一些零碎的小知识（三）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>在IOS开发中，我们经常用的NSArray或者NSMutableArray ,但是当使用不当的时候，会有下面的错误提示。
-Collection &lt;__NSArrayM: 0xxxxxxx> was mutated while being enumerated.</p>
-
-<p>遇到这类错误的时候，是同时对同一个数组进行了操作</p>
-
-<p>错误例子：</p>
-
-<pre><code>NSMutableArray * arrayTemp = xxx;   
-
-for (NSDictionary * dic in arrayTemp) {        
-
-    if (condition){            
-        [arrayTemp removeObject:dic];
-    }       
-}
-</code></pre>
-
-<p>数组在遍历的同时，也对它进行移除操作，这样做程序在运行的时候会崩溃</p>
-
-<p>所以应改为</p>
-
-<pre><code>NSMutableArray * arrayTemp = xxx; 
-
-NSArray * array = [NSArray arrayWithArray: arrayTemp];  
-
-for (NSDictionary * dic in array) {        
-
-    if (condition){            
-        [arrayTemp removeObject:dic];
-    }       
-}
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T20:45:04+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios9/" itemprop="url">iOS开发一些零碎的小知识（二）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>关于收键盘
-在viewDidLoad里添加以下代码</p>
-
-<pre><code>self.view.userInteractionEnabled =YES;
-UITapGestureRecognizer* guest = [[UITapGestureRecognizeralloc]
-initWithTarget:selfaction:@selector(touchView:)];
-[self.viewaddGestureRecognizer:guest];
-</code></pre>
-
-<p>然后在外部定义一个名为touchView的方法</p>
-
-<pre><code>-(void)touchView:(UITapGestureRecognizer*) recognizer{
-[self.viewendEditing:YES];
-}
-</code></pre>
-
-<p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T20:11:07+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios8/" itemprop="url">UIBarButtonItem随着屏幕切换变化的问题</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T20:04:43+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios7/" itemprop="url">iOS开发一些零碎的知识点（一）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>一、导航栏的创建</p>
-
-<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
-NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
-firstCon];//指定导航控制器的根视图控制器
-nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
-</code></pre>
-
-<p>二、下拉菜单的创建</p>
-
-<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
-UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
-pvc];//创建下拉菜单
-[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
-UIPopoverArrowDirectionAny animated:YES];//展示出来
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T19:45:43+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios6/" itemprop="url">AFNetworking的用法</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>AFNeiworking 用法</p>
-
-<p>1、get post请求</p>
-
-<pre><code>NSString *url1 = @"http://api.openweathermap.org/data/2.5/
-forecast/daily?lat=39.907501&amp;lon=116.397232&amp;cnt=10";//测试get请求
-
-NSString *url2 =@"http://webservice.webxml.com.cn/
-WebServices/MobileCodeWS.asmx/getMobileCodeInfo";//测试post请求
-
-//创建一个请求管理类对象
-AFHTTPRequestOperationManager* manager = [AFHTTPRequestOperationManager manager];
-//注意：此行不加也可以   
-manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer. 
-acceptableContentTypes setByAddingObject:@"text/html"];
-
-//设置请求类型
-manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-
-//设置返回类型 json AFXMLParserResponseSerializer:xml类型 AFHTTPResponseSerializer:二进制类型
-//manager.responseSerializer = [AFJSONResponseSerializer serializer];
-manager.responseSerializer = [AFXMLParserResponseSerializer serializer];
-
-//get请求
-[manager GET:url1 parameters:nil success:^(AFHTTPRequestOperation *operation,
-id responseObject) {
-    NSLog(@"%@",responseObject);
-
-} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
-    NSLog(@"%@",error);
-}];
-
-//post请求，参数不显示在正文（一个网址？后面就是正文，内容就是参数），参数设置在parameters里
-[manager POST:url2 parameters:@{@"mobileCode":@"15910514636",@"userID":@""}
-success:^(AFHTTPRequestOperation *operation,id responseObject) {
-    NSLog(@"%@",responseObject);
-
-} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
-    NSLog(@"%@",error);
-
-}];
-</code></pre>
-
-<p>2、上传</p>
-
-<pre><code>NSString* url = @"";
-
-//参数
-NSDictionary* paras =@{};
-
-//获得的数据
-NSDate* data =nil;
-AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-manager.responseSerializer = [AFJSONResponseSerializer serializer];
-
-manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.
-acceptableContentTypes   setByAddingObject:@"text/html"];
-AFHTTPRequestOperation *httpoperation = 
-[manager POST:url parameters:paras constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
-//构造数据，上传的数据
-    [formData appendPartWithFileData:dataname:@"upload"fileName:@"image1.jpg"mimeType:nil];
-
-} success:^(AFHTTPRequestOperation *operation,id responseObject) {
-
-} failure:^(AFHTTPRequestOperation *operation,NSError *error) {
-
-}];
-</code></pre>
-
-<p>3、监听网络状态</p>
-
-<pre><code>//开启网络状态指示器
-[[AFNetworkActivityIndicatorManager sharedManager]setEnabled:YES];
-//初始化监听
-AFHTTPRequestOperationManager* manager =  [[AFHTTPRequestOperationManager alloc]
-initWithBaseURL:[NSURL URLWithString:@"http://www.baidu.com"]];
-NSOperationQueue* queue = manager.operationQueue;
-
-//监听结果回调
-[manager.reachabilityManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-    switch (status) {
-        caseAFNetworkReachabilityStatusReachableViaWiFi:
-        caseAFNetworkReachabilityStatusReachableViaWWAN:
-            [queue setSuspended:NO];//设置是否挂起该进程
-            NSLog(@"have net");
-            break;
-        caseAFNetworkReachabilityStatusNotReachable:
-        default:
-            [queue setSuspended:YES];
-            NSLog(@"no");
-            break;
-    }
-}];
-//开始监听
-[manager.reachabilityManager startMonitoring];
 </code></pre>
 
 		

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 算法 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-06T22:24:43+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[八大排序算法--基数排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios33/"/>
+    <updated>2016-02-06T22:22:28+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios33</id>
+    <content type="html"><![CDATA[<h2>基数排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+/**
+ arr 排列的数组
+ d 数据的位数 （1,10,100）
+ n 数据的个数
+ **/
+void radixSort(int arr[],int d,int n){
+    //当前位数
+    int currentD = 1;
+    //arr的索引
+    int k = 0;
+    //10个桶,记得初始化
+    int countInBucket[10]  = {0};
+    //存储每次桶排序后的结果
+    int bucket[10][n];
+
+    while (currentD&lt;d) {
+        for (int i=0; i&lt;n; i++) {
+            //用于比较的位上的数
+            int j = (arr[i]/currentD)%10;
+            bucket[j][countInBucket[j]] = arr[i];
+            //桶内元素个数+1
+            countInBucket[j]++;
+        }
+        for (int i=0; i&lt;10; i++) {
+                //桶内有元素
+            if (countInBucket[i]!=0) {
+                for (int j =0; j&lt;countInBucket[i]; j++) {
+                    arr[k] = bucket[i][j];
+                    k++;
+                }
+            }
+            countInBucket[i] = 0;
+        }
+        k = 0;
+        currentD = currentD*10;
+    }
+
+}
+
+
+int main(int argc, const char * argv[]) {
+    int a[] = {12,3,1,4,2,5,4,8,5,4,3,9,4,0};
+    radixSort(a, 100, 14);
+    for (int i=0; i&lt;14; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[八大排序算法--归并排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios32/"/>
+    <updated>2016-02-06T22:19:21+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios32</id>
+    <content type="html"><![CDATA[<h2>归并排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+void mergeArr(int first,int mid,int last,int a[],int tmp[]){
+    int i = first;
+    int j = mid+1;
+    int n = mid ;
+    int m = last;
+    int k = 0;
+    while (i&lt;=n&amp;&amp;j&lt;=m) {
+        if (a[i]&lt;a[j]) {
+            tmp[k++] = a[i++];
+        }else{
+            tmp[k++] = a[j++];
+        }
+
+    }
+    while (i&lt;=n) {
+        tmp[k++] = a[i++];
+    }
+    while(j&lt;=m) {
+        tmp[k++] = a[j++];
+    }
+    for (int i=0; i&lt;k; i++) {
+        a[first+i] = tmp[i];
+    }
+}
+
+void mergeSort(int first ,int last,int a[],int tmp[]){
+    if (first&lt;last) {
+        int mid = (first+last)/2;
+        mergeSort(first, mid, a, tmp);
+        mergeSort(mid+1, last, a, tmp);
+        mergeArr(first, mid, last, a, tmp);
+    }
+}
+
+void MergeSort(int n,int a[]){
+    int *tmp = new int[n];
+    mergeSort(0, n-1, a, tmp);
+    delete [] tmp;
+}
+int main(int argc, const char * argv[]) {
+    int a[] = {2,4,1,8,6,7,9};
+    MergeSort(7,a);
+    for (int i=0; i&lt;7; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[八大排序算法--冒泡排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios30/"/>
+    <updated>2016-02-06T22:15:23+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios30</id>
+    <content type="html"><![CDATA[<h2>冒泡排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+
+void mySwap(int &amp;a,int &amp;b){
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+void bubbleSort(int n,int a[]){
+    for (int i=0; i&lt;n; i++) {
+        for (int j = 0; j&lt;n-i-1; j++) {
+            if (a[j]&lt;a[j+1]) {
+                mySwap(a[j], a[j+1]);
+            }
+        }
+    }
+}
+
+
+int main(int argc, const char * argv[]) {
+    int a[] = {2,7,4,1,8,9,6,5};
+    bubbleSort(8, a);
+    for (int i=0; i&lt;8; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[八大排序算法--简单选择排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios28/"/>
+    <updated>2016-02-06T22:11:04+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios28</id>
+    <content type="html"><![CDATA[<h2>简单选择排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+void printArr(int n,int a[]){
+    for (int i=0; i&lt;n; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+}
+
+void simpleSelectionSort(int n,int a[]){
+    for (int i=0; i&lt;n; i++) {
+        int k = i;
+        int tmp;
+        for (int j = i+1; j&lt;n; j++) {
+            if (a[j]&lt;a[k]) {
+                k = j;
+            }
+        }
+        tmp = a[i];
+        a[i] = a[k];
+        a[k] = tmp;
+        printArr(n, a);
+    }
+
+}
+
+int main(int argc, const char * argv[]) {
+    int a[] = {2,4,5,1,9,8,6,4,5};
+
+    simpleSelectionSort(9, a);
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[八大排序算法--希尔排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios27/"/>
+    <updated>2016-02-06T22:08:07+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios27</id>
+    <content type="html"><![CDATA[<h2>希尔排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+void printArr(int n,int a[]){
+    for (int i=0; i&lt;n; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+}
+
+void directInsertSort(int dk,int n,int a[]){
+    for (int i = dk; i&lt;n; i++) {
+        if (a[i]&lt;a[i-dk]) {
+            int x = a[i];
+            int j = i-dk;
+            while (x&lt;a[j]) {
+                a[j+dk] = a[j];
+                j = j-dk;
+            }
+            a[j+dk] = x;
+        }
+    }
+    printArr(n,a);
+}
+
+void shellSort(int n,int a[]){
+    int dk = n/2;
+    while (dk&gt;=1) {
+        directInsertSort(dk,n, a);
+        dk = dk/2;
+    }
+}
+int main(int argc, const char * argv[]) {
+    int a[] = {2,4,5,1,9,8,6,4,5};
+    shellSort(9, a);
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
