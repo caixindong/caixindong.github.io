@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构--栈与队列 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou-zhan-yu-dui-lie/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T12:26:10+08:00</updated>
+  <updated>2016-02-06T15:11:59+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[利用队列实现栈]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios24/"/>
+    <updated>2016-02-06T14:50:43+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios24</id>
+    <content type="html"><![CDATA[<h2>C++库中的queue:</h2>
+
+<p>queue 模板类的定义在\<queue>头文件中  <br/>
+queue 的基本操作有：  <br/>
+<code>1.</code> 入队：q.push(x);  <br/>
+<code>2.</code> 出队：q.pop(),注意它不返回元素的值;  <br/>
+<code>3.</code> 访问队首元素： q.front();  <br/>
+<code>4.</code> 访问队尾元素： q.back();  <br/>
+<code>5.</code> 队列的元素个数： q.size();  <br/>
+<code>6.</code> 判断队列是否为空： q.empty();</p>
+
+<h2>我们利用队列的这些特点来实现我们的栈</h2>
+
+<p>做法如下：  <br/>
+<code>1.</code> 用一个size来记录栈的容量，实现栈需要利用两个队列q1、q2;  <br/>
+<code>2.</code> 压栈时，将元素插入到非空队列里;  <br/>
+<code>3.</code> 弹栈时，先取得非空队列q1，弹出元素插入到空队列q2中，直到只剩下最后一个元素，弹栈就是弹出这个元素，且不插入到q2中;  <br/>
+<code>4.</code> 查看栈顶元素，操作同上，只是最后那个元素最终要插入到q2中;      <br/>
+代码如下：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;queue&gt;
+using namespace std;
+class Stack {
+    int size=0;
+    queue&lt;int&gt; q1;
+    queue&lt;int&gt; q2;
+public:
+    // Push element x onto stack.
+    void push(int x) {
+        if (empty()||!q1.empty()) {
+            q1.push(x);
+        }else{
+            q2.push(x);
+        }
+        size++;
+    }
+
+    // Removes the element on top of the stack.
+    void pop() {
+        if (!q1.empty()) {
+            while (q1.size()&gt;1) {
+                int a = q1.front();
+                q1.pop();
+                q2.push(a);
+            }
+            q1.pop();
+        }else{
+            while (q2.size()&gt;1) {
+                int a = q2.front();
+                q2.pop();
+                q1.push(a);
+            }
+            q2.pop();
+        }
+        size--;
+    }
+
+    // Get the top element.
+    int top() {
+        if (!q1.empty()) {
+            return q1.back();
+        }else{
+            return q2.back();
+        }
+    }
+
+    // Return whether the stack is empty.
+    bool empty() {
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[队列的实现(C++版)]]></title>
