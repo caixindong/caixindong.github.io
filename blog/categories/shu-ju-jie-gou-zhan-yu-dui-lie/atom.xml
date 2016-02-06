@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构--栈与队列 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou-zhan-yu-dui-lie/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T11:52:30+08:00</updated>
+  <updated>2016-02-06T12:14:34+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,92 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[队列的实现(C++版)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios23/"/>
+    <updated>2016-02-06T11:54:12+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios23</id>
+    <content type="html"><![CDATA[<h2>队列</h2>
+
+<p>我利用链表来实现队列，实现方法：  <br/>
+<code>1.</code> 初始化一个头指针，并创建一个尾指针指向头指针 ； <br/>
+<code>2.</code> 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点；  <br/>
+<code>3.</code> 出队时，判断队列是否为空，如果为空，则提示队列为空；如果不为空，则取出头指针指向的节点，调整头指针指向该节点指向的下一个节点，再判断此时队列是否为空，如果为空，则调整尾指针指向头指针,返回节点的值，free这个节点；  <br/>
+代码实现：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+template&lt;class T&gt;
+//链表节点
+struct ListNode {
+    T val;
+    ListNode* next;
+    ListNode(T x){
+        val = x;
+        next = NULL;
+    };
+};
+template&lt;class T&gt;
+class MyQueue{
+    ListNode&lt;T&gt;* head;
+    ListNode&lt;T&gt;* last;
+    int size;
+public:
+    MyQueue(){
+        head = new ListNode&lt;T&gt;(NULL);
+        last = head;
+        size = 0;
+    }
+    ~MyQueue(){
+        head = NULL;
+        last = NULL;
+    }
+    //判断队列是否为空
+    bool isEmpty(){
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //入队
+    void offer(T value){
+        ListNode&lt;T&gt;* newNode = new ListNode&lt;T&gt;(value);
+        last-&gt;next = newNode;
+        last = newNode;
+        size++;
+    }
+    //查看队头元素
+    T peek(){
+        if (isEmpty()) {
+            cout&lt;&lt;"队列为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            return head-&gt;next-&gt;val;
+        }
+    }
+    //出队
+    T poll(){
+        if (isEmpty()) {
+            cout&lt;&lt;"队列为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            ListNode&lt;T&gt;* p = head-&gt;next;
+            T pVal = p-&gt;val;
+            head-&gt;next = p-&gt;next;
+            size--;
+            if (size==0) {
+                last = head;
+            }
+            free(p);
+            return pVal;
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[栈的实现(C++版)]]></title>

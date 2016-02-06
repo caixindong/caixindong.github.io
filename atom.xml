@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T11:52:30+08:00</updated>
+  <updated>2016-02-06T12:14:34+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,164 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[队列的实现(C++版)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios23/"/>
+    <updated>2016-02-06T11:54:12+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios23</id>
+    <content type="html"><![CDATA[<h2>队列</h2>
+
+<p>我利用链表来实现队列，实现方法：  <br/>
+<code>1.</code> 初始化一个头指针，并创建一个尾指针指向头指针 ； <br/>
+<code>2.</code> 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点；  <br/>
+<code>3.</code> 出队时，判断队列是否为空，如果为空，则提示队列为空；如果不为空，则取出头指针指向的节点，调整头指针指向该节点指向的下一个节点，再判断此时队列是否为空，如果为空，则调整尾指针指向头指针,返回节点的值，free这个节点；  <br/>
+代码实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="c1">//链表节点</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="p">(</span><span class="n">T</span> <span class="n">x</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">val</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">MyQueue</span><span class="p">{</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">last</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">MyQueue</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="o">~</span><span class="n">MyQueue</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//判断队列是否为空</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">isEmpty</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//入队</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">offer</span><span class="p">(</span><span class="n">T</span> <span class="n">value</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">last</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">newNode</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="n">newNode</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//查看队头元素</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">peek</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;队列为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//出队</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">poll</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;队列为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">T</span> <span class="n">pVal</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">size</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">last</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">pVal</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[栈的实现(C++版)]]></title>
@@ -1048,83 +1206,6 @@ myoperation.removeDependency(myoperation1)  //移除依赖
 <p> 10、一直等到操作执行完</p>
 
 <pre><code>myoperation.waitUntilFinished()
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS多线程（GCD)(swift)]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/04/ios3/"/>
-    <updated>2015-10-04T11:10:31+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/04/ios3</id>
-    <content type="html"><![CDATA[<h1>实现iOS多线程主要有三种方式</h1>
-
-<p>一、GCD</p>
-
-<p>他是苹果设计的在底层管理线程的方法
-GCD最主要的概念就是队列，可分为两种类型，一为串行队列，二为并行队列，开发时用到的有三种队列：主队列、全局队列、自定义队列</p>
-
-<p>1、创建gcd队列</p>
-
-<pre><code>let myQueue:dispatch_queue_t =dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0)
-
-//第一个参数是优先级
-//用异步方式执行队列里的方法      
-dispatch_async(myQueue, { () -&gt;Void in
-        //任务
-    })
-</code></pre>
-
-<p>2、自定义队列</p>
-
-<pre><code>let myqueue2:dispatch_queue_t = dispatch_queue_create("xindong.com",
-DISPATCH_QUEUE_CONCURRENT)
-//最后一个参数指的是并行的队列，还有一个是DISPATCH_QUEUE_SERIAL(串行)
-</code></pre>
-
-<p>3、延迟执行</p>
-
-<pre><code>let myTime:dispatch_time_t=dispatch_time(DISPATCH_TIME_NOW, 
-(Int64)(NSEC_PER_SEC*2))
-//后面那个参数代表两秒，苹果公司建议这样写，这是转化为gcd能读懂的时间
-
-dispatch_after(myTime,dispatch_get_main_queue(), { () -&gt;Void in
-        //任务
-    })//苹果公司建议用主队列
-
-4、多次执行
-    dispatch_apply(3,dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0))
-     { (UInt index) -&gt; Voidin
-        //任务
-    }//执行3次，一般放在并行队列中
-    //他是一个同步操作会阻塞主线程，所以一般放在异步执行的代码里
-</code></pre>
-
-<p>5、调度组</p>
-
-<pre><code>    let mygroup =dispatch_group_create()//创建调度组
-    dispatch_group_async(mygroup, myQueue) { () -&gt;Void in
-    //异步执行调度组里面的内容
-        //加载图片数据
-        dispatch_async(dispatch_get_main_queue(), { () -&gt;Void in
-            //主线程更新ui
-        })
-    }       dispatch_group_notify(mygroup,dispatch_get_main_queue()) { () -&gt;Void in
-        //这个方法在调度组里面的内容全部执行完毕后调用
-    }
-
-dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
-//一直等到调度组执行完，在执行下面的，这是一个同步操作，会阻塞主线程
-</code></pre>
-
-<p>6、暂停队列</p>
-
-<pre><code>dispatch_suspend(myQueue)//不能暂停主队列和系统队列
-</code></pre>
-
-<p>7、恢复队列</p>
-
-<pre><code>    dispatch_resume(myQueue)
 </code></pre>
 ]]></content>
   </entry>
