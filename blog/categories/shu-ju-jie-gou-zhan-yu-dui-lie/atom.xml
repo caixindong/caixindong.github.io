@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构--栈与队列 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou-zhan-yu-dui-lie/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T11:49:06+08:00</updated>
+  <updated>2016-02-06T11:52:30+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -27,76 +27,76 @@
 空，就提示栈为空；  <br/>
 代码实现：</p>
 
-<pre><code>#include &lt;iostream&gt;
-#define MAXSIZE 4
-using namespace std;
-template&lt;class T&gt;
-class MyStack{
-int size;
-T* arr;
-public:
-MyStack(){
-    size = 0;
-    arr = new T[MAXSIZE];
-
-}
-
-~MyStack(){
-    delete [] arr;
-}
-
-int sizeOfStack(){
-    return size;
-}
-//压栈
-void push(const T &amp;t){
-    if (isFull()) {
-        cout&lt;&lt;"栈溢出"&lt;&lt;endl;
-        exit(1);
-    }else{
-        arr[size] = t;
-        size++;
+<pre><code class="C++">    #include &lt;iostream&gt;
+    #define MAXSIZE 4
+    using namespace std;
+    template&lt;class T&gt;
+    class MyStack{
+    int size;
+    T* arr;
+    public:
+    MyStack(){
+        size = 0;
+        arr = new T[MAXSIZE];
 
     }
-}
-//弹栈
-T pop(){
-    if (isEmpty()) {
-        cout&lt;&lt;"栈为空"&lt;&lt;endl;
-        exit(0);
-    }else{
-        T t = peek();
-        arr[size-1]=NULL;
-        size--;
-        return t;
+
+    ~MyStack(){
+        delete [] arr;
     }
-}
-//查看栈顶元素
-T peek(){
-    if (isEmpty()) {
-        cout&lt;&lt;"栈为空"&lt;&lt;endl;
-        exit(0);
-    }else{
-        return arr[size-1];
+
+    int sizeOfStack(){
+        return size;
     }
-}
-//判断栈是否为空
-bool isEmpty(){
-    if (size==0) {
-        return true;
-    }else{
-        return false;
+    //压栈
+    void push(const T &amp;t){
+        if (isFull()) {
+            cout&lt;&lt;"栈溢出"&lt;&lt;endl;
+            exit(1);
+        }else{
+            arr[size] = t;
+            size++;
+
+        }
     }
-}
-//判断栈是否溢出
-bool isFull(){
-    if (size&gt;=MAXSIZE) {
-        return true;
-    }else{
-        return false;
+    //弹栈
+    T pop(){
+        if (isEmpty()) {
+            cout&lt;&lt;"栈为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            T t = peek();
+            arr[size-1]=NULL;
+            size--;
+            return t;
+        }
     }
-}
-};
+    //查看栈顶元素
+    T peek(){
+        if (isEmpty()) {
+            cout&lt;&lt;"栈为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            return arr[size-1];
+        }
+    }
+    //判断栈是否为空
+    bool isEmpty(){
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //判断栈是否溢出
+    bool isFull(){
+        if (size&gt;=MAXSIZE) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    };
 </code></pre>
 ]]></content>
   </entry>
