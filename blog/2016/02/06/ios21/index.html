@@ -1,0 +1,179 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>内存栈与内存堆的区别 - Cool Guy</title>
+	<meta name="author" content="Xindong">
+
+	
+	<meta name="description" content="内存栈与内存堆的区别 内存栈 又称为栈内存，它有以下特点：
+1. 函数压栈和弹栈符合后进先出的原则；
+2. 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域；
+3. 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快；
+4. 栈内存是由系统自动分配的； &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://caixindong.github.io/blog/2016/02/06/ios21/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img alt='Profile Picture' src='/images/touxiang.jpeg' style='width: 160px;'>");
+	</script>
+</div>
+<h1><a href="/">Cool Guy</a></h1>
+<p class="subtitle">Blog like a hacker.</p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/aboutme">AboutMe</a></li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/3872004666/profile?topnav=1&wvr=6" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="http://git.oschina.net/xindong" title="GitHub">GitHub</a>
+		
+		
+		<a class="dribbble" href="http://www.dribbble.com/allenhsu" title="Dribbble">Dribbble</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+<hgroup>
+
+</hgroup>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">内存栈与内存堆的区别</h1>
+	<div class="entry-content" itemprop="articleBody"><h2>内存栈</h2>
+
+<p>又称为栈内存，它有以下特点：
+<code>1.</code> 函数压栈和弹栈符合后进先出的原则；
+<code>2.</code> 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域；
+<code>3.</code> 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快；
+<code>4.</code> 栈内存是由系统自动分配的；</p>
+
+<h2>内存堆</h2>
+
+<p>又称为堆内存，它有一下特点：
+<code>1.</code> 他是用静态链表来存储内存的地址；
+<code>2.</code> 堆内存是由低地址向高地址拓展，它是一块不连续的内存区域；
+<code>3.</code> 内存块有两种状态：已使用和闲置，分配时，将内存块标志为已使用，回收时，将内存块标志为闲置；
+<code>4.</code> 分配时，它的时间复杂度为O(n)，因为它需要遍历链表寻找闲置的内存块；
+<code>5.</code> 内存回收的方式有两种，一种是手动回收(C,C++),一种是GC线程自动回收(Java)；
+<code>6.</code> 标志清除算法是最基本的内存回收算法；
+<code>7.</code> 堆内存需要程序员自己申请，并指明大小；</p>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+ 
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2016/02/06/ios21" data-title="内存栈与内存堆的区别" data-url="http://caixindong.github.io/blog/2016/02/06/ios21/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Xindong -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

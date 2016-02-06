@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-01-16T17:27:16+08:00</updated>
+  <updated>2016-02-06T11:15:18+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,32 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[内存栈与内存堆的区别]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios21/"/>
+    <updated>2016-02-06T10:47:06+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios21</id>
+    <content type="html"><![CDATA[<h2>内存栈</h2>
+
+<p>又称为栈内存，它有以下特点：
+<code>1.</code> 函数压栈和弹栈符合后进先出的原则；
+<code>2.</code> 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域；
+<code>3.</code> 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快；
+<code>4.</code> 栈内存是由系统自动分配的；</p>
+
+<h2>内存堆</h2>
+
+<p>又称为堆内存，它有一下特点：
+<code>1.</code> 他是用静态链表来存储内存的地址；
+<code>2.</code> 堆内存是由低地址向高地址拓展，它是一块不连续的内存区域；
+<code>3.</code> 内存块有两种状态：已使用和闲置，分配时，将内存块标志为已使用，回收时，将内存块标志为闲置；
+<code>4.</code> 分配时，它的时间复杂度为O(n)，因为它需要遍历链表寻找闲置的内存块；
+<code>5.</code> 内存回收的方式有两种，一种是手动回收(C,C++),一种是GC线程自动回收(Java)；
+<code>6.</code> 标志清除算法是最基本的内存回收算法；
+<code>7.</code> 堆内存需要程序员自己申请，并指明大小；</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS本地推送功能实现]]></title>
@@ -950,66 +976,6 @@ dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
     <content type="html"><![CDATA[<h1>iOS TableView 的header for section无法加载的问题</h1>
 
 <p>最近在练习的一个项目遇到重写header不加载的问题，在这里提醒下大家，重写的header要被调用，一定要重写delegate的height for header的方法才会被调用</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS OC知识点]]></title>
-    <link href="http://caixindong.github.io/blog/2015/10/04/ios1/"/>
-    <updated>2015-10-04T00:46:33+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/10/04/ios1</id>
-    <content type="html"><![CDATA[<h1>OC知识点</h1>
-
-<p>1、类的设计</p>
-
-<p>@property （nonatomic ，strong）NSString* __</p>
-
-<p>@property （nonatomic ，assign）int age (值类型用assign)</p>
-
-<p>2、封装</p>
-
-<p>3、继承</p>
-
-<p>4、重写</p>
-
-<p>5、self指针（类似java的this）</p>
-
-<p>6、类别（区别于继承）</p>
-
-<p>相同目的：都是无法满足需求，需要更新属性或方法拓展</p>
-
-<p>不同点：继承即能拓展成员变量，成员属性，也能够添加方法；类别，只能添加方法</p>
-
-<p>继承添加的新方法新属性，都是在子类对象中调用，而类别添加的新方法可以在原类对象直接调用</p>
-
-<p>7、内存管理（mrc模式和arc模式）</p>
-
-<p>8、代理（delegate委托，类似java的接口）</p>
-
-<p>9、copy（浅拷贝和深拷贝）</p>
-
-<p>浅拷贝还是指向原来的内存空间，而深拷贝则另外开辟新的空间</p>
-
-<p>10、单例设计模式（全局变量）</p>
-
-<p>遇到多线程时要加锁@synchronized（self）｛</p>
-
-<p>｝</p>
-
-<p>只执行一次可以加上dispatch_once(&hellip;,&hellip;.)</p>
-
-<p>11、通知中心设计模式（broadcost）</p>
-
-<p>一般用单例实现广播栈</p>
-
-<p>NSNotificationCenter</p>
-
-<p>12、block（代码块）</p>
-
-<p>int(^myblock) = ^(int a,int b){</p>
-
-<p>};
-myblock(3,5);</p>
 ]]></content>
   </entry>
   

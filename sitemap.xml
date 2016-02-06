@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://caixindong.github.io/blog/2016/02/06/ios21/</loc>
+    <lastmod>2016-02-06T10:47:06+08:00</lastmod>
+  </url>
+  <url>
     <loc>http://caixindong.github.io/blog/2016/01/11/ios20/</loc>
     <lastmod>2016-01-11T15:49:33+08:00</lastmod>
   </url>
@@ -111,6 +115,9 @@
   </url>
   <url>
     <loc>http://caixindong.github.io/blog/categories/swift/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/blog/categories/zhan-nei-cun-yu-dui-nei-cun/</loc>
   </url>
   <url>
     <loc>http://caixindong.github.io/baidu_verify_4KZcnsWG5l.html</loc>
