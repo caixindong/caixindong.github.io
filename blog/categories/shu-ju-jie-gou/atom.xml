@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-06T15:33:39+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[利用栈实现队列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios25/"/>
+    <updated>2016-02-06T15:13:58+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios25</id>
+    <content type="html"><![CDATA[<h2>C++库中的stack</h2>
+
+<p>stack模板类的定义在stack头文件中  <br/>
+stack的基本操作有：
+<code>1.</code> 入栈：s.push();  <br/>
+<code>2.</code> 出栈：s.pop()，注意它不返回元素的值;  <br/>
+<code>3.</code> 访问栈顶元素：s.top();  <br/>
+<code>4.</code> 栈中元素的个数：s.size();  <br/>
+<code>5.</code> 判断栈是否为空：s.empty();</p>
+
+<h2>我们利用栈的这些特点来实现我们的队列</h2>
+
+<p>做法如下:  <br/>
+<code>1.</code> 用一个size来记录队列的容量，实现队列需要两个栈s1,s2;  <br/>
+<code>2.</code> 入队时，我们将元素压入s1;  <br/>
+<code>3.</code> 出队时，如果s2有元素，就弹出s2的栈顶元素;如果没有，则将s1中的所有元素弹出并压入s2中，再弹出s2的栈顶元素;  <br/>
+<code>4.</code> 查看队头元素操作同上，只是不需要弹出s2的栈顶元素;  <br/>
+代码如下：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+
+class Queue {
+public:
+    int size = 0;
+    stack&lt;int&gt; s1;
+    stack&lt;int&gt; s2;
+
+    // Push element x to the back of queue.
+    void push(int x) {
+        s1.push(x);
+        size++;
+    }
+
+    // Removes the element from in front of queue.
+    void pop(void) {
+        if (!s2.empty()) {
+            s2.pop();
+        }else{
+            while (!s1.empty()) {
+                int t = s1.top();
+                s1.pop();
+                s2.push(t);
+            }
+            s2.pop();
+        }
+        size--;
+    }
+
+    // Get the front element.
+    int peek(void) {
+        if (!s2.empty()) {
+            return s2.top();
+        }else{
+            while (!s1.empty()) {
+                int t = s1.top();
+                s1.pop();
+                s2.push(t);
+            }
+            return s2.top();
+        }
+    }
+
+    // Return whether the queue is empty.
+    bool empty(void) {
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[利用队列实现栈]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios24/"/>
+    <updated>2016-02-06T14:50:43+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios24</id>
+    <content type="html"><![CDATA[<h2>C++库中的queue:</h2>
+
+<p>queue 模板类的定义在queue头文件中  <br/>
+queue 的基本操作有：  <br/>
+<code>1.</code> 入队：q.push(x);  <br/>
+<code>2.</code> 出队：q.pop(),注意它不返回元素的值;  <br/>
+<code>3.</code> 访问队首元素： q.front();  <br/>
+<code>4.</code> 访问队尾元素： q.back();  <br/>
+<code>5.</code> 队列的元素个数： q.size();  <br/>
+<code>6.</code> 判断队列是否为空： q.empty();</p>
+
+<h2>我们利用队列的这些特点来实现我们的栈</h2>
+
+<p>做法如下：  <br/>
+<code>1.</code> 用一个size来记录栈的容量，实现栈需要利用两个队列q1、q2;  <br/>
+<code>2.</code> 压栈时，将元素插入到非空队列里;  <br/>
+<code>3.</code> 弹栈时，先取得非空队列q1，弹出元素插入到空队列q2中，直到只剩下最后一个元素，弹栈就是弹出这个元素，且不插入到q2中;  <br/>
+<code>4.</code> 查看栈顶元素，操作同上，只是最后那个元素最终要插入到q2中;      <br/>
+代码如下：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;queue&gt;
+using namespace std;
+class Stack {
+    int size=0;
+    queue&lt;int&gt; q1;
+    queue&lt;int&gt; q2;
+public:
+    // Push element x onto stack.
+    void push(int x) {
+        if (empty()||!q1.empty()) {
+            q1.push(x);
+        }else{
+            q2.push(x);
+        }
+        size++;
+    }
+
+    // Removes the element on top of the stack.
+    void pop() {
+        if (!q1.empty()) {
+            while (q1.size()&gt;1) {
+                int a = q1.front();
+                q1.pop();
+                q2.push(a);
+            }
+            q1.pop();
+        }else{
+            while (q2.size()&gt;1) {
+                int a = q2.front();
+                q2.pop();
+                q1.push(a);
+            }
+            q2.pop();
+        }
+        size--;
+    }
+
+    // Get the top element.
+    int top() {
+        if (!q1.empty()) {
+            return q1.back();
+        }else{
+            return q2.back();
+        }
+    }
+
+    // Return whether the stack is empty.
+    bool empty() {
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[队列的实现(C++版)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios23/"/>
+    <updated>2016-02-06T11:54:12+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios23</id>
+    <content type="html"><![CDATA[<h2>队列</h2>
+
+<p>我利用链表来实现队列，实现方法：  <br/>
+<code>1.</code> 初始化一个头指针，并创建一个尾指针指向头指针 ； <br/>
+<code>2.</code> 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点；  <br/>
+<code>3.</code> 出队时，判断队列是否为空，如果为空，则提示队列为空；如果不为空，则取出头指针指向的节点，调整头指针指向该节点指向的下一个节点，再判断此时队列是否为空，如果为空，则调整尾指针指向头指针,返回节点的值，free这个节点；  <br/>
+代码实现：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+template&lt;class T&gt;
+//链表节点
+struct ListNode {
+    T val;
+    ListNode* next;
+    ListNode(T x){
+        val = x;
+        next = NULL;
+    };
+};
+template&lt;class T&gt;
+class MyQueue{
+    ListNode&lt;T&gt;* head;
+    ListNode&lt;T&gt;* last;
+    int size;
+public:
+    MyQueue(){
+        head = new ListNode&lt;T&gt;(NULL);
+        last = head;
+        size = 0;
+    }
+    ~MyQueue(){
+        head = NULL;
+        last = NULL;
+    }
+    //判断队列是否为空
+    bool isEmpty(){
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //入队
+    void offer(T value){
+        ListNode&lt;T&gt;* newNode = new ListNode&lt;T&gt;(value);
+        last-&gt;next = newNode;
+        last = newNode;
+        size++;
+    }
+    //查看队头元素
+    T peek(){
+        if (isEmpty()) {
+            cout&lt;&lt;"队列为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            return head-&gt;next-&gt;val;
+        }
+    }
+    //出队
+    T poll(){
+        if (isEmpty()) {
+            cout&lt;&lt;"队列为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            ListNode&lt;T&gt;* p = head-&gt;next;
+            T pVal = p-&gt;val;
+            head-&gt;next = p-&gt;next;
+            size--;
+            if (size==0) {
+                last = head;
+            }
+            free(p);
+            return pVal;
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[栈的实现(C++版)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios22/"/>
+    <updated>2016-02-06T11:34:25+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios22</id>
+    <content type="html"><![CDATA[<h2>栈</h2>
+
+<p>我利用数组来实现栈，实现方法：  <br/>
+<code>1.</code> 创建MAXSIZE大小的数组用于存放数据，MAXSIZE也为栈的最大容量；  <br/>
+<code>2.</code> 当压栈时，判断栈是否满了，如果不满，就往数组里添加数据，如果满了，就提示栈溢出；  <br/>
+<code>3.</code>  当弹栈时，判断栈是否为空，如果不为空，就取出数组末尾的元素，取出后将该位置的值置为NULL，数组指针向前移动一位；如果为
+空，就提示栈为空；  <br/>
+代码实现：</p>
+
+<pre><code class="C++">    #include &lt;iostream&gt;
+    #define MAXSIZE 4
+    using namespace std;
+    template&lt;class T&gt;
+    class MyStack{
+    int size;
+    T* arr;
+    public:
+    MyStack(){
+        size = 0;
+        arr = new T[MAXSIZE];
+
+    }
+
+    ~MyStack(){
+        delete [] arr;
+    }
+
+    int sizeOfStack(){
+        return size;
+    }
+    //压栈
+    void push(const T &amp;t){
+        if (isFull()) {
+            cout&lt;&lt;"栈溢出"&lt;&lt;endl;
+            exit(1);
+        }else{
+            arr[size] = t;
+            size++;
+
+        }
+    }
+    //弹栈
+    T pop(){
+        if (isEmpty()) {
+            cout&lt;&lt;"栈为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            T t = peek();
+            arr[size-1]=NULL;
+            size--;
+            return t;
+        }
+    }
+    //查看栈顶元素
+    T peek(){
+        if (isEmpty()) {
+            cout&lt;&lt;"栈为空"&lt;&lt;endl;
+            exit(0);
+        }else{
+            return arr[size-1];
+        }
+    }
+    //判断栈是否为空
+    bool isEmpty(){
+        if (size==0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //判断栈是否溢出
+    bool isFull(){
+        if (size&gt;=MAXSIZE) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+    };
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
