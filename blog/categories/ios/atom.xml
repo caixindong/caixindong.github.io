@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T12:22:15+08:00</updated>
+  <updated>2016-02-06T12:26:10+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -20,108 +20,108 @@
     <id>http://caixindong.github.io/blog/2016/01/11/ios20</id>
     <content type="html"><![CDATA[<p>1、首先在AppDelegate注册推送</p>
 
-<pre><code>- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+<pre><code class="objc">    - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 
-    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
 
-    //注册推送, iOS 8以上
-    UIUserNotificationSettings *settings = [UIUserNotificationSettings
+        //注册推送, iOS 8以上
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings
 
-                                            settingsForTypes:(UIUserNotificationTypeBadge |
+                                                settingsForTypes:(UIUserNotificationTypeBadge |
 
-                                                              UIUserNotificationTypeSound |
+                                                                  UIUserNotificationTypeSound |
 
-                                                              UIUserNotificationTypeAlert)
+                                                                  UIUserNotificationTypeAlert)
 
-                                            categories:nil];
+                                                categories:nil];
 
-    [application registerUserNotificationSettings:settings];
-    [application registerForRemoteNotifications];
+        [application registerUserNotificationSettings:settings];
+        [application registerForRemoteNotifications];
 
-} else {
-    //注册推送, 适配系统版本iOS 8以下的手机
-    UIRemoteNotificationType myTypes = UIRemoteNotificationTypeBadge |
+    } else {
+        //注册推送, 适配系统版本iOS 8以下的手机
+        UIRemoteNotificationType myTypes = UIRemoteNotificationTypeBadge |
 
-    UIRemoteNotificationTypeAlert |
+        UIRemoteNotificationTypeAlert |
 
-    UIRemoteNotificationTypeSound;
+        UIRemoteNotificationTypeSound;
 
-    [application registerForRemoteNotificationTypes:myTypes];
+        [application registerForRemoteNotificationTypes:myTypes];
 
-}
+    }
 
 
-return YES;
-}
+    return YES;
+    }
 </code></pre>
 
 <p>2、注册成功与否的回调</p>
 
-<pre><code>- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken {
-        NSLog(@"device token is %@",deviceToken);
-}
+<pre><code class="objc">    - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken {
+            NSLog(@"device token is %@",deviceToken);
+    }
 
-- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error{
-        NSLog(@"push fail error is %@",error);
-}
+    - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error{
+            NSLog(@"push fail error is %@",error);
+    }
 </code></pre>
 
 <p>3、获取本地通知数据回调</p>
 
-<pre><code>- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification{
-        NSLog(@"get notification");
-        //获取通知后的操作
-}
+<pre><code class="objc">    - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification{
+            NSLog(@"get notification");
+            //获取通知后的操作
+    }
 </code></pre>
 
 <p>4、发起本地推送</p>
 
-<pre><code>-(void)sendLocalNotifation{
-    UILocalNotification* notifation = [[UILocalNotification alloc]init];
-    //当前时间5秒后
-    NSDate* pushDate = [NSDate dateWithTimeIntervalSinceNow:5];
-    if (notifation!=nil) {
-        //设置推送时间
-        notifation.fireDate = pushDate;
-        //设置时区
-        notifation.timeZone = [NSTimeZone defaultTimeZone];
-        //设置重复次数
-        notifation.repeatInterval = 0;
-        notifation.soundName = UILocalNotificationDefaultSoundName;
-        //通知弹窗的文本
-        notifation.alertBody = @"推送的文本";
-        //设置icon小红点
-        notifation.applicationIconBadgeNumber = 1;
-        //设置userinfo 方便在之后需要撤销的时候使用
-        NSDictionary* info = [NSDictionary dictionaryWithObject:@"通知的名字" forKey:@"key"];
-        notifation.userInfo = info;
-        //添加推送到UIApplication
-        UIApplication* app = [UIApplication sharedApplication];
-        [app scheduleLocalNotification:notifation];
+<pre><code class="objc">    -(void)sendLocalNotifation{
+        UILocalNotification* notifation = [[UILocalNotification alloc]init];
+        //当前时间5秒后
+        NSDate* pushDate = [NSDate dateWithTimeIntervalSinceNow:5];
+        if (notifation!=nil) {
+            //设置推送时间
+            notifation.fireDate = pushDate;
+            //设置时区
+            notifation.timeZone = [NSTimeZone defaultTimeZone];
+            //设置重复次数
+            notifation.repeatInterval = 0;
+            notifation.soundName = UILocalNotificationDefaultSoundName;
+            //通知弹窗的文本
+            notifation.alertBody = @"推送的文本";
+            //设置icon小红点
+            notifation.applicationIconBadgeNumber = 1;
+            //设置userinfo 方便在之后需要撤销的时候使用
+            NSDictionary* info = [NSDictionary dictionaryWithObject:@"通知的名字" forKey:@"key"];
+            notifation.userInfo = info;
+            //添加推送到UIApplication
+            UIApplication* app = [UIApplication sharedApplication];
+            [app scheduleLocalNotification:notifation];
+        }
     }
-}
 </code></pre>
 
 <p>5、解除本地推送</p>
 
-<pre><code>-(void)cancleLocalNotifation{
-    UIApplication* app = [UIApplication sharedApplication];
-    //获取所有本地推送
-    NSArray* localArray = [app scheduledLocalNotifications];
-    UILocalNotification* notification;
-    if (localArray) {
-        for(UILocalNotification* noti in localArray){
-        NSDictionary* userInfo = noti.userInfo;
-        if (userInfo) {
-            NSString *keyValue = [userInfo objectForKey:@"key"];
-            if ([keyValue isEqualToString:@"通知的名字"]) {
-                notification = noti;
-                [app cancelLocalNotification:notification];
+<pre><code class="objc">    -(void)cancleLocalNotifation{
+        UIApplication* app = [UIApplication sharedApplication];
+        //获取所有本地推送
+        NSArray* localArray = [app scheduledLocalNotifications];
+        UILocalNotification* notification;
+        if (localArray) {
+            for(UILocalNotification* noti in localArray){
+            NSDictionary* userInfo = noti.userInfo;
+            if (userInfo) {
+                NSString *keyValue = [userInfo objectForKey:@"key"];
+                if ([keyValue isEqualToString:@"通知的名字"]) {
+                    notification = noti;
+                    [app cancelLocalNotification:notification];
+                }
             }
         }
     }
-}
 </code></pre>
 ]]></content>
   </entry>
