@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T15:33:39+08:00</updated>
+  <updated>2016-02-06T15:34:31+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[<h2>C++库中的stack</h2>
 
 <p>stack模板类的定义在stack头文件中  <br/>
-stack的基本操作有：
+stack的基本操作有：  <br/>
 <code>1.</code> 入栈：s.push();  <br/>
 <code>2.</code> 出栈：s.pop()，注意它不返回元素的值;  <br/>
 <code>3.</code> 访问栈顶元素：s.top();  <br/>
