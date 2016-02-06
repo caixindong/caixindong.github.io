@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 算法 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T22:27:10+08:00</updated>
+  <updated>2016-02-06T22:28:15+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -141,6 +141,81 @@ int main(int argc, const char * argv[]) {
   </entry>
   
   <entry>
+    <title type="html"><![CDATA[八大排序算法--快速排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios31/"/>
+    <updated>2016-02-06T22:17:04+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios31</id>
+    <content type="html"><![CDATA[<h2>快速排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+//挖坑填坑，分治
+
+//挖坑填坑
+//分
+void mySwap(int &amp;a,int &amp;b){
+    int tmp = a;
+    a = b;
+    b = tmp;
+}
+
+int partition(int start,int end,int a[]){
+    //去中间为基准，将它与第一个元素交换
+    //swap(a[start], a[(start+end)/2]);
+    int i = start;
+    int j = end;
+    int x = a[start];
+    while (i&lt;j) {
+        while (i&lt;j&amp;&amp;a[j]&gt;=x) {
+            j--;
+        }
+        if (i&lt;j) {
+            //挖坑填坑
+            a[i] = a[j];
+            i++;
+        }
+        while (i&lt;j&amp;&amp;a[i]&lt;x) {
+            i++;
+        }
+        if (i&lt;j) {
+            a[j] = a[i];
+            j--;
+        }
+    }
+    a[i] = x;
+    return i;
+}
+
+//治
+void quickSort(int low,int high,int a[]){
+    if (low&lt;high) {
+        int p = partition(low, high, a);
+        quickSort(low, p-1, a);
+        quickSort(p+1, high, a);
+    }
+}
+
+
+void QuickSort(int n,int a[]){
+    quickSort(0, n-1, a);
+}
+
+int main(int argc, const char * argv[]) {
+    int a[] = {1,4,2,8,7,9,6};
+    QuickSort(7, a);
+    for (int i=0; i&lt;7; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[八大排序算法--冒泡排序]]></title>
     <link href="http://caixindong.github.io/blog/2016/02/06/ios30/"/>
     <updated>2016-02-06T22:15:23+08:00</updated>
@@ -183,93 +258,65 @@ int main(int argc, const char * argv[]) {
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[八大排序算法--简单选择排序]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios28/"/>
-    <updated>2016-02-06T22:11:04+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios28</id>
-    <content type="html"><![CDATA[<h2>简单选择排序</h2>
+    <title type="html"><![CDATA[八大排序算法--堆排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios29/"/>
+    <updated>2016-02-06T22:12:33+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios29</id>
+    <content type="html"><![CDATA[<h2>堆排序</h2>
 
 <p>代码如下</p>
 
 <pre><code class="C++">#include &lt;iostream&gt;
 using namespace std;
-void printArr(int n,int a[]){
-    for (int i=0; i&lt;n; i++) {
-        cout&lt;&lt;a[i]&lt;&lt;" ";
+
+void mySwap(int &amp;a,int &amp;b){
+    int tmp;
+    tmp = a;
+    a = b;
+    b = tmp;
+}
+//堆调整
+void heapAdjuct(int a[],int size,int i){
+    int lchild = 2*i;
+    int rchild = 2*i+1;
+    int max = i;
+    if (i&lt;=size/2-1) {
+        if (lchild&lt;=size-1&amp;&amp;a[lchild]&gt;a[max]) {
+            max = lchild;
+        }
+        if (rchild&lt;=size-1&amp;&amp;a[rchild]&gt;a[max]) {
+            max = rchild;
+        }
+        if (max!=i) {
+            mySwap(a[i], a[max]);
+            heapAdjuct(a, size, max);
+        }
+
     }
-    cout&lt;&lt;endl;
+}
+//初始化堆
+void setupNewHeap(int a[],int size){
+    for (int i=size/2-1; i&gt;=0; i--) {
+        heapAdjuct(a, size, i);
+    }
 }
 
-void simpleSelectionSort(int n,int a[]){
-    for (int i=0; i&lt;n; i++) {
-        int k = i;
-        int tmp;
-        for (int j = i+1; j&lt;n; j++) {
-            if (a[j]&lt;a[k]) {
-                k = j;
-            }
-        }
-        tmp = a[i];
-        a[i] = a[k];
-        a[k] = tmp;
-        printArr(n, a);
+void heapSort(int a[],int size){
+    setupNewHeap(a, size);
+    for (int i = size-1; i&gt;0; i--) {
+        mySwap(a[i], a[0]);
+        heapAdjuct(a,i, 0);
     }
-
 }
 
 int main(int argc, const char * argv[]) {
-    int a[] = {2,4,5,1,9,8,6,4,5};
-
-    simpleSelectionSort(9, a);
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[八大排序算法--希尔排序]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios27/"/>
-    <updated>2016-02-06T22:08:07+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios27</id>
-    <content type="html"><![CDATA[<h2>希尔排序</h2>
-
-<p>代码如下</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-void printArr(int n,int a[]){
-    for (int i=0; i&lt;n; i++) {
+    int a[] = {2,3,1,5,6,9,3,4,8};
+    heapSort(a,9);
+    for (int i=0; i&lt;9; i++) {
         cout&lt;&lt;a[i]&lt;&lt;" ";
+
     }
     cout&lt;&lt;endl;
-}
-
-void directInsertSort(int dk,int n,int a[]){
-    for (int i = dk; i&lt;n; i++) {
-        if (a[i]&lt;a[i-dk]) {
-            int x = a[i];
-            int j = i-dk;
-            while (x&lt;a[j]) {
-                a[j+dk] = a[j];
-                j = j-dk;
-            }
-            a[j+dk] = x;
-        }
-    }
-    printArr(n,a);
-}
-
-void shellSort(int n,int a[]){
-    int dk = n/2;
-    while (dk&gt;=1) {
-        directInsertSort(dk,n, a);
-        dk = dk/2;
-    }
-}
-int main(int argc, const char * argv[]) {
-    int a[] = {2,4,5,1,9,8,6,4,5};
-    shellSort(9, a);
     return 0;
 }
 </code></pre>
