@@ -677,56 +677,105 @@ return YES;
 	<div class="entry-content" itemprop="articleBody">
 		<p>1、在工具类定义压缩图片的方法,传入图片和所要压缩的尺寸</p>
 
-<pre><code>+(UIImage *)imageWithImage:(UIImage *)image scaleToSize :(CGSize )newSize{
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">+(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nf">imageWithImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">image</span> <span class="nl">scaleToSize</span> <span class="p">:(</span><span class="bp">CGSize</span> <span class="p">)</span><span class="n">newSize</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">UIGraphicsBeginImageContext</span><span class="p">(</span><span class="n">newSize</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="n">image</span> <span class="nl">drawInRect</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
+</span><span class='line'>
+</span><span class='line'><span class="bp">UIImage</span><span class="o">*</span> <span class="n">newImage</span> <span class="o">=</span> <span class="n">UIGraphicsGetImageFromCurrentImageContext</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">UIGraphicsEndImageContext</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">newImage</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-UIGraphicsBeginImageContext(newSize);
-
-[image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-
-UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
-
-UIGraphicsEndImageContext();
-
-return newImage;
-
-}
-</code></pre>
 
 <p>2、利用AFNetworking做图片上传功能</p>
 
-<pre><code>+(void)POSTToUrl:(NSString *)url WithData:(NSData *)data 
-    WithReturnBlock:(ReturnValueBlock)block         
-    WithErrorCodeBlock:(ErrorCodeBlock)errorBlock       
-    WithFailtureBlock:(FailureBlock)failtureBlock{
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">+(</span><span class="kt">void</span><span class="p">)</span><span class="nf">POSTToUrl:</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">WithData:</span><span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span>
+</span><span class='line'>  <span class="nf">WithReturnBlock:</span><span class="p">(</span><span class="n">ReturnValueBlock</span><span class="p">)</span><span class="nv">block</span>        
+</span><span class='line'>  <span class="nf">WithErrorCodeBlock:</span><span class="p">(</span><span class="n">ErrorCodeBlock</span><span class="p">)</span><span class="nv">errorBlock</span>      
+</span><span class='line'>  <span class="nf">WithFailtureBlock:</span><span class="p">(</span><span class="n">FailureBlock</span><span class="p">)</span><span class="nv">failtureBlock</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">AFHTTPRequestOperationManager</span><span class="o">*</span> <span class="n">manager</span> <span class="o">=</span> <span class="p">[[</span><span class="n">AFHTTPRequestOperationManager</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">requestSerializer</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFHTTPRequestSerializer</span> <span class="n">serializer</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFJSONResponseSerializer</span> <span class="n">serializer</span><span class="p">];</span>     
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//不设置可能会出现404的bug</span>
+</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span><span class="p">.</span><span class="n">acceptableContentTypes</span> <span class="o">=</span>       <span class="p">[</span><span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span><span class="p">.</span><span class="n">acceptableContentTypes</span>   <span class="nl">setByAddingObject</span><span class="p">:</span><span class="s">@&quot;text/html&quot;</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="p">[</span><span class="n">manager</span> <span class="nl">POST</span><span class="p">:</span><span class="n">url</span> <span class="nl">parameters</span><span class="p">:</span><span class="nb">nil</span>
+</span><span class='line'>  <span class="nl">constructingBodyWithBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span><span class="o">&lt;</span><span class="n">AFMultipartFormData</span><span class="o">&gt;</span> <span class="n">formData</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//以上传的时间为图片名</span>
+</span><span class='line'>      <span class="bp">NSDateFormatter</span> <span class="o">*</span><span class="n">formatter</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSDateFormatter</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>      <span class="n">formatter</span><span class="p">.</span><span class="n">dateFormat</span> <span class="o">=</span> <span class="s">@&quot;yyyyMMddHHmmss&quot;</span><span class="p">;</span>
+</span><span class='line'>          <span class="bp">NSString</span> <span class="o">*</span><span class="n">str</span> <span class="o">=</span> <span class="p">[</span><span class="n">formatter</span> <span class="nl">stringFromDate</span><span class="p">:[</span><span class="bp">NSDate</span> <span class="n">date</span><span class="p">]];</span>
+</span><span class='line'>      <span class="bp">NSString</span> <span class="o">*</span><span class="n">fileName</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:</span><span class="s">@&quot;%@.png&quot;</span><span class="p">,</span> <span class="n">str</span><span class="p">];</span>
+</span><span class='line'>      
+</span><span class='line'>          <span class="p">[</span><span class="n">formData</span> <span class="nl">appendPartWithFileData</span><span class="p">:</span><span class="n">data</span>
+</span><span class='line'>          <span class="nl">name</span><span class="p">:</span><span class="s">@&quot;upload&quot;</span> <span class="c1">//upload.php处理文件的字段</span>
+</span><span class='line'>          <span class="nl">fileName</span><span class="p">:</span><span class="n">fileName</span> <span class="c1">//图片名字 </span>
+</span><span class='line'>          <span class="nl">mimeType</span><span class="p">:</span><span class="s">@&quot;image/png&quot;</span><span class="p">];</span>
+</span><span class='line'>          
+</span><span class='line'>  <span class="p">}</span><span class="nl">success</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">AFHTTPRequestOperation</span> <span class="o">*</span><span class="n">operation</span><span class="p">,</span><span class="kt">id</span> <span class="n">responseObject</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//上传成功</span>
+</span><span class='line'>  <span class="p">}</span><span class="nl">failure</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">AFHTTPRequestOperation</span> <span class="o">*</span><span class="n">operation</span><span class="p">,</span><span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//上传失败</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-    AFHTTPRequestOperationManager* manager = [[AFHTTPRequestOperationManager alloc]init];
 
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];     
 
-    //不设置可能会出现404的bug
-    manager.responseSerializer.acceptableContentTypes =     [manager.responseSerializer.acceptableContentTypes   setByAddingObject:@"text/html"];
-
-    [manager POST:url parameters:nil 
-    constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
-        //以上传的时间为图片名
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        formatter.dateFormat = @"yyyyMMddHHmmss";
-        NSString *str = [formatter stringFromDate:[NSDate date]];
-        NSString *fileName = [NSString stringWithFormat:@"%@.png", str];
-
-        [formData appendPartWithFileData:data 
-        name:@"upload" //upload.php处理文件的字段
-        fileName:fileName //图片名字 
-        mimeType:@"image/png"];
-
-    }success:^(AFHTTPRequestOperation *operation,id responseObject) {
-        //上传成功
-    }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
-        //上传失败
-    }
-}
-</code></pre>
 
 		
 		

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-06T12:14:34+08:00</updated>
+  <updated>2016-02-06T12:22:15+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -133,55 +133,55 @@ return YES;
     <id>http://caixindong.github.io/blog/2015/12/31/ios19</id>
     <content type="html"><![CDATA[<p>1、在工具类定义压缩图片的方法,传入图片和所要压缩的尺寸</p>
 
-<pre><code>+(UIImage *)imageWithImage:(UIImage *)image scaleToSize :(CGSize )newSize{
+<pre><code class="objc ">    +(UIImage *)imageWithImage:(UIImage *)image scaleToSize :(CGSize )newSize{
 
-UIGraphicsBeginImageContext(newSize);
+    UIGraphicsBeginImageContext(newSize);
 
-[image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
 
-UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
 
-UIGraphicsEndImageContext();
+    UIGraphicsEndImageContext();
 
-return newImage;
+    return newImage;
 
-}
+    }
 </code></pre>
 
 <p>2、利用AFNetworking做图片上传功能</p>
 
-<pre><code>+(void)POSTToUrl:(NSString *)url WithData:(NSData *)data 
-    WithReturnBlock:(ReturnValueBlock)block         
-    WithErrorCodeBlock:(ErrorCodeBlock)errorBlock       
-    WithFailtureBlock:(FailureBlock)failtureBlock{
+<pre><code class="objc">    +(void)POSTToUrl:(NSString *)url WithData:(NSData *)data 
+        WithReturnBlock:(ReturnValueBlock)block         
+        WithErrorCodeBlock:(ErrorCodeBlock)errorBlock       
+        WithFailtureBlock:(FailureBlock)failtureBlock{
 
-    AFHTTPRequestOperationManager* manager = [[AFHTTPRequestOperationManager alloc]init];
+        AFHTTPRequestOperationManager* manager = [[AFHTTPRequestOperationManager alloc]init];
 
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];     
+        manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+        manager.responseSerializer = [AFJSONResponseSerializer serializer];     
 
-    //不设置可能会出现404的bug
-    manager.responseSerializer.acceptableContentTypes =     [manager.responseSerializer.acceptableContentTypes   setByAddingObject:@"text/html"];
+        //不设置可能会出现404的bug
+        manager.responseSerializer.acceptableContentTypes =     [manager.responseSerializer.acceptableContentTypes   setByAddingObject:@"text/html"];
 
-    [manager POST:url parameters:nil 
-    constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
-        //以上传的时间为图片名
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        formatter.dateFormat = @"yyyyMMddHHmmss";
-        NSString *str = [formatter stringFromDate:[NSDate date]];
-        NSString *fileName = [NSString stringWithFormat:@"%@.png", str];
+        [manager POST:url parameters:nil 
+        constructingBodyWithBlock:^(id&lt;AFMultipartFormData&gt; formData) {
+            //以上传的时间为图片名
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            formatter.dateFormat = @"yyyyMMddHHmmss";
+            NSString *str = [formatter stringFromDate:[NSDate date]];
+            NSString *fileName = [NSString stringWithFormat:@"%@.png", str];
 
-        [formData appendPartWithFileData:data 
-        name:@"upload" //upload.php处理文件的字段
-        fileName:fileName //图片名字 
-        mimeType:@"image/png"];
+            [formData appendPartWithFileData:data 
+            name:@"upload" //upload.php处理文件的字段
+            fileName:fileName //图片名字 
+            mimeType:@"image/png"];
 
-    }success:^(AFHTTPRequestOperation *operation,id responseObject) {
-        //上传成功
-    }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
-        //上传失败
+        }success:^(AFHTTPRequestOperation *operation,id responseObject) {
+            //上传成功
+        }failure:^(AFHTTPRequestOperation *operation,NSError *error) {
+            //上传失败
+        }
     }
-}
 </code></pre>
 ]]></content>
   </entry>
