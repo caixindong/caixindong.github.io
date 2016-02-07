@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-07T11:26:05+08:00</updated>
+  <updated>2016-02-07T12:51:27+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[栈的压入与弹出序列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/07/ios35/"/>
+    <updated>2016-02-07T11:28:41+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/07/ios35</id>
+    <content type="html"><![CDATA[<h2>要求：</h2>
+
+<p>给定压栈序列，如何判断弹栈序列是否合法，例如：  <br/>
+压栈序列：1，2，3，4，5  <br/>
+弹栈序列：4，5，3，2，1  就是合法  <br/>
+弹栈序列：4，5，3，1，2  就是不合法</p>
+
+<h2>做法：</h2>
+
+<p><code>1.</code> 初始化一个栈s和指针k，k用于遍历压栈序列，遍历弹栈序列，如果s非空且弹栈序列元素与s栈顶元素相同，就弹栈；    <br/>
+<code>2.</code> 如果上述条件不成立，遍历压栈序列，如果压栈序列元素与弹栈序列元素相同时，则继续遍历，否则将压栈元素压入栈中，继续遍历；当k大于等于数组长度时，则返回false；  <br/>
+<code>3.</code> 如果压栈序列遍历完成，则返回true；</p>
+
+<h2>代码如下：</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stack&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span><span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">TestValidPushAndPop</span><span class="p">(</span><span class="kt">int</span> <span class="n">pushSequence</span><span class="p">[],</span><span class="kt">int</span> <span class="n">popSequence</span><span class="p">[],</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">stack</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">s</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">s</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span><span class="o">&amp;&amp;</span><span class="n">popSequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="n">s</span><span class="p">.</span><span class="n">top</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">s</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>                    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                        <span class="k">if</span> <span class="p">(</span><span class="n">pushSequence</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">==</span><span class="n">popSequence</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>                            <span class="n">k</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>                            <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>                        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                            <span class="n">s</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">pushSequence</span><span class="p">[</span><span class="n">k</span><span class="p">]);</span>
+</span><span class='line'>                            <span class="n">k</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>                        <span class="p">}</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">Solution</span><span class="o">*</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Solution</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">push</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">};</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">pop</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">};</span>
+</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">TestValidPushAndPop</span><span class="p">(</span><span class="n">push</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[实现一个带有min()函数的栈，在 O(1) 时间内取得最小元素]]></title>
@@ -1916,25 +2023,6 @@ kCAMediaTimingFunctionLinear]];
     <updated>2015-11-19T16:20:47+08:00</updated>
     <id>http://caixindong.github.io/blog/2015/11/19/ios16</id>
     <content type="html"><![CDATA[<p>  当我们在使用<code>UITableView</code>的时候或者其他类<code>UIScrollView</code>的UI组件时，我们可能会遇到UITableView顶部留有一段空白区域的情况，那是因为<code>iOS 7</code> viewcontroller新增属性<code>automaticallyAdjustsScrollViewInsets</code>，即是否根据按所在界面的navigationbar与tabbar的高度，自动调整scrollview的 inset。如果我们不想要那段空白，将<code>automaticallyAdjustsScrollViewInsets</code>这个值设为<code>NO</code>就可以解决这个问题了</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[强大的FastCoder]]></title>
-    <link href="http://caixindong.github.io/blog/2015/11/08/ios15/"/>
-    <updated>2015-11-08T21:31:42+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/11/08/ios15</id>
-    <content type="html"><![CDATA[<p>FastCoder是一个Cocoa object和object graph的高性能二进制序列化格式,可以作为Property Lists和JSON的替代选择。通过两个简单的方法就可以实现任意对象和NSData之间的相互转化</p>
-
-<p>1、对象转化为NSData</p>
-
-<pre><code>NSData *data = [FastCoder dataWithRootObject:obj];
-</code></pre>
-
-<p>2、从中NSData取回对象</p>
-
-<pre><code>id obj = [FastCoder objectWithData:data];
-</code></pre>
 ]]></content>
   </entry>
   

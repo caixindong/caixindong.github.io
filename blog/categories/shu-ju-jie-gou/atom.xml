@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-07T11:26:05+08:00</updated>
+  <updated>2016-02-07T12:51:27+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,71 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[栈的压入与弹出序列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/07/ios35/"/>
+    <updated>2016-02-07T11:28:41+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/07/ios35</id>
+    <content type="html"><![CDATA[<h2>要求：</h2>
+
+<p>给定压栈序列，如何判断弹栈序列是否合法，例如：  <br/>
+压栈序列：1，2，3，4，5  <br/>
+弹栈序列：4，5，3，2，1  就是合法  <br/>
+弹栈序列：4，5，3，1，2  就是不合法</p>
+
+<h2>做法：</h2>
+
+<p><code>1.</code> 初始化一个栈s和指针k，k用于遍历压栈序列，遍历弹栈序列，如果s非空且弹栈序列元素与s栈顶元素相同，就弹栈；    <br/>
+<code>2.</code> 如果上述条件不成立，遍历压栈序列，如果压栈序列元素与弹栈序列元素相同时，则继续遍历，否则将压栈元素压入栈中，继续遍历；当k大于等于数组长度时，则返回false；  <br/>
+<code>3.</code> 如果压栈序列遍历完成，则返回true；</p>
+
+<h2>代码如下：</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+class Solution{
+public:
+    bool TestValidPushAndPop(int pushSequence[],int popSequence[],int n){
+        int k = 0;
+        stack&lt;int&gt; s;
+        for (int i=0; i&lt;n; i++) {
+            if (!s.empty()&amp;&amp;popSequence[i]==s.top()) {
+                s.pop();
+            }else{
+                while (true) {
+                    if (k &gt;= n) {
+                        return false;
+                    }else{
+                        if (pushSequence[k]==popSequence[i]) {
+                            k++;
+                            break;
+                        }else{
+                            s.push(pushSequence[k]);
+                            k++;
+                        }
+                    }
+                }
+
+            }
+        }
+        return true;
+    }
+
+
+};
+int main(int argc, const char * argv[]) {
+    Solution* s = new Solution();
+    int push[] = {1,2,3,4,5};
+    int pop[] = {4,5,3,2,1};
+    cout&lt;&lt;s-&gt;TestValidPushAndPop(push, pop, 5)&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[实现一个带有min()函数的栈，在 O(1) 时间内取得最小元素]]></title>
@@ -318,94 +383,6 @@ public:
         }
     }
 };
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[栈的实现(C++版)]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios22/"/>
-    <updated>2016-02-06T11:34:25+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios22</id>
-    <content type="html"><![CDATA[<h2>栈</h2>
-
-<p>我利用数组来实现栈，实现方法：  <br/>
-<code>1.</code> 创建MAXSIZE大小的数组用于存放数据，MAXSIZE也为栈的最大容量；  <br/>
-<code>2.</code> 当压栈时，判断栈是否满了，如果不满，就往数组里添加数据，如果满了，就提示栈溢出；  <br/>
-<code>3.</code>  当弹栈时，判断栈是否为空，如果不为空，就取出数组末尾的元素，取出后将该位置的值置为NULL，数组指针向前移动一位；如果为
-空，就提示栈为空；  <br/>
-代码实现：</p>
-
-<pre><code class="C++">    #include &lt;iostream&gt;
-    #define MAXSIZE 4
-    using namespace std;
-    template&lt;class T&gt;
-    class MyStack{
-    int size;
-    T* arr;
-    public:
-    MyStack(){
-        size = 0;
-        arr = new T[MAXSIZE];
-
-    }
-
-    ~MyStack(){
-        delete [] arr;
-    }
-
-    int sizeOfStack(){
-        return size;
-    }
-    //压栈
-    void push(const T &amp;t){
-        if (isFull()) {
-            cout&lt;&lt;"栈溢出"&lt;&lt;endl;
-            exit(1);
-        }else{
-            arr[size] = t;
-            size++;
-
-        }
-    }
-    //弹栈
-    T pop(){
-        if (isEmpty()) {
-            cout&lt;&lt;"栈为空"&lt;&lt;endl;
-            exit(0);
-        }else{
-            T t = peek();
-            arr[size-1]=NULL;
-            size--;
-            return t;
-        }
-    }
-    //查看栈顶元素
-    T peek(){
-        if (isEmpty()) {
-            cout&lt;&lt;"栈为空"&lt;&lt;endl;
-            exit(0);
-        }else{
-            return arr[size-1];
-        }
-    }
-    //判断栈是否为空
-    bool isEmpty(){
-        if (size==0) {
-            return true;
-        }else{
-            return false;
-        }
-    }
-    //判断栈是否溢出
-    bool isFull(){
-        if (size&gt;=MAXSIZE) {
-            return true;
-        }else{
-            return false;
-        }
-    }
-    };
 </code></pre>
 ]]></content>
   </entry>
