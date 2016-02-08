@@ -1,0 +1,322 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>C++ split()函数的实现 - Cool Guy</title>
+	<meta name="author" content="Xindong">
+
+	
+	<meta name="description" content="C++ Split()函数的实现 前言 java标准库提供split()函数用于字符型切割，但是C++的标准库并没有提供相应功能的方法，但是不用怕，今天我提供两种方法来实现我们自己的split()函数。 方法一 利用C++标准库提供s.find_first_of()函数和substr() &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://caixindong.github.io/blog/2016/02/08/ios39/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img alt='Profile Picture' src='/images/touxiang.jpeg' style='width: 160px;'>");
+	</script>
+</div>
+<h1><a href="/">Cool Guy</a></h1>
+<p class="subtitle">Blog like a hacker.</p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/aboutme">AboutMe</a></li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/3872004666/profile?topnav=1&wvr=6" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="http://git.oschina.net/xindong" title="GitHub">GitHub</a>
+		
+		
+		<a class="dribbble" href="http://www.dribbble.com/allenhsu" title="Dribbble">Dribbble</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+<hgroup>
+
+</hgroup>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">C++ Split()函数的实现</h1>
+	<div class="entry-content" itemprop="articleBody"><h2>前言</h2>
+
+<p>java标准库提供split()函数用于字符型切割，但是C++的标准库并没有提供相应功能的方法，但是不用怕，今天我提供两种方法来实现我们自己的split()函数。</p>
+
+<h2>方法一</h2>
+
+<p>利用C++标准库提供s.find_first_of()函数和substr()函数的来解决。  <br/>
+代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;vector&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;string&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm">* s 指待分割的字符串</span>
+</span><span class='line'><span class="cm">* delim 指分割符</span>
+</span><span class='line'><span class="cm">* ret 用于存储分割结果的容器</span>
+</span><span class='line'><span class="cm">**/</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">split01</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span> <span class="n">s</span><span class="p">,</span><span class="k">const</span> <span class="n">string</span> <span class="n">delim</span><span class="p">,</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span> <span class="o">&gt;*</span> <span class="n">ret</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>  
+</span><span class='line'>  <span class="c1">//记录每次分割的起始位置</span>
+</span><span class='line'>    <span class="kt">size_t</span> <span class="n">last</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//记录匹配delim这个字符的下标</span>
+</span><span class='line'>    <span class="kt">size_t</span> <span class="n">index</span><span class="o">=</span><span class="n">s</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="n">delim</span><span class="p">,</span><span class="n">last</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">//当=-1时表示查找不到</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">index</span><span class="o">!=-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>      
+</span><span class='line'>        <span class="n">ret</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">last</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="n">last</span><span class="p">));</span>
+</span><span class='line'>        <span class="c1">//记录下一次分割的起始位置</span>
+</span><span class='line'>        <span class="n">last</span><span class="o">=</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">index</span><span class="o">=</span><span class="n">s</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="n">delim</span><span class="p">,</span><span class="n">last</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//若最后一个分割符后面还有元素</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="o">-</span><span class="n">last</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">ret</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">last</span><span class="p">));</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>方法二</h2>
+
+<p>利用C++库提供的strtok()函数来解决。  <br/>
+函数说明：char * strtok(char <em>s, const char </em>delim)，参数s 指向欲分割的字符串，参数delim 则为分割字符串，当strtok()在参数s 的字符串中发现到参数delim 的分割字符时则会将该字符改为\0 字符。还有一个用于多线程的strtok_r()。  <br/>
+代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;vector&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;string&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">split02</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span> <span class="n">mystr</span><span class="p">,</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">deli</span><span class="p">,</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;*</span> <span class="n">list</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span> <span class="o">=</span> <span class="n">mystr</span><span class="p">.</span><span class="n">data</span><span class="p">();</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">mystr</span><span class="p">.</span><span class="n">length</span><span class="p">()];</span>
+</span><span class='line'>    <span class="c1">//从mystr拷贝（sizeof(buffer)+1）-1个字符到buffer中</span>
+</span><span class='line'>    <span class="n">snprintf</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">str</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">gg</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">strtok_r</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">deli</span><span class="p">,</span><span class="o">&amp;</span><span class="n">gg</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">list</span><span class="o">-&gt;</span><span class="n">clear</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">list</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">//往后的调用则将参数s 设置成NULL。每次调用成功则返回下一个分割后的字符串指针，设为NULL则默认指向这个指针</span>
+</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">strtok_r</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">deli</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">gg</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>附录:C++中string与char*和const char*互转的方法</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="c1">//string 转 const char*</span>
+</span><span class='line'><span class="n">string</span> <span class="n">s1</span> <span class="o">=</span> <span class="s">&quot;abc&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">s1</span><span class="p">.</span><span class="n">c_str</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//const char* 转 string</span>
+</span><span class='line'><span class="n">string</span> <span class="nf">s2</span><span class="p">(</span><span class="n">c1</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//string 转 char*</span>
+</span><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="n">c2</span><span class="p">;</span>
+</span><span class='line'><span class="n">c2</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="n">s1</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'><span class="n">strcpy</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">s1</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//char* 转 string</span>
+</span><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="n">c3</span> <span class="o">=</span> <span class="s">&quot;abc&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="n">string</span> <span class="nf">s3</span><span class="p">(</span><span class="n">c3</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//const char* 转为 char*</span>
+</span><span class='line'><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c4</span> <span class="o">=</span> <span class="s">&quot;123&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="n">c5</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+</span><span class='line'><span class="n">strcpy</span><span class="p">(</span><span class="n">c5</span><span class="p">,</span> <span class="n">c4</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+ 
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2016/02/08/ios39" data-title="C++ split()函数的实现" data-url="http://caixindong.github.io/blog/2016/02/08/ios39/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Xindong -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

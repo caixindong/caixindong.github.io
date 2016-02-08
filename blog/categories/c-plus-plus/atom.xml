@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: C++ | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-08T20:51:08+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[C++ Split()函数的实现]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/08/ios39/"/>
+    <updated>2016-02-08T19:32:26+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/08/ios39</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>java标准库提供split()函数用于字符型切割，但是C++的标准库并没有提供相应功能的方法，但是不用怕，今天我提供两种方法来实现我们自己的split()函数。</p>
+
+<h2>方法一</h2>
+
+<p>利用C++标准库提供s.find_first_of()函数和substr()函数的来解决。  <br/>
+代码如下：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+/**
+* s 指待分割的字符串
+* delim 指分割符
+* ret 用于存储分割结果的容器
+**/
+
+void split01(const string s,const string delim,vector&lt;string &gt;* ret)
+{   
+    //记录每次分割的起始位置
+    size_t last = 0;
+    //记录匹配delim这个字符的下标
+    size_t index=s.find_first_of(delim,last);
+    //当=-1时表示查找不到
+    while (index!=-1)
+    {       
+        ret-&gt;push_back(s.substr(last,index-last));
+        //记录下一次分割的起始位置
+        last=index+1;
+        index=s.find_first_of(delim,last);
+    }
+    //若最后一个分割符后面还有元素
+    if (s.length()-last&gt;0) 
+    {
+        ret-&gt;push_back(s.substr(last));
+    }
+}
+</code></pre>
+
+<h2>方法二</h2>
+
+<p>利用C++库提供的strtok()函数来解决。  <br/>
+函数说明：char * strtok(char <em>s, const char </em>delim)，参数s 指向欲分割的字符串，参数delim 则为分割字符串，当strtok()在参数s 的字符串中发现到参数delim 的分割字符时则会将该字符改为\0 字符。还有一个用于多线程的strtok_r()。  <br/>
+代码如下：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+
+void split02(const string mystr,const char* deli,vector&lt;string&gt;* list){
+    const char* str = mystr.data();
+    char buffer[mystr.length()];
+    //从mystr拷贝（sizeof(buffer)+1）-1个字符到buffer中
+    snprintf(buffer, sizeof(buffer)+1,str);
+    char* gg;
+    char* p = strtok_r(buffer, deli,&amp;gg);
+    list-&gt;clear();
+    while (p!=NULL) {
+        list-&gt;push_back(p);
+        //往后的调用则将参数s 设置成NULL。每次调用成功则返回下一个分割后的字符串指针，设为NULL则默认指向这个指针
+        p = strtok_r(NULL, deli, &amp;gg);
+    }
+}
+</code></pre>
+
+<h2>附录:C++中string与char*和const char*互转的方法</h2>
+
+<pre><code class="C++">    //string 转 const char*
+    string s1 = "abc";
+    const char* c1 = s1.c_str();
+
+    //const char* 转 string
+    string s2(c1);
+
+    //string 转 char*
+    char* c2;
+    c2 = new char[s1.length()+1];
+    strcpy(c2, s1.c_str());
+
+    //char* 转 string
+    char* c3 = "abc";
+    string s3(c3);
+
+    //const char* 转为 char*
+    const char* c4 = "123";
+    char* c5 = new char[100];
+    strcpy(c5, c4);
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
