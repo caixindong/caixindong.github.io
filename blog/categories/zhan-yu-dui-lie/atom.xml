@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 栈与队列 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/zhan-yu-dui-lie/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-08T10:55:03+08:00</updated>
+  <updated>2016-02-08T13:34:33+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[路径简化问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/08/ios37/"/>
+    <updated>2016-02-08T13:15:41+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/08/ios37</id>
+    <content type="html"><![CDATA[<h2>要求：</h2>
+
+<p>给定一个UNIX风格的全路径，简化它，例如：  <br/>
+“/home/”  =>  &ldquo;/home&rdquo;  <br/>
+&ldquo;/a/./b/../../c/&rdquo;  =>  &ldquo;/c&rdquo;</p>
+
+<h2>做法：</h2>
+
+<p><code>1.</code> &ldquo;."指的是当前目录，&rdquo;..&ldquo;指的是上级目录，"cd / &rdquo; 则是返回根目录；  <br/>
+<code>2.</code> 初始化一个vector1，我们将这个全路径按 “/” 分割，存储在vector1里；  <br/>
+<code>3.</code> 然后初始化另一个vector2，遍历这个vector1，遇到文件夹，则将它添加到vector2的尾部，遇到 &ldquo;..&rdquo; 则删除vector2的尾部的元素，如遇到 “” 或 “ . ” 则跳过继续遍历，根据这个特点，也可以用栈来实现；  <br/>
+<code>4.</code> 最后将vector2输出，拼接字符串；</p>
+
+<h2>代码实现：</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+using namespace std;
+class Solution {
+public:
+    void spilt(const char* str,const char* deli,vector&lt;string&gt;* ve,int n){
+        char tmp[n+1];
+        snprintf(tmp, sizeof(tmp), str);
+        ve-&gt;clear();
+        char* gg;
+        char* p  = strtok_r(tmp, deli, &amp;gg);
+        while (p!=NULL) {
+            ve-&gt;push_back(p);
+            p = strtok_r(NULL, deli, &amp;gg);
+        }
+
+
+    }
+
+    string simplifyPath(string path) {
+        vector&lt;string&gt; ve;
+        vector&lt;string&gt; newVe;
+        //字符串转化为char*
+        const char* str = path.c_str();
+       spilt(str, "/", &amp;ve,(int)path.length());
+        int n = (int)ve.size();
+        for (int i = 0; i&lt;n; i++) {
+            if (ve[i]==""||ve[i]==".") {
+                continue;
+            }else{
+                if (ve[i]=="..") {
+                    if (!newVe.empty()) {
+                        newVe.pop_back();
+                    }
+                }else{
+                    newVe.push_back(ve[i]);
+                }
+
+            }
+        }
+        if (newVe.empty()) {
+            return "/";
+        }else{
+            int m = (int)newVe.size();
+            string newStr = "";
+            for (int i=0; i&lt;m; i++) {
+                newStr = newStr+"/"+newVe[i];
+            }
+
+            return newStr;
+        }
+    }
+};
+
+
+int main(int argc, const char * argv[]) {
+    Solution* s = new Solution();
+    cout&lt;&lt;s-&gt;simplifyPath("///HSGambA/..///DLCkPZxIAWDX/iIQIncFWSaMLG/././RVOlTgYl/NnTHKiAVWVCPCARqna///lxbPdAlgTC/eXBfVOBuPbBRb/////iy///../gE/MoNMalkJgUChQbXuRogz/./../FkR/././././GtP///./..///CAiQtMuRub/xOcs/RtEkqhqCLZAkCzdX/////SNMEIs/cyneqrDxUosUhcGAB/bPHrLgioq/./HhFgLUjEFrg/nKlbXBRicXjxNBLD/.///.///LIUAUsBU/kTqEWZYpIdRRxDV/////pLjoiqd/mMgSebGPyZ/./VQAErxTVbJtFGJ/wyeOwQUEwz/../.././//d/../../qmYZmdXO///liGrmA/.././../Cc///tOLsCMtVJcDDKcuPM///./fywuWZOHnln/UjepoOdc/CVSRAwOielKl/../ExXI/SYsxkdfeRHPuRZhsRrQc/./RxruFyUPeisM/../uyGh/EjJsGlCLKMpnzS/SYoyFtsznGK/./mnbKK/../SLAKsHcouXPKSQwJa/./../NPn/kHeVSrDVVfhv/P/../CSXZeqLgJOLbyZZNiJGa/L///AOldPsSFIZqKKixZQ/evwGyGJhoKvvyot/pWtiAkFrvnLTbZZT/EkKrRJyXmNoUWCDr/qHgRjqETRtMfrX/WZxvvGRWclANrbuLuu///xBOFLDmoQtYQhjK/../MCRZBSWX/IYshVeeYGeHEPAsDYDp///pNnHlXfOQCVJu/../Ux/../HFaPOmbhjNq/OXRFgVU/uxMsClzPA/./cPlqKKvZNAQKzwFL///uvKKsZoHjZArQQ/DJruUeMYHMlhKPkFMy/NqdCweXujNHGJTL/tjhFFsOMeXWlNeDJjf/EeWUzIHmqfS/.././DDmiy///.././EqjhEiYgVbHo/NTvBQ/././//../nMzJgmVGcMlZgTQhwC/.///MXtPzGrZEB/WynGrD/////../PidAvghpCyxRYQRKaZEF/../mtoy//")&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[括号匹配问题]]></title>
@@ -286,91 +371,6 @@ public:
 
     // Return whether the queue is empty.
     bool empty(void) {
-        if (size==0) {
-            return true;
-        }else{
-            return false;
-        }
-    }
-};
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[利用队列实现栈]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios24/"/>
-    <updated>2016-02-06T14:50:43+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios24</id>
-    <content type="html"><![CDATA[<h2>C++库中的queue:</h2>
-
-<p>queue 模板类的定义在queue头文件中  <br/>
-queue 的基本操作有：  <br/>
-<code>1.</code> 入队：q.push(x);  <br/>
-<code>2.</code> 出队：q.pop(),注意它不返回元素的值;  <br/>
-<code>3.</code> 访问队首元素： q.front();  <br/>
-<code>4.</code> 访问队尾元素： q.back();  <br/>
-<code>5.</code> 队列的元素个数： q.size();  <br/>
-<code>6.</code> 判断队列是否为空： q.empty();</p>
-
-<h2>我们利用队列的这些特点来实现我们的栈</h2>
-
-<p>做法如下：  <br/>
-<code>1.</code> 用一个size来记录栈的容量，实现栈需要利用两个队列q1、q2;  <br/>
-<code>2.</code> 压栈时，将元素插入到非空队列里;  <br/>
-<code>3.</code> 弹栈时，先取得非空队列q1，弹出元素插入到空队列q2中，直到只剩下最后一个元素，弹栈就是弹出这个元素，且不插入到q2中;  <br/>
-<code>4.</code> 查看栈顶元素，操作同上，只是最后那个元素最终要插入到q2中;      <br/>
-代码如下：</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;queue&gt;
-using namespace std;
-class Stack {
-    int size=0;
-    queue&lt;int&gt; q1;
-    queue&lt;int&gt; q2;
-public:
-    // Push element x onto stack.
-    void push(int x) {
-        if (empty()||!q1.empty()) {
-            q1.push(x);
-        }else{
-            q2.push(x);
-        }
-        size++;
-    }
-
-    // Removes the element on top of the stack.
-    void pop() {
-        if (!q1.empty()) {
-            while (q1.size()&gt;1) {
-                int a = q1.front();
-                q1.pop();
-                q2.push(a);
-            }
-            q1.pop();
-        }else{
-            while (q2.size()&gt;1) {
-                int a = q2.front();
-                q2.pop();
-                q1.push(a);
-            }
-            q2.pop();
-        }
-        size--;
-    }
-
-    // Get the top element.
-    int top() {
-        if (!q1.empty()) {
-            return q1.back();
-        }else{
-            return q2.back();
-        }
-    }
-
-    // Return whether the stack is empty.
-    bool empty() {
         if (size==0) {
             return true;
         }else{
