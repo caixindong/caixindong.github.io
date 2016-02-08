@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-08T14:28:58+08:00</updated>
+  <updated>2016-02-08T14:30:10+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -24,7 +24,7 @@
 丑数，就是只含有2、3、5三个因子的正整数。  <br/>
 <code>2.</code> 如何让判断丑数？  <br/>
 一个数先被2整除，直到不能被2整除，再被3整除，直到不能被3整除，再被5整除，直到不能被5整除，除到最后如果只剩下1则为丑数，否则不为丑数  <br/>
-<code>3.</code> 代码实现如下：</p>
+<code>3.</code> 判断丑数代码实现如下：</p>
 
 <pre><code class="C++">#include &lt;iostream&gt;
 using namespace std;
