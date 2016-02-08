@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-08T20:51:08+08:00</updated>
+  <updated>2016-02-08T20:53:12+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -71,7 +71,7 @@ void split01(const string s,const string delim,vector&lt;string &gt;* ret)
 using namespace std;
 
 void split02(const string mystr,const char* deli,vector&lt;string&gt;* list){
-    const char* str = mystr.data();
+    const char* str = mystr.c_str();
     char buffer[mystr.length()];
     //从mystr拷贝（sizeof(buffer)+1）-1个字符到buffer中
     snprintf(buffer, sizeof(buffer)+1,str);
