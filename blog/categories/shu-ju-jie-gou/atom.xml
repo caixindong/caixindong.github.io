@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-07T12:56:35+08:00</updated>
+  <updated>2016-02-08T10:50:44+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,87 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[括号匹配问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/08/ios36/"/>
+    <updated>2016-02-08T10:34:21+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/08/ios36</id>
+    <content type="html"><![CDATA[<h1>新年到了，恭祝大家新年快乐</h1>
+
+<h2>今天解决括号匹配问题</h2>
+
+<h2>要求：</h2>
+
+<p>给定一个字符串，判断它是否括号匹配，'(&lsquo;和&rsquo;)&lsquo;匹配，&rsquo;[&lsquo;和&rsquo;]&lsquo;匹配，&rsquo;{&lsquo;和&rsquo;}&lsquo;匹配，成对出现。例如："( [ [ ] ] )&ldquo;括号匹配，而&rdquo;[ [ ( ( ) )&ldquo;则不匹配。</p>
+
+<h2>做法：</h2>
+
+<p><code>1.</code> 既然要括号匹配，那么奇数长度的字符串一定是不匹配的，而且后出现的符号先匹配，由此我们可以联想到栈后进先出的特点，所以这道题利用栈来解决；  <br/>
+<code>2.</code> 遍历字符串，如果遇到了'(&lsquo; , &rsquo;[&lsquo; , &rsquo;{&lsquo;则将它们压栈，如果遇到&rsquo;)&lsquo; , &rsquo;]&lsquo; , &rsquo;}&lsquo;则判断它是否与栈顶元素匹配，如果匹配，则继续遍历字符串，否则返回false，说明它不匹配；当字符串遍历完了，判断栈是否为空，如果为空则括号匹配，如果不为空则括号不匹配。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+class Solution {
+public:
+    bool isValid(string s) {
+        if (s.length()&lt;=0) {
+            return true;
+        }
+        int n = (int)s.length();
+        if (n%2!=0) {
+            return false;
+        }else{
+            stack&lt;char&gt; stack;
+            for (int i=0; i&lt;n; i++) {
+                if (s[i]=='('||s[i]=='['||s[i]=='{') {
+                    stack.push(s[i]);
+                }
+                if (!stack.empty()) {
+                    if (s[i]==')') {
+                        char top = stack.top();
+                        if (top=='(') {
+                            stack.pop();
+                            continue;
+                        }else{
+                            return false;
+                        }
+                    }
+                    else if (s[i]==']') {
+                        char top = stack.top();
+                        if (top=='[') {
+                            stack.pop();
+                            continue;
+                        }else{
+                            return false;
+                        }
+                    }
+                    else if (s[i]=='}') {
+                        char top = stack.top();
+                        if (top=='{') {
+                            stack.pop();
+                            continue;
+                        }else{
+                            return false;
+                        }
+                    }
+                }
+            }
+            if (stack.empty()) {
+                return true;
+            }else{
+                return false;
+            }
+            ;
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[栈的压入与弹出序列]]></title>
@@ -294,92 +375,6 @@ public:
             return true;
         }else{
             return false;
-        }
-    }
-};
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[队列的实现(C++版)]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios23/"/>
-    <updated>2016-02-06T11:54:12+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios23</id>
-    <content type="html"><![CDATA[<h2>队列</h2>
-
-<p>我利用链表来实现队列，实现方法：  <br/>
-<code>1.</code> 初始化一个头指针，并创建一个尾指针指向头指针 ； <br/>
-<code>2.</code> 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点；  <br/>
-<code>3.</code> 出队时，判断队列是否为空，如果为空，则提示队列为空；如果不为空，则取出头指针指向的节点，调整头指针指向该节点指向的下一个节点，再判断此时队列是否为空，如果为空，则调整尾指针指向头指针,返回节点的值，free这个节点；  <br/>
-代码实现：</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-template&lt;class T&gt;
-//链表节点
-struct ListNode {
-    T val;
-    ListNode* next;
-    ListNode(T x){
-        val = x;
-        next = NULL;
-    };
-};
-template&lt;class T&gt;
-class MyQueue{
-    ListNode&lt;T&gt;* head;
-    ListNode&lt;T&gt;* last;
-    int size;
-public:
-    MyQueue(){
-        head = new ListNode&lt;T&gt;(NULL);
-        last = head;
-        size = 0;
-    }
-    ~MyQueue(){
-        head = NULL;
-        last = NULL;
-    }
-    //判断队列是否为空
-    bool isEmpty(){
-        if (size==0) {
-            return true;
-        }else{
-            return false;
-        }
-    }
-    //入队
-    void offer(T value){
-        ListNode&lt;T&gt;* newNode = new ListNode&lt;T&gt;(value);
-        last-&gt;next = newNode;
-        last = newNode;
-        size++;
-    }
-    //查看队头元素
-    T peek(){
-        if (isEmpty()) {
-            cout&lt;&lt;"队列为空"&lt;&lt;endl;
-            exit(0);
-        }else{
-            return head-&gt;next-&gt;val;
-        }
-    }
-    //出队
-    T poll(){
-        if (isEmpty()) {
-            cout&lt;&lt;"队列为空"&lt;&lt;endl;
-            exit(0);
-        }else{
-            ListNode&lt;T&gt;* p = head-&gt;next;
-            T pVal = p-&gt;val;
-            head-&gt;next = p-&gt;next;
-            size--;
-            if (size==0) {
-                last = head;
-            }
-            free(p);
-            return pVal;
         }
     }
 };
