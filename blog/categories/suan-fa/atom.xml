@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 算法 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-08T20:53:12+08:00</updated>
+  <updated>2016-02-10T20:07:17+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -277,8 +277,8 @@ void mySwap(int &amp;a,int &amp;b){
 }
 //堆调整
 void heapAdjuct(int a[],int size,int i){
-    int lchild = 2*i;
-    int rchild = 2*i+1;
+    int lchild = 2*(i+1)-1;
+    int rchild = 2*(i+1);
     int max = i;
     if (i&lt;=size/2-1) {
         if (lchild&lt;=size-1&amp;&amp;a[lchild]&gt;a[max]) {

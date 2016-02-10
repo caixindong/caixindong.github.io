@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-08T20:53:12+08:00</updated>
+  <updated>2016-02-10T20:07:17+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -1393,8 +1393,8 @@
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="c1">//堆调整</span>
 </span><span class='line'><span class="kt">void</span> <span class="nf">heapAdjuct</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">size</span><span class="p">,</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">lchild</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">rchild</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">lchild</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rchild</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
 </span><span class='line'>    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
 </span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">lchild</span><span class="o">&lt;=</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">a</span><span class="p">[</span><span class="n">lchild</span><span class="p">]</span><span class="o">&gt;</span><span class="n">a</span><span class="p">[</span><span class="n">max</span><span class="p">])</span> <span class="p">{</span>
