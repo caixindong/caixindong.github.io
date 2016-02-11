@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 树 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-11T13:52:14+08:00</updated>
+  <updated>2016-02-11T14:18:58+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,161 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[二叉树的DFS遍历(非递归)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/11/ios41/"/>
+    <updated>2016-02-11T13:54:08+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/11/ios41</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>递归是利用函数压栈实现，如果我们要将递归的写法转化为非递归写法，自然需要利用栈来实现。</p>
+
+<h2>二叉树的实现</h2>
+
+<p>代码如下：</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct treeNode {
+    int val;
+    int position;
+    treeNode* left;
+    treeNode* right;
+    treeNode(int val,int position){
+        this-&gt;val = val;
+        this-&gt;position = position;
+        this-&gt;left = nullptr;
+        this-&gt;right = nullptr;
+    }
+};
+
+
+class BinarySearchTree {
+    treeNode* root = nullptr;
+
+    void add(int value,int position,treeNode* node){
+        if (node==nullptr) {
+            throw "树为空";
+        }
+
+        if (value == node-&gt;val) {
+            return;
+        }else if(value &lt; node-&gt;val){
+            if (node-&gt;left==nullptr) {
+                node-&gt;left = new treeNode(value,position);
+            }else{
+                add(value, position, node-&gt;left);
+            }
+        }else{
+            if (node-&gt;right==nullptr) {
+                node-&gt;right = new treeNode(value,position);
+            }else{
+                add(value, position, node-&gt;right);
+            }
+        }
+    }
+public:
+    /**
+     *添加节点
+     **/
+    void add(int value,int position){
+        if (root==nullptr) {
+            root = new treeNode(value,position);
+        }else{
+            add(value, position, root);
+        }
+    }
+
+};
+</code></pre>
+
+<h2>前序遍历非递归写法</h2>
+
+<p>代码如下：</p>
+
+<pre><code class="C++">    /**
+     *前序遍历
+     **/
+    void pre_order(){
+        treeNode* currentNode = root;
+        std::stack&lt;treeNode*&gt; stack;
+        while (currentNode||!stack.empty()) {
+            if (currentNode) {
+                std::cout&lt;&lt;currentNode-&gt;val&lt;&lt;std::endl;
+                stack.push(currentNode);
+                currentNode = currentNode-&gt;left;
+            }else{
+                currentNode = stack.top();
+                stack.pop();
+                currentNode = currentNode-&gt;right;
+            }
+        }
+
+
+    }
+</code></pre>
+
+<h2>中序遍历非递归写法</h2>
+
+<p>代码如下：</p>
+
+<pre><code class="C++">    /**
+     *中序遍历
+     **/
+    void mid_order(){
+        treeNode* currentNode = root;
+        std::stack&lt;treeNode*&gt; stack;
+        while (!stack.empty()||currentNode) {
+            if (currentNode) {
+                stack.push(currentNode);
+                currentNode = currentNode-&gt;left;
+            }else{
+                currentNode = stack.top();
+                stack.pop();
+                std::cout&lt;&lt;currentNode-&gt;val&lt;&lt;std::endl;
+                currentNode = currentNode-&gt;right;
+            }
+        }
+
+    }
+</code></pre>
+
+<h2>后序遍历非递归写法</h2>
+
+<p>代码如下：</p>
+
+<pre><code class="C++">    /**
+     *后序遍历
+     **/
+    void back_order(){
+        treeNode* currentNode = root;
+        treeNode* lastVisitNode = nullptr;
+        std::stack&lt;treeNode*&gt; stack;
+
+        while (currentNode) {
+            stack.push(currentNode);
+            currentNode = currentNode-&gt;left;
+        }
+        while (!stack.empty()) {
+            currentNode = stack.top();
+            stack.pop();
+            if (currentNode-&gt;right==nullptr||currentNode-&gt;right==lastVisitNode) {
+                std::cout&lt;&lt;currentNode-&gt;val&lt;&lt;std::endl;
+                lastVisitNode = currentNode;
+            }else{
+                stack.push(currentNode);
+                currentNode = currentNode-&gt;right;
+                while (currentNode) {
+                    stack.push(currentNode);
+                    currentNode = currentNode-&gt;left;
+                }
+            }
+        }
+    }
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[二叉树的DFS遍历(递归)]]></title>
