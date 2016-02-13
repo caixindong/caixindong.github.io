@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 算法 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-11T14:18:58+08:00</updated>
+  <updated>2016-02-13T11:13:21+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[二分查找算法的实现]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/13/ios42/"/>
+    <updated>2016-02-13T11:09:21+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/13/ios42</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>使用二分查找算法的前提是查找的序列有序。</p>
+
+<h2>递归实现</h2>
+
+<p>代码如下：</p>
+
+<pre><code class="C++">int binary_search01(int start,int end,int key,int a[]){
+    if (start&lt;=end) {
+        int mid = (start+end)/2;
+        if (key&gt;a[mid]) {
+            return binary_search01(mid+1, end, key, a);
+        }else if(key&lt; a[mid]){
+            return binary_search01(start, mid-1, key, a);
+        }else{
+            return mid;
+        }
+    }
+    return -1;
+}
+</code></pre>
+
+<h2>非递归实现</h2>
+
+<p>代码如下：</p>
+
+<pre><code class="C++">int binary_search02(int start,int end,int key,int a[]){
+    int mid;
+    while (start&lt;=end) {
+        mid = (start+end)/2;
+        if (key&gt;a[mid]) {
+            start = mid+1;
+        }else if(key&lt; a[mid]){
+            end = mid - 1;
+        }else{
+            return mid;
+        }
+    }
+    return -1;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[八大排序算法--基数排序]]></title>
@@ -249,72 +299,6 @@ int main(int argc, const char * argv[]) {
     bubbleSort(8, a);
     for (int i=0; i&lt;8; i++) {
         cout&lt;&lt;a[i]&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[八大排序算法--堆排序]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios29/"/>
-    <updated>2016-02-06T22:12:33+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios29</id>
-    <content type="html"><![CDATA[<h2>堆排序</h2>
-
-<p>代码如下</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-
-void mySwap(int &amp;a,int &amp;b){
-    int tmp;
-    tmp = a;
-    a = b;
-    b = tmp;
-}
-//堆调整
-void heapAdjuct(int a[],int size,int i){
-    int lchild = 2*(i+1)-1;
-    int rchild = 2*(i+1);
-    int max = i;
-    if (i&lt;=size/2-1) {
-        if (lchild&lt;=size-1&amp;&amp;a[lchild]&gt;a[max]) {
-            max = lchild;
-        }
-        if (rchild&lt;=size-1&amp;&amp;a[rchild]&gt;a[max]) {
-            max = rchild;
-        }
-        if (max!=i) {
-            mySwap(a[i], a[max]);
-            heapAdjuct(a, size, max);
-        }
-
-    }
-}
-//初始化堆
-void setupNewHeap(int a[],int size){
-    for (int i=size/2-1; i&gt;=0; i--) {
-        heapAdjuct(a, size, i);
-    }
-}
-
-void heapSort(int a[],int size){
-    setupNewHeap(a, size);
-    for (int i = size-1; i&gt;0; i--) {
-        mySwap(a[i], a[0]);
-        heapAdjuct(a,i, 0);
-    }
-}
-
-int main(int argc, const char * argv[]) {
-    int a[] = {2,3,1,5,6,9,3,4,8};
-    heapSort(a,9);
-    for (int i=0; i&lt;9; i++) {
-        cout&lt;&lt;a[i]&lt;&lt;" ";
-
     }
     cout&lt;&lt;endl;
     return 0;
