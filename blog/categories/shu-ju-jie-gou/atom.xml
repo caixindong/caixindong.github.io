@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T14:20:03+08:00</updated>
+  <updated>2016-02-13T14:33:53+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -230,42 +230,16 @@ struct treeNode {
 };
 
 
-class BinarySearchTree {
-    treeNode* root = nullptr;
+class BinaryTree {
 
-    void add(int value,int position,treeNode* node){
-        if (node==nullptr) {
-            throw "树为空";
-        }
-
-        if (value == node-&gt;val) {
-            return;
-        }else if(value &lt; node-&gt;val){
-            if (node-&gt;left==nullptr) {
-                node-&gt;left = new treeNode(value,position);
-            }else{
-                add(value, position, node-&gt;left);
-            }
-        }else{
-            if (node-&gt;right==nullptr) {
-                node-&gt;right = new treeNode(value,position);
-            }else{
-                add(value, position, node-&gt;right);
-            }
-        }
-    }
 public:
-    /**
-     *添加节点
-     **/
-    void add(int value,int position){
-        if (root==nullptr) {
-            root = new treeNode(value,position);
-        }else{
-            add(value, position, root);
-        }
+    treeNode* root = nullptr;
+    BinartTree(){
+        root = nullptr;
     }
-
+    void pre_order();
+    void mid_order();
+    void back_order()
 };
 </code></pre>
 
@@ -276,7 +250,7 @@ public:
 <pre><code class="C++">    /**
      *前序遍历
      **/
-    void pre_order(){
+    void BinaryTree::pre_order(){
         treeNode* currentNode = root;
         std::stack&lt;treeNode*&gt; stack;
         while (currentNode||!stack.empty()) {
@@ -302,7 +276,7 @@ public:
 <pre><code class="C++">    /**
      *中序遍历
      **/
-    void mid_order(){
+    void BinaryTree::mid_order(){
         treeNode* currentNode = root;
         std::stack&lt;treeNode*&gt; stack;
         while (!stack.empty()||currentNode) {
@@ -327,7 +301,7 @@ public:
 <pre><code class="C++">    /**
      *后序遍历
      **/
-    void back_order(){
+    void BinaryTree::back_order(){
         treeNode* currentNode = root;
         treeNode* lastVisitNode = nullptr;
         std::stack&lt;treeNode*&gt; stack;
@@ -381,42 +355,15 @@ struct treeNode {
 };
 
 
-class BinarySearchTree {
-    treeNode* root = nullptr;
-
-    void add(int value,int position,treeNode* node){
-        if (node==nullptr) {
-            throw "树为空";
-        }
-
-        if (value == node-&gt;val) {
-            return;
-        }else if(value &lt; node-&gt;val){
-            if (node-&gt;left==nullptr) {
-                node-&gt;left = new treeNode(value,position);
-            }else{
-                add(value, position, node-&gt;left);
-            }
-        }else{
-            if (node-&gt;right==nullptr) {
-                node-&gt;right = new treeNode(value,position);
-            }else{
-                add(value, position, node-&gt;right);
-            }
-        }
-    }
+class BinaryTree {
 public:
-    /**
-     *添加节点
-     **/
-    void add(int value,int position){
-        if (root==nullptr) {
-            root = new treeNode(value,position);
-        }else{
-            add(value, position, root);
-        }
+    treeNode* root = nullptr;
+    BinaryTree(){
+        root = nullptr;
     }
-
+    pre_order(treeNode* node);
+    mid_order(treeNode* node);
+    back_order(treeNode* node);
 };
 </code></pre>
 
@@ -424,14 +371,17 @@ public:
 
 <p>代码如下：</p>
 
-<pre><code class="C++">    void DFSTravel(treeNode* node){
+<pre><code class="C++">
+/**
+*前序遍历
+**/
+    void BinaryTree::pre_order(treeNode* node){
         if (node==nullptr) {
             return;
         }else{
-            //前序遍历
             cout&lt;&lt;node-&gt;val&lt;&lt;endl;
-            DFSTravel(node-&gt;left);
-            DFSTravel(node-&gt;right);           
+            pre_order(node-&gt;left);
+            pre_order(node-&gt;right);           
         }
     }
 </code></pre>
@@ -440,14 +390,17 @@ public:
 
 <p>代码如下：</p>
 
-<pre><code class="C++">    void DFSTravel(treeNode* node){
+<pre><code class="C++">
+/**
+*中序遍历
+**/
+    void BinaryTree::mid_order(treeNode* node){
         if (node==nullptr) {
             return;
         }else{
-           //中序遍历
-            DFSTravel(node-&gt;left);
+           mid_order(node-&gt;left);
             cout&lt;&lt;node-&gt;val&lt;&lt;endl;
-            DFSTravel(node-&gt;right);           
+            mid_order(node-&gt;right);           
         }
     }
 </code></pre>
@@ -456,13 +409,16 @@ public:
 
 <p>代码如下：</p>
 
-<pre><code class="C++">    void DFSTravel(treeNode* node){
+<pre><code class="C++">
+/**
+*后序遍历
+**/
+    void BinaryTree::back_order(treeNode* node){
         if (node==nullptr) {
             return;
         }else{           
-            //后序遍历
-            DFSTravel(node-&gt;left);
-            DFSTravel(node-&gt;right);
+           back_order(node-&gt;left);
+            back_order(node-&gt;right);
             cout&lt;&lt;node-&gt;val&lt;&lt;endl;
         }
     }
