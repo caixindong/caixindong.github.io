@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T11:13:21+08:00</updated>
+  <updated>2016-02-13T11:35:32+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[利用二叉查找树来进行查找]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/13/ios43/"/>
+    <updated>2016-02-13T11:18:43+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/13/ios43</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>虽然二分法的查找速度快（O(log2n)）,但是有局限条件，就是查找的序列必须有序。  <br/>
+除此之外，我们还可以利用二叉查找树来进行查找，如果它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树,查找时间的时间复杂度为O(log2n)；但是如果他的结点都集中于某一边，则查找时间的复杂度可能会变为O(n)。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct treeNode {
+    int val;
+    int position;
+    treeNode* left;
+    treeNode* right;
+    treeNode(int val,int position){
+        this-&gt;val = val;
+        this-&gt;position = position;
+        this-&gt;left = nullptr;
+        this-&gt;right = nullptr;
+    }
+};
+
+
+class BinarySearchTree {
+    treeNode* root = nullptr;
+
+    void add(int value,int position,treeNode* node){
+        if (node==nullptr) {
+            throw "树为空";
+        }
+
+        if (value == node-&gt;val) {
+            return;
+        }else if(value &lt; node-&gt;val){
+            if (node-&gt;left==nullptr) {
+                node-&gt;left = new treeNode(value,position);
+            }else{
+                add(value, position, node-&gt;left);
+            }
+        }else{
+            if (node-&gt;right==nullptr) {
+                node-&gt;right = new treeNode(value,position);
+            }else{
+                add(value, position, node-&gt;right);
+            }
+        }
+    }
+
+    int search(int keyValue,treeNode* node){
+        if (node==nullptr) {
+            return -1;
+        }else if(keyValue &lt; node-&gt;val){
+            return search(keyValue, node-&gt;left);
+        }else if(keyValue &gt; node-&gt;val){
+            return search(keyValue, node-&gt;right);
+        }else{
+            return node-&gt;position;
+        }
+    }
+    public:
+
+    /**
+     *添加结点
+     **/
+    void add(int value,int position){
+        if (root==nullptr) {
+            root = new treeNode(value,position);
+        }else{
+            add(value, position, root);
+        }
+    }
+
+    /**
+     *搜索
+     **/
+    int search(int keyValue){
+        return search(keyValue, root);
+    }
+
+};
+
+int main(int argc, const char * argv[]) {
+
+    int a[] = {4,6,3,5,7,2,9,8,10};
+    BinarySearchTree* tree = new BinarySearchTree();
+    for (int i=0; i&lt;9; i++) {
+        tree-&gt;add(a[i], i);
+    }
+
+    for (int i=0; i&lt;20; i++) {
+        cout&lt;&lt;tree-&gt;search(i)&lt;&lt;endl;
+    }
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[二叉树的DFS遍历(非递归)]]></title>
@@ -474,87 +578,6 @@ int main(int argc, const char * argv[]) {
     cout&lt;&lt;s-&gt;simplifyPath("///HSGambA/..///DLCkPZxIAWDX/iIQIncFWSaMLG/././RVOlTgYl/NnTHKiAVWVCPCARqna///lxbPdAlgTC/eXBfVOBuPbBRb/////iy///../gE/MoNMalkJgUChQbXuRogz/./../FkR/././././GtP///./..///CAiQtMuRub/xOcs/RtEkqhqCLZAkCzdX/////SNMEIs/cyneqrDxUosUhcGAB/bPHrLgioq/./HhFgLUjEFrg/nKlbXBRicXjxNBLD/.///.///LIUAUsBU/kTqEWZYpIdRRxDV/////pLjoiqd/mMgSebGPyZ/./VQAErxTVbJtFGJ/wyeOwQUEwz/../.././//d/../../qmYZmdXO///liGrmA/.././../Cc///tOLsCMtVJcDDKcuPM///./fywuWZOHnln/UjepoOdc/CVSRAwOielKl/../ExXI/SYsxkdfeRHPuRZhsRrQc/./RxruFyUPeisM/../uyGh/EjJsGlCLKMpnzS/SYoyFtsznGK/./mnbKK/../SLAKsHcouXPKSQwJa/./../NPn/kHeVSrDVVfhv/P/../CSXZeqLgJOLbyZZNiJGa/L///AOldPsSFIZqKKixZQ/evwGyGJhoKvvyot/pWtiAkFrvnLTbZZT/EkKrRJyXmNoUWCDr/qHgRjqETRtMfrX/WZxvvGRWclANrbuLuu///xBOFLDmoQtYQhjK/../MCRZBSWX/IYshVeeYGeHEPAsDYDp///pNnHlXfOQCVJu/../Ux/../HFaPOmbhjNq/OXRFgVU/uxMsClzPA/./cPlqKKvZNAQKzwFL///uvKKsZoHjZArQQ/DJruUeMYHMlhKPkFMy/NqdCweXujNHGJTL/tjhFFsOMeXWlNeDJjf/EeWUzIHmqfS/.././DDmiy///.././EqjhEiYgVbHo/NTvBQ/././//../nMzJgmVGcMlZgTQhwC/.///MXtPzGrZEB/WynGrD/////../PidAvghpCyxRYQRKaZEF/../mtoy//")&lt;&lt;endl;
     return 0;
 }
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[括号匹配问题]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/08/ios36/"/>
-    <updated>2016-02-08T10:34:21+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/08/ios36</id>
-    <content type="html"><![CDATA[<h1>新年到了，恭祝大家新年快乐</h1>
-
-<h2>今天解决括号匹配问题</h2>
-
-<h2>要求：</h2>
-
-<p>给定一个字符串，判断它是否括号匹配，'(&lsquo;和&rsquo;)&lsquo;匹配，&rsquo;[&lsquo;和&rsquo;]&lsquo;匹配，&rsquo;{&lsquo;和&rsquo;}&lsquo;匹配，成对出现。例如："( [ [ ] ] )&ldquo;括号匹配，而&rdquo;[ [ ( ( ) )&ldquo;则不匹配。</p>
-
-<h2>做法：</h2>
-
-<p><code>1.</code> 既然要括号匹配，那么奇数长度的字符串一定是不匹配的，而且后出现的符号先匹配，由此我们可以联想到栈后进先出的特点，所以这道题利用栈来解决；  <br/>
-<code>2.</code> 遍历字符串，如果遇到了'(&lsquo; , &rsquo;[&lsquo; , &rsquo;{&lsquo;则将它们压栈，如果遇到&rsquo;)&lsquo; , &rsquo;]&lsquo; , &rsquo;}&lsquo;则判断它是否与栈顶元素匹配，如果匹配，则继续遍历字符串，否则返回false，说明它不匹配；当字符串遍历完了，判断栈是否为空，如果为空则括号匹配，如果不为空则括号不匹配。</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;stack&gt;
-using namespace std;
-class Solution {
-public:
-    bool isValid(string s) {
-        if (s.length()&lt;=0) {
-            return true;
-        }
-        int n = (int)s.length();
-        if (n%2!=0) {
-            return false;
-        }else{
-            stack&lt;char&gt; stack;
-            for (int i=0; i&lt;n; i++) {
-                if (s[i]=='('||s[i]=='['||s[i]=='{') {
-                    stack.push(s[i]);
-                }
-                if (!stack.empty()) {
-                    if (s[i]==')') {
-                        char top = stack.top();
-                        if (top=='(') {
-                            stack.pop();
-                            continue;
-                        }else{
-                            return false;
-                        }
-                    }
-                    else if (s[i]==']') {
-                        char top = stack.top();
-                        if (top=='[') {
-                            stack.pop();
-                            continue;
-                        }else{
-                            return false;
-                        }
-                    }
-                    else if (s[i]=='}') {
-                        char top = stack.top();
-                        if (top=='{') {
-                            stack.pop();
-                            continue;
-                        }else{
-                            return false;
-                        }
-                    }
-                }
-            }
-            if (stack.empty()) {
-                return true;
-            }else{
-                return false;
-            }
-            ;
-        }
-    }
-};
 </code></pre>
 ]]></content>
   </entry>

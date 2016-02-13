@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 算法 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T11:13:21+08:00</updated>
+  <updated>2016-02-13T11:35:32+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[利用二叉查找树来进行查找]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/13/ios43/"/>
+    <updated>2016-02-13T11:18:43+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/13/ios43</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>虽然二分法的查找速度快（O(log2n)）,但是有局限条件，就是查找的序列必须有序。  <br/>
+除此之外，我们还可以利用二叉查找树来进行查找，如果它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树,查找时间的时间复杂度为O(log2n)；但是如果他的结点都集中于某一边，则查找时间的复杂度可能会变为O(n)。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct treeNode {
+    int val;
+    int position;
+    treeNode* left;
+    treeNode* right;
+    treeNode(int val,int position){
+        this-&gt;val = val;
+        this-&gt;position = position;
+        this-&gt;left = nullptr;
+        this-&gt;right = nullptr;
+    }
+};
+
+
+class BinarySearchTree {
+    treeNode* root = nullptr;
+
+    void add(int value,int position,treeNode* node){
+        if (node==nullptr) {
+            throw "树为空";
+        }
+
+        if (value == node-&gt;val) {
+            return;
+        }else if(value &lt; node-&gt;val){
+            if (node-&gt;left==nullptr) {
+                node-&gt;left = new treeNode(value,position);
+            }else{
+                add(value, position, node-&gt;left);
+            }
+        }else{
+            if (node-&gt;right==nullptr) {
+                node-&gt;right = new treeNode(value,position);
+            }else{
+                add(value, position, node-&gt;right);
+            }
+        }
+    }
+
+    int search(int keyValue,treeNode* node){
+        if (node==nullptr) {
+            return -1;
+        }else if(keyValue &lt; node-&gt;val){
+            return search(keyValue, node-&gt;left);
+        }else if(keyValue &gt; node-&gt;val){
+            return search(keyValue, node-&gt;right);
+        }else{
+            return node-&gt;position;
+        }
+    }
+    public:
+
+    /**
+     *添加结点
+     **/
+    void add(int value,int position){
+        if (root==nullptr) {
+            root = new treeNode(value,position);
+        }else{
+            add(value, position, root);
+        }
+    }
+
+    /**
+     *搜索
+     **/
+    int search(int keyValue){
+        return search(keyValue, root);
+    }
+
+};
+
+int main(int argc, const char * argv[]) {
+
+    int a[] = {4,6,3,5,7,2,9,8,10};
+    BinarySearchTree* tree = new BinarySearchTree();
+    for (int i=0; i&lt;9; i++) {
+        tree-&gt;add(a[i], i);
+    }
+
+    for (int i=0; i&lt;20; i++) {
+        cout&lt;&lt;tree-&gt;search(i)&lt;&lt;endl;
+    }
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[二分查找算法的实现]]></title>
@@ -256,48 +360,6 @@ int main(int argc, const char * argv[]) {
     int a[] = {1,4,2,8,7,9,6};
     QuickSort(7, a);
     for (int i=0; i&lt;7; i++) {
-        cout&lt;&lt;a[i]&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[八大排序算法--冒泡排序]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios30/"/>
-    <updated>2016-02-06T22:15:23+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios30</id>
-    <content type="html"><![CDATA[<h2>冒泡排序</h2>
-
-<p>代码如下</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-
-void mySwap(int &amp;a,int &amp;b){
-    int tmp = a;
-    a = b;
-    b = tmp;
-}
-
-void bubbleSort(int n,int a[]){
-    for (int i=0; i&lt;n; i++) {
-        for (int j = 0; j&lt;n-i-1; j++) {
-            if (a[j]&lt;a[j+1]) {
-                mySwap(a[j], a[j+1]);
-            }
-        }
-    }
-}
-
-
-int main(int argc, const char * argv[]) {
-    int a[] = {2,7,4,1,8,9,6,5};
-    bubbleSort(8, a);
-    for (int i=0; i&lt;8; i++) {
         cout&lt;&lt;a[i]&lt;&lt;" ";
     }
     cout&lt;&lt;endl;
