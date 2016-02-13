@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 树 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T14:33:53+08:00</updated>
+  <updated>2016-02-13T14:38:32+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[二叉树的BFS遍历(非递归)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/13/ios45/"/>
+    <updated>2016-02-13T14:35:24+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/13/ios45</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>我们可以利用队列先进先出的特点对我们树进行广度优先遍历。</p>
+
+<h2>代码实现：</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+#include &lt;queue&gt;
+using namespace std;
+
+template&lt;class T&gt;
+struct TreeNode {
+    T val;
+    TreeNode&lt;T&gt;* left;
+    TreeNode&lt;T&gt;* right;
+    TreeNode(T val){
+        this-&gt;val = val;
+        this-&gt;left = nullptr;
+        this-&gt;right = nullptr;
+    }
+};
+
+template&lt;class T&gt;
+void BFSTravel(TreeNode&lt;T&gt;* node){
+    queue&lt;TreeNode&lt;T&gt;*&gt; queue;
+    queue.push(node);
+    while (!queue.empty()) {
+        TreeNode&lt;T&gt;* currentNode = queue.front();
+        cout&lt;&lt;currentNode-&gt;val&lt;&lt;endl;
+        queue.pop();
+        if (currentNode-&gt;left) {
+            queue.push(currentNode-&gt;left);
+        }
+        if(currentNode-&gt;right){
+            queue.push(currentNode-&gt;right);
+        }
+    }
+
+}
+
+int main(int argc, const char * argv[]) {
+    TreeNode&lt;int&gt;* root = new TreeNode&lt;int&gt;(10);
+    TreeNode&lt;int&gt;* node1 = new TreeNode&lt;int&gt;(1);
+    TreeNode&lt;int&gt;* node2 = new TreeNode&lt;int&gt;(2);
+    TreeNode&lt;int&gt;* node3 = new TreeNode&lt;int&gt;(3);
+    TreeNode&lt;int&gt;* node4 = new TreeNode&lt;int&gt;(4);
+    root-&gt;left = node1;
+    root-&gt;right = node3;
+    node3-&gt;left = node2;
+    node3-&gt;right = node4;
+    BFSTravel(root);
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[二叉树的BFS遍历(递归)]]></title>
