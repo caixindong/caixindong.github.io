@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T11:35:32+08:00</updated>
+  <updated>2016-02-13T14:20:03+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[二叉树的BFS遍历(递归)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/13/ios44/"/>
+    <updated>2016-02-13T14:01:23+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/13/ios44</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>BFS,即广度优先遍历，做法就是逐层遍历</p>
+
+<h2>代码实现：</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct treeNode {
+    int val;
+    int position;
+    treeNode* left;
+    treeNode* right;
+    treeNode(int val,int position){
+        this-&gt;val = val;
+        this-&gt;position = position;
+        this-&gt;left = nullptr;
+        this-&gt;right = nullptr;
+    }
+};
+
+class BinaryTree {
+    int max(int x,int y){
+        return x&gt;y?x:y;
+    }
+    /**
+    *计算每个结点的深度
+    **/
+    int depth(treeNode* node){
+        if (node==nullptr) {
+            return 0;
+        }else{
+            int leftD = depth(node-&gt;left);
+            int rightD = depth(node-&gt;right);
+            return max(leftD, rightD)+1;
+        }
+    }
+public:
+    treeNode* root = nullptr;
+
+    /**
+     *获取深度
+     **/
+    int depth(){
+        return depth(root);
+    }
+
+
+    /**
+     * 广度优先遍历
+     **/
+    void BFSTravel(){
+        int dep = depth();
+        for (int i=0; i&lt;dep; i++) {
+            printLevel(root, i);
+        }
+    }
+
+
+    /**
+     *打印每一层
+     **/
+    void printLevel(treeNode* node, int level){
+        if (node==nullptr) {
+            return;
+        }
+        if (level==0) {
+            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
+        }else{
+            printLevel(node-&gt;left, level-1);
+            printLevel(node-&gt;right, level-1);
+        }
+    }
+
+    };
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[利用二叉查找树来进行查找]]></title>
@@ -491,91 +575,6 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     Solution* s = new Solution();
     cout&lt;&lt;s-&gt;nthUglyNumber(4)&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[路径简化问题]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/08/ios37/"/>
-    <updated>2016-02-08T13:15:41+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/08/ios37</id>
-    <content type="html"><![CDATA[<h2>要求：</h2>
-
-<p>给定一个UNIX风格的全路径，简化它，例如：  <br/>
-“/home/”  =>  &ldquo;/home&rdquo;  <br/>
-&ldquo;/a/./b/../../c/&rdquo;  =>  &ldquo;/c&rdquo;</p>
-
-<h2>做法：</h2>
-
-<p><code>1.</code> &ldquo;."指的是当前目录，&rdquo;..&ldquo;指的是上级目录，"cd / &rdquo; 则是返回根目录；  <br/>
-<code>2.</code> 初始化一个vector1，我们将这个全路径按 “/” 分割，存储在vector1里；  <br/>
-<code>3.</code> 然后初始化另一个vector2，遍历这个vector1，遇到文件夹，则将它添加到vector2的尾部，遇到 &ldquo;..&rdquo; 则删除vector2的尾部的元素，如遇到 “” 或 “ . ” 则跳过继续遍历，根据这个特点，也可以用栈来实现；  <br/>
-<code>4.</code> 最后将vector2输出，拼接字符串；</p>
-
-<h2>代码实现：</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;vector&gt;
-#include &lt;string&gt;
-using namespace std;
-class Solution {
-public:
-    void spilt(const char* str,const char* deli,vector&lt;string&gt;* ve,int n){
-        char tmp[n+1];
-        snprintf(tmp, sizeof(tmp), str);
-        ve-&gt;clear();
-        char* gg;
-        char* p  = strtok_r(tmp, deli, &amp;gg);
-        while (p!=NULL) {
-            ve-&gt;push_back(p);
-            p = strtok_r(NULL, deli, &amp;gg);
-        }
-
-
-    }
-
-    string simplifyPath(string path) {
-        vector&lt;string&gt; ve;
-        vector&lt;string&gt; newVe;
-        //字符串转化为char*
-        const char* str = path.c_str();
-       spilt(str, "/", &amp;ve,(int)path.length());
-        int n = (int)ve.size();
-        for (int i = 0; i&lt;n; i++) {
-            if (ve[i]==""||ve[i]==".") {
-                continue;
-            }else{
-                if (ve[i]=="..") {
-                    if (!newVe.empty()) {
-                        newVe.pop_back();
-                    }
-                }else{
-                    newVe.push_back(ve[i]);
-                }
-
-            }
-        }
-        if (newVe.empty()) {
-            return "/";
-        }else{
-            int m = (int)newVe.size();
-            string newStr = "";
-            for (int i=0; i&lt;m; i++) {
-                newStr = newStr+"/"+newVe[i];
-            }
-
-            return newStr;
-        }
-    }
-};
-
-
-int main(int argc, const char * argv[]) {
-    Solution* s = new Solution();
-    cout&lt;&lt;s-&gt;simplifyPath("///HSGambA/..///DLCkPZxIAWDX/iIQIncFWSaMLG/././RVOlTgYl/NnTHKiAVWVCPCARqna///lxbPdAlgTC/eXBfVOBuPbBRb/////iy///../gE/MoNMalkJgUChQbXuRogz/./../FkR/././././GtP///./..///CAiQtMuRub/xOcs/RtEkqhqCLZAkCzdX/////SNMEIs/cyneqrDxUosUhcGAB/bPHrLgioq/./HhFgLUjEFrg/nKlbXBRicXjxNBLD/.///.///LIUAUsBU/kTqEWZYpIdRRxDV/////pLjoiqd/mMgSebGPyZ/./VQAErxTVbJtFGJ/wyeOwQUEwz/../.././//d/../../qmYZmdXO///liGrmA/.././../Cc///tOLsCMtVJcDDKcuPM///./fywuWZOHnln/UjepoOdc/CVSRAwOielKl/../ExXI/SYsxkdfeRHPuRZhsRrQc/./RxruFyUPeisM/../uyGh/EjJsGlCLKMpnzS/SYoyFtsznGK/./mnbKK/../SLAKsHcouXPKSQwJa/./../NPn/kHeVSrDVVfhv/P/../CSXZeqLgJOLbyZZNiJGa/L///AOldPsSFIZqKKixZQ/evwGyGJhoKvvyot/pWtiAkFrvnLTbZZT/EkKrRJyXmNoUWCDr/qHgRjqETRtMfrX/WZxvvGRWclANrbuLuu///xBOFLDmoQtYQhjK/../MCRZBSWX/IYshVeeYGeHEPAsDYDp///pNnHlXfOQCVJu/../Ux/../HFaPOmbhjNq/OXRFgVU/uxMsClzPA/./cPlqKKvZNAQKzwFL///uvKKsZoHjZArQQ/DJruUeMYHMlhKPkFMy/NqdCweXujNHGJTL/tjhFFsOMeXWlNeDJjf/EeWUzIHmqfS/.././DDmiy///.././EqjhEiYgVbHo/NTvBQ/././//../nMzJgmVGcMlZgTQhwC/.///MXtPzGrZEB/WynGrD/////../PidAvghpCyxRYQRKaZEF/../mtoy//")&lt;&lt;endl;
     return 0;
 }
 </code></pre>
