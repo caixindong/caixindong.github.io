@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T14:38:32+08:00</updated>
+  <updated>2016-02-13T15:07:55+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,119 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[表达式求值问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/13/ios46/"/>
+    <updated>2016-02-13T14:45:50+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/13/ios46</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>我们给出一个表达式，将它转化为逆波兰式，传给树求值，例如1+2+3 转化为 12+3+</p>
+
+<h2>做法</h2>
+
+<p><code>匹配：</code> 初始化一个栈stack，然后遍历这个逆波兰式的字符串，如果遇到数字，则以这个数字的值生成一个新的树节点，将这个节点入栈；如果遇到操作符，就以操作符为值生成一个新的树节点，弹栈弹出一个节点作为该新节点的右孩子节点，再弹出一个节点作为该新节点的左孩子节点，最后将该新节点入栈。遍历结束后，判断栈里的元素个数是否为1，如果为1则匹配成功；如果不为1则逆波兰式是非法的。  <br/>
+<code>求值：</code> 遍历树进行求值，具体做法看代码。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;stack&gt;
+using namespace std;
+struct treeNode{
+    char val;
+    treeNode* left;
+    treeNode* right;
+    treeNode(char val){
+        this-&gt;val = val;
+        this-&gt;left = nullptr;
+        this-&gt;right = nullptr;
+    }
+};
+
+
+class BSTree{
+    treeNode* root;
+public:
+    BSTree(){
+        root = nullptr;
+    }
+    /**
+     *解析表达式字符串
+     **/
+    void parse(char str[]){
+        const char* p = str;
+        stack&lt;treeNode*&gt; stack;
+        while (*p != '\0') {
+            if (*p&gt;='0' &amp;&amp; *p&lt;='9') {
+                stack.push(new treeNode(*p));
+            }else{
+                treeNode* newNode = new treeNode(*p);
+                treeNode* rightNode = stack.top();
+                stack.pop();
+                newNode-&gt;right = rightNode;
+                treeNode* leftNode = stack.top();
+                stack.pop();
+                newNode-&gt;left = leftNode;
+                stack.push(newNode);
+            }
+            p++;
+        }
+        if (stack.size()!=1) {
+            cout&lt;&lt;"Illegal expression";
+            root = nullptr;
+        }else{
+            root = stack.top();
+        }
+
+
+    }
+    /**
+     *计算表达式的值
+     **/
+    int evaluate(){
+        if (root==nullptr) {
+            cout&lt;&lt;" ";
+            //如果表达式不规范返回int最小值
+            return numeric_limits&lt;int&gt;::min();
+        }else{
+            return evaluate(root);
+        }
+    }
+private:
+    int evaluate(treeNode* node){
+        switch (node-&gt;val) {
+            case '+':
+                return evaluate(node-&gt;left)+evaluate(node-&gt;right);
+
+            case '-':
+                return evaluate(node-&gt;left)-evaluate(node-&gt;right);
+
+            case '*':
+                return evaluate(node-&gt;left)*evaluate(node-&gt;right);
+
+            case '/':
+                return evaluate(node-&gt;left)/evaluate(node-&gt;right);
+                ;
+                //叶子节点
+            default:
+                return node-&gt;val - '0';
+                ;
+        }
+
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    BSTree tree;
+    tree.parse("44+22+/");
+    cout&lt;&lt;tree.evaluate()&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[二叉树的BFS遍历(非递归)]]></title>
@@ -387,102 +500,6 @@ public:
                     currentNode = currentNode-&gt;left;
                 }
             }
-        }
-    }
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[二叉树的DFS遍历(递归)]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/11/ios40/"/>
-    <updated>2016-02-11T13:40:04+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/11/ios40</id>
-    <content type="html"><![CDATA[<h2>二叉(搜索)树的实现</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-struct treeNode {
-    int val;
-    int position;
-    treeNode* left;
-    treeNode* right;
-    treeNode(int val,int position){
-        this-&gt;val = val;
-        this-&gt;position = position;
-        this-&gt;left = nullptr;
-        this-&gt;right = nullptr;
-    }
-};
-
-
-class BinaryTree {
-public:
-    treeNode* root = nullptr;
-    BinaryTree(){
-        root = nullptr;
-    }
-    pre_order(treeNode* node);
-    mid_order(treeNode* node);
-    back_order(treeNode* node);
-};
-</code></pre>
-
-<h2>先序遍历</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">
-/**
-*前序遍历
-**/
-    void BinaryTree::pre_order(treeNode* node){
-        if (node==nullptr) {
-            return;
-        }else{
-            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
-            pre_order(node-&gt;left);
-            pre_order(node-&gt;right);           
-        }
-    }
-</code></pre>
-
-<h2>中序遍历</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">
-/**
-*中序遍历
-**/
-    void BinaryTree::mid_order(treeNode* node){
-        if (node==nullptr) {
-            return;
-        }else{
-           mid_order(node-&gt;left);
-            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
-            mid_order(node-&gt;right);           
-        }
-    }
-</code></pre>
-
-<h2>后序遍历</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">
-/**
-*后序遍历
-**/
-    void BinaryTree::back_order(treeNode* node){
-        if (node==nullptr) {
-            return;
-        }else{           
-           back_order(node-&gt;left);
-            back_order(node-&gt;right);
-            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
         }
     }
 </code></pre>
