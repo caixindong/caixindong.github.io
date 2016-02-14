@@ -7,7 +7,12 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios iOS开发过程中遇过的一些小bug（一） 当我们在使用UITableView的时候或者其他类UIScrollView的UI组件时，我们可能会遇到UITableView顶部留有一段空白区域的情况，那是因为iOS 7 &hellip;">
+	<meta name="description" content="ios 几个比较有趣的界面过渡动画 动画的类型依次为立方，吸走，翻转，水波，翻页，翻页回，打开相机，关闭相机 NSString *Types[]={@"cube",
+@"suckEffect",
+@"oglFlip",
+@"rippleEffect",
+@"pageCurl",
+@" &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +90,64 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-19T16:35:49+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/11/19/ios17/" itemprop="url">几个比较有趣的界面过渡动画</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>动画的类型依次为立方，吸走，翻转，水波，翻页，翻页回，打开相机，关闭相机</p>
+
+<pre><code>NSString *Types[]={@"cube",
+@"suckEffect",
+@"oglFlip",
+@"rippleEffect",
+@"pageCurl",
+@"pageUnCurl",
+@"cameraIrisHollowOpen",
+@"cameraIrisHollowClose"};
+</code></pre>
+
+<p>直接贴代码</p>
+
+<pre><code>CATransition *animation = [CATransition animation];
+[animation setDuration:0.8];
+//设置动画的类型
+[animation setType: @"rippleEffect"];
+//设置动画变化快慢得函数
+[animation setTimingFunction:[CAMediaTimingFunction functionWithName:
+kCAMediaTimingFunctionLinear]];
+[self.navigationController.view.layer addAnimation:animation forKey:nil];
+[self.navigationController pushViewController:tvc animated:NO];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -690,56 +753,6 @@ initWithTarget:selfaction:@selector(touchView:)];
 	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios8/" itemprop="url">UIBarButtonItem随着屏幕切换变化的问题</a></h1>
 	<div class="entry-content" itemprop="articleBody">
 		<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T20:04:43+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios7/" itemprop="url">iOS开发一些零碎的知识点（一）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>一、导航栏的创建</p>
-
-<pre><code>UIViewController* firstCon = [[UIViewControlleralloc]init];
-NavigationController* nav = [[NavigationControlleralloc]initWithRootViewController:
-firstCon];//指定导航控制器的根视图控制器
-nav.modalPresentationStyle =UIModalPresentationFormSheet;//呈现出模态效果
-</code></pre>
-
-<p>二、下拉菜单的创建</p>
-
-<pre><code> UIViewController* pvc = [[UIViewControlleralloc]init];
-UIPopoverController* pop = [[UIPopoverControlleralloc]initWithContentViewController:
-pvc];//创建下拉菜单
-[pop presentPopoverFromBarButtonItem:firstItem permittedArrowDirections:
-UIPopoverArrowDirectionAny animated:YES];//展示出来
-</code></pre>
 
 		
 		

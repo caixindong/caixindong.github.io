@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 树 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-13T15:07:55+08:00</updated>
+  <updated>2016-02-14T11:35:10+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[判断一颗树是否是平衡二叉树]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/14/ios47/"/>
+    <updated>2016-02-14T11:21:07+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/14/ios47</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>判断一个树是否是平衡二叉树，何为平衡二叉树，就是它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树。</p>
+
+<h2>做法</h2>
+
+<p>由要求可看出判断一颗树是否是平衡二叉树的依据就是每个节点的左右子树的高度(深度)差的绝对值不超过1，那么我们可以通过计算节点的深度来判断，那如何计算节点的深度呢？我们发现树有个特点就是父节点的深度是子节点深度的最大值加1，由这个特点，我们可以计算节点的深度</p>
+
+<h2>代码如下</h2>
+
+<p>我提供两种代码思路</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+
+
+  struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ };
+
+class Solution {
+public:
+
+    /**
+     *方法一
+     * 传统方法，计算每个节点的深度判断，时间复杂度为O(n^2)
+     **/
+    int depth(TreeNode* node){
+        if (node==nullptr) {
+            return 0;
+        }else if(!node-&gt;left&amp;&amp;!node-&gt;right){
+            return 1;
+        }
+        else{
+            int leftD = depth(node-&gt;left);
+            int rightD = depth(node-&gt;right);
+            return 1+(leftD&gt;rightD?leftD:rightD);
+        }
+    }
+    bool isBalanced(TreeNode* root) {
+        if (root==nullptr) {
+            return true;
+        }else{
+            int leftD = depth(root-&gt;left);
+            int rightD = depth(root-&gt;right);
+            if (abs(leftD-rightD)&gt;1) {
+                return false;
+            }else{
+                return isBalanced(root-&gt;left)&amp;&amp;isBalanced(root-&gt;right);
+            }
+        }
+    }
+
+    /**
+     *方法二
+     * 边计算深度边判断，时间复杂度为O(n)
+     **/
+    int depth2(TreeNode* node){
+        if (node==nullptr) {
+            return 0;
+        }else{
+            int leftD = depth2(node-&gt;left);
+            int rightD = depth2(node-&gt;right);
+            if (leftD==-1||rightD==-1||abs(leftD-rightD)&gt;1) {
+                return -1;
+            }else{
+                return (leftD&gt;rightD?leftD:rightD)+1;
+            }
+        }
+    }
+    bool isBanlanced2(TreeNode* root){
+        if (root==nullptr) {
+            return true;
+        }else{
+            if (depth2(root)==-1) {
+                return false;
+            }else{
+                return true;
+            }
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[表达式求值问题]]></title>
@@ -396,102 +490,6 @@ public:
                     currentNode = currentNode-&gt;left;
                 }
             }
-        }
-    }
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[二叉树的DFS遍历(递归)]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/11/ios40/"/>
-    <updated>2016-02-11T13:40:04+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/11/ios40</id>
-    <content type="html"><![CDATA[<h2>二叉(搜索)树的实现</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-struct treeNode {
-    int val;
-    int position;
-    treeNode* left;
-    treeNode* right;
-    treeNode(int val,int position){
-        this-&gt;val = val;
-        this-&gt;position = position;
-        this-&gt;left = nullptr;
-        this-&gt;right = nullptr;
-    }
-};
-
-
-class BinaryTree {
-public:
-    treeNode* root = nullptr;
-    BinaryTree(){
-        root = nullptr;
-    }
-    pre_order(treeNode* node);
-    mid_order(treeNode* node);
-    back_order(treeNode* node);
-};
-</code></pre>
-
-<h2>先序遍历</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">
-/**
-*前序遍历
-**/
-    void BinaryTree::pre_order(treeNode* node){
-        if (node==nullptr) {
-            return;
-        }else{
-            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
-            pre_order(node-&gt;left);
-            pre_order(node-&gt;right);           
-        }
-    }
-</code></pre>
-
-<h2>中序遍历</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">
-/**
-*中序遍历
-**/
-    void BinaryTree::mid_order(treeNode* node){
-        if (node==nullptr) {
-            return;
-        }else{
-           mid_order(node-&gt;left);
-            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
-            mid_order(node-&gt;right);           
-        }
-    }
-</code></pre>
-
-<h2>后序遍历</h2>
-
-<p>代码如下：</p>
-
-<pre><code class="C++">
-/**
-*后序遍历
-**/
-    void BinaryTree::back_order(treeNode* node){
-        if (node==nullptr) {
-            return;
-        }else{           
-           back_order(node-&gt;left);
-            back_order(node-&gt;right);
-            cout&lt;&lt;node-&gt;val&lt;&lt;endl;
         }
     }
 </code></pre>
