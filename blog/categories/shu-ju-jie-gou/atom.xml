@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-14T13:58:47+08:00</updated>
+  <updated>2016-02-14T22:51:30+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,87 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[最长回文字符串]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/14/ios50/"/>
+    <updated>2016-02-14T22:36:55+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/14/ios50</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个字符串，求它的最长回文子字符串</p>
+
+<h2>做法</h2>
+
+<p>最长回文字符串的长度可能为奇数，也可能为偶数，所以我们可以假定这两种情况来求。我们采用中间拓展法来获取回文子串：由一个字符向它的左右两边拓展，当左右相等时继续拓展，当不等时停止拓展，记录此时的长度n，获得一个n长度的回文子串。然后对下一个字符继续用中间拓展法。当遍历完字符串所有字符后，选取长度最大的回文子串。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;string&gt;
+using namespace std;
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int n = (int)s.length();
+                if (n==1) {
+            return s;
+        }
+        //记录最长的回文子串长度
+        int max = 0;
+        int maxLeft = 0;
+        int maxRight = 0;
+        for(int i=0;i&lt;n;i++){
+            //假定回文子串的长度为奇数
+            int start = i-1;
+            int end = i+1;
+            int len = 1;
+            int left = start;
+            int right = end;
+            while (start&gt;=0&amp;&amp;end&lt;n) {
+                if (s[start]==s[end]) {
+                    len = len+2;
+                    left = start;
+                    right = end;
+                    start--;
+                    end++;
+                }else{
+                    break;
+                }
+            }
+            if (len&gt;max) {
+                max = len;
+                maxLeft = left;
+                maxRight = right;
+            }
+            //假定回文子串的长度为偶数
+            start = i;
+            end = i+1;
+            len = 0;
+            left = start;
+            right = end;
+            while (start&gt;=0&amp;&amp;end&lt;n) {
+                if (s[start]==s[end]) {
+                    len = len+2;
+                    left = start;
+                    right = end;
+                    start--;
+                    end++;
+                }else{
+                    break;
+                }
+            }
+            if (len&gt;max) {
+                max = len;
+                maxLeft = left;
+                maxRight = right;
+            }
+        }
+        return s.substr(maxLeft,maxRight-maxLeft+1);
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[判断是否是回文字符串]]></title>
@@ -354,69 +435,6 @@ int main(int argc, const char * argv[]) {
     BSTree tree;
     tree.parse("44+22+/");
     cout&lt;&lt;tree.evaluate()&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[二叉树的BFS遍历(非递归)]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/13/ios45/"/>
-    <updated>2016-02-13T14:35:24+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/13/ios45</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>我们可以利用队列先进先出的特点对我们树进行广度优先遍历。</p>
-
-<h2>代码实现：</h2>
-
-<pre><code class="C++">
-#include &lt;iostream&gt;
-#include &lt;queue&gt;
-using namespace std;
-
-template&lt;class T&gt;
-struct TreeNode {
-    T val;
-    TreeNode&lt;T&gt;* left;
-    TreeNode&lt;T&gt;* right;
-    TreeNode(T val){
-        this-&gt;val = val;
-        this-&gt;left = nullptr;
-        this-&gt;right = nullptr;
-    }
-};
-
-template&lt;class T&gt;
-void BFSTravel(TreeNode&lt;T&gt;* node){
-    queue&lt;TreeNode&lt;T&gt;*&gt; queue;
-    queue.push(node);
-    while (!queue.empty()) {
-        TreeNode&lt;T&gt;* currentNode = queue.front();
-        cout&lt;&lt;currentNode-&gt;val&lt;&lt;endl;
-        queue.pop();
-        if (currentNode-&gt;left) {
-            queue.push(currentNode-&gt;left);
-        }
-        if(currentNode-&gt;right){
-            queue.push(currentNode-&gt;right);
-        }
-    }
-
-}
-
-int main(int argc, const char * argv[]) {
-    TreeNode&lt;int&gt;* root = new TreeNode&lt;int&gt;(10);
-    TreeNode&lt;int&gt;* node1 = new TreeNode&lt;int&gt;(1);
-    TreeNode&lt;int&gt;* node2 = new TreeNode&lt;int&gt;(2);
-    TreeNode&lt;int&gt;* node3 = new TreeNode&lt;int&gt;(3);
-    TreeNode&lt;int&gt;* node4 = new TreeNode&lt;int&gt;(4);
-    root-&gt;left = node1;
-    root-&gt;right = node3;
-    node3-&gt;left = node2;
-    node3-&gt;right = node4;
-    BFSTravel(root);
     return 0;
 }
 </code></pre>
