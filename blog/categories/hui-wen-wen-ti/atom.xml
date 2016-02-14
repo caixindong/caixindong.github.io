@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 回文问题 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/hui-wen-wen-ti/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-14T12:26:47+08:00</updated>
+  <updated>2016-02-14T13:58:47+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,72 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[判断是否是回文字符串]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/14/ios49/"/>
+    <updated>2016-02-14T13:41:59+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/14/ios49</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>判断是否是回文字符串</p>
+
+<h2>做法</h2>
+
+<p>先将字符串转化为小写字符串，接着初始化一个头指针和尾指针，遍历字符串，遍历的时候注意字符是否是‘1’~‘9’或‘a’~&lsquo;z'，如果不是就跳过遍历。如果头尾指针遍历到的字符不同就返回false，否则继续遍历。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+using namespace::std;
+class Solution {
+public:
+
+    /**
+    * 判断是否是1~9或a~b之中的字符
+    **/
+    bool isNormalChar(char c){
+        if (('a'&lt;=c&amp;&amp;c&lt;='z')||('0'&lt;=c&amp;&amp;c&lt;='9')) {
+            return true;
+        }
+        return false;
+    }
+
+    bool isPalindrome(string s) {
+        if (s.length()&lt;=1) {
+            return true;
+        }
+        //将字符串中的大写转化为小写
+        transform(s.begin(), s.end(), s.begin(),::tolower);
+        int n = (int)s.length();
+        int i = 0;
+        int j = n-1;
+        while (i&lt;j) {
+            if (s[i]==s[j]) {
+                i++;
+                j--;
+            }else{
+                if (!isNormalChar(s[i])) {
+                    i++;
+                }else if(!isNormalChar(s[j])){
+                    j--;
+                }else{
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+};
+int main(int argc, const char * argv[]) {
+    Solution* s = new Solution();
+    cout&lt;&lt;s-&gt;isPalindrome("ab")&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[判断是否是回文数字]]></title>
