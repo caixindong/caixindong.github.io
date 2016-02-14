@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 回文问题 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/hui-wen-wen-ti/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-14T12:18:12+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[判断是否是回文数字]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/14/ios48/"/>
+    <updated>2016-02-14T12:07:13+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/14/ios48</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>什么是回文？  <br/>
+回文就是正着读、反着读都一样的字符串，例如：“心连心”、“abccba”、“bcdcb”、“123321” 这些都是回文。</p>
+
+<h2>要求</h2>
+
+<p>判断一个数字是否是回文数字</p>
+
+<h2>做法</h2>
+
+<p>判断数字的每一位是否对称</p>
+
+<h2>代码如下</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+#include &lt;math.h&gt;
+using namespace std;
+class Solution {
+public:
+    /**
+    *计算数字的位数
+    **/
+    int wei(int x){
+        int count = 0;
+        while (x&gt;0) {
+            x = x/10;
+            count++;
+        }
+        return count;
+    }
+
+    /**
+    *   判断
+    **/
+    bool isPalindrome(int x) {
+        if (x&lt;0) {
+            return false;
+        }
+        if (x&gt;=0&amp;&amp;x&lt;10) {
+            return true;
+        }else{
+            int n = wei(x);
+            int t = (int)pow(10,n-1);
+            int tmp = x;
+            int half = n/2;
+            for(int i=0;i&lt;half;i++){
+                if (x/t%10==tmp%10) {
+                    t = t/10;
+                    tmp = tmp/10;
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    Solution* s =  new Solution();
+    cout&lt;&lt;s-&gt;isPalindrome(1221)&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

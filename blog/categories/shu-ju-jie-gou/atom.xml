@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-14T11:35:10+08:00</updated>
+  <updated>2016-02-14T12:18:12+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,80 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[判断是否是回文数字]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/14/ios48/"/>
+    <updated>2016-02-14T12:07:13+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/14/ios48</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>什么是回文？  <br/>
+回文就是正着读、反着读都一样的字符串，例如：“心连心”、“abccba”、“bcdcb”、“123321” 这些都是回文。</p>
+
+<h2>要求</h2>
+
+<p>判断一个数字是否是回文数字</p>
+
+<h2>做法</h2>
+
+<p>判断数字的每一位是否对称</p>
+
+<h2>代码如下</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+#include &lt;math.h&gt;
+using namespace std;
+class Solution {
+public:
+    /**
+    *计算数字的位数
+    **/
+    int wei(int x){
+        int count = 0;
+        while (x&gt;0) {
+            x = x/10;
+            count++;
+        }
+        return count;
+    }
+
+    /**
+    *   判断
+    **/
+    bool isPalindrome(int x) {
+        if (x&lt;0) {
+            return false;
+        }
+        if (x&gt;=0&amp;&amp;x&lt;10) {
+            return true;
+        }else{
+            int n = wei(x);
+            int t = (int)pow(10,n-1);
+            int tmp = x;
+            int half = n/2;
+            for(int i=0;i&lt;half;i++){
+                if (x/t%10==tmp%10) {
+                    t = t/10;
+                    tmp = tmp/10;
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    Solution* s =  new Solution();
+    cout&lt;&lt;s-&gt;isPalindrome(1221)&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[判断一颗树是否是平衡二叉树]]></title>
@@ -363,110 +437,6 @@ public:
     }
 
     };
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[利用二叉查找树来进行查找]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/13/ios43/"/>
-    <updated>2016-02-13T11:18:43+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/13/ios43</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>虽然二分法的查找速度快（O(log2n)）,但是有局限条件，就是查找的序列必须有序。  <br/>
-除此之外，我们还可以利用二叉查找树来进行查找，如果它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树,查找时间的时间复杂度为O(log2n)；但是如果他的结点都集中于某一边，则查找时间的复杂度可能会变为O(n)。</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-struct treeNode {
-    int val;
-    int position;
-    treeNode* left;
-    treeNode* right;
-    treeNode(int val,int position){
-        this-&gt;val = val;
-        this-&gt;position = position;
-        this-&gt;left = nullptr;
-        this-&gt;right = nullptr;
-    }
-};
-
-
-class BinarySearchTree {
-    treeNode* root = nullptr;
-
-    void add(int value,int position,treeNode* node){
-        if (node==nullptr) {
-            throw "树为空";
-        }
-
-        if (value == node-&gt;val) {
-            return;
-        }else if(value &lt; node-&gt;val){
-            if (node-&gt;left==nullptr) {
-                node-&gt;left = new treeNode(value,position);
-            }else{
-                add(value, position, node-&gt;left);
-            }
-        }else{
-            if (node-&gt;right==nullptr) {
-                node-&gt;right = new treeNode(value,position);
-            }else{
-                add(value, position, node-&gt;right);
-            }
-        }
-    }
-
-    int search(int keyValue,treeNode* node){
-        if (node==nullptr) {
-            return -1;
-        }else if(keyValue &lt; node-&gt;val){
-            return search(keyValue, node-&gt;left);
-        }else if(keyValue &gt; node-&gt;val){
-            return search(keyValue, node-&gt;right);
-        }else{
-            return node-&gt;position;
-        }
-    }
-    public:
-
-    /**
-     *添加结点
-     **/
-    void add(int value,int position){
-        if (root==nullptr) {
-            root = new treeNode(value,position);
-        }else{
-            add(value, position, root);
-        }
-    }
-
-    /**
-     *搜索
-     **/
-    int search(int keyValue){
-        return search(keyValue, root);
-    }
-
-};
-
-int main(int argc, const char * argv[]) {
-
-    int a[] = {4,6,3,5,7,2,9,8,10};
-    BinarySearchTree* tree = new BinarySearchTree();
-    for (int i=0; i&lt;9; i++) {
-        tree-&gt;add(a[i], i);
-    }
-
-    for (int i=0; i&lt;20; i++) {
-        cout&lt;&lt;tree-&gt;search(i)&lt;&lt;endl;
-    }
-
-    return 0;
-}
 </code></pre>
 ]]></content>
   </entry>
