@@ -7,41 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios iOS本地推送功能实现 1、首先在AppDelegate注册推送 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-- (BOOL) &hellip;">
+	<meta name="description" content="栈内存与堆内存 内存栈与内存堆的区别 内存栈 又称为栈内存，它有以下特点： 1. 函数压栈和弹栈符合后进先出的原则； 2. 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域； 3. 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快； 4. &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -119,6 +85,58 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T10:47:06+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/zhan-nei-cun-yu-dui-nei-cun/'>栈内存与堆内存</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios21/" itemprop="url">内存栈与内存堆的区别</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>内存栈</h2>
+
+<p>又称为栈内存，它有以下特点：  <br/>
+<code>1.</code> 函数压栈和弹栈符合后进先出的原则；  <br/>
+<code>2.</code> 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域；  <br/>
+<code>3.</code> 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快；  <br/>
+<code>4.</code> 栈内存是由系统自动分配的；</p>
+
+<h2>内存堆</h2>
+
+<p>又称为堆内存，它有一下特点：  <br/>
+<code>1.</code> 他是用静态链表来存储内存的地址；  <br/>
+<code>2.</code> 堆内存是由低地址向高地址拓展，它是一块不连续的内存区域；  <br/>
+<code>3.</code> 内存块有两种状态：已使用和闲置，分配时，将内存块标志为已使用，回收时，将内存块标志为闲置；  <br/>
+<code>4.</code> 分配时，它的时间复杂度为O(n)，因为它需要遍历链表寻找闲置的内存块；  <br/>
+<code>5.</code> 内存回收的方式有两种，一种是手动回收(C,C++),一种是GC线程自动回收(Java)；  <br/>
+<code>6.</code> 标志清除算法是最基本的内存回收算法；  <br/>
+<code>7.</code> 堆内存需要程序员自己申请，并指明大小；</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -981,62 +999,6 @@ myuser.email = userEmail;//邮箱
     }
 }];
 </code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-14T19:06:18+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/14/ios11/" itemprop="url">抽屉视图（MMDrawerController使用）</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>1、初始化MMDrawerController，用这个controller装载我们的不同视图控制器</p>
-
-<pre><code>MMDrawerController* drawerController = [[MMDrawerController alloc]
-initWithCenterViewController:controller1 leftDrawerViewController:controller2];
-</code></pre>
-
-<p>controller1是主视图，controller2是左侧视图</p>
-
-<p>2、为drawerController添加打开抽屉和关闭抽屉的手势</p>
-
-<pre><code>drawerController.openDrawerGestureModeMask = MMOpenDrawerGestureModePanningCenterView;
-drawerController.closeDrawerGestureModeMask = MMCloseDrawerGestureModePanningCenterView;
-</code></pre>
-
-<p>3、打开抽屉</p>
-
-<pre><code>[drawerController toggleDrawerSide:MMDrawerSideLeft animated:YES completion:nil];
-</code></pre>
-
-<p>执行这个方法可以打开左侧抽屉视图，一般用作点击事件</p>
-
-<p>详细使用：<a href="https://github.com/mutualmobile/MMDrawerController">https://github.com/mutualmobile/MMDrawerController</a></p>
 
 		
 		

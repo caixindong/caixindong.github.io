@@ -4,7 +4,7 @@
   <title><![CDATA[Category: C++ | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/c-plus-plus/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-14T22:51:30+08:00</updated>
+  <updated>2016-02-16T14:02:23+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,98 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[浅析C++仿函数]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/16/ios51/"/>
+    <updated>2016-02-16T13:28:30+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/16/ios51</id>
+    <content type="html"><![CDATA[<h2>何为仿函数</h2>
+
+<p>仿函数这个词经常出现在C++的模板库(STL)里，就自己浅陋的理解，仿函数就是能够实现跟函数一样的功能的东西，通常以结构体或类的形式呈现出来。实现的关键一步就是重载()这个操作符。</p>
+
+<h2>为什么要用仿函数</h2>
+
+<p>我们知道，函数可以作为参数来传递，我们知道可以用函数指针来实现。而仿函数是另一种方式来实现这样的功能。STL模板库中，大量使用这种技巧。</p>
+
+<h2>代码举例说明</h2>
+
+<pre><code class="C++">
+/**
+*我们实现对结构体Node对象的比较
+**/
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;functional&gt;
+using namespace std;
+
+/**
+*结构体Node
+**/
+struct Node {
+    int val;
+    Node(int v):val(v){
+
+    }
+};
+
+/**
+*基于二元操作符的仿函数实现
+**/
+struct Compare:binary_function&lt;Node*, Node*, bool&gt; {
+    /**
+    * 重载（）操作符
+    **/
+    bool operator()(Node &amp;a,Node &amp;b){
+        return a.val&lt;b.val;
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    Node n1(2);
+    Node n2(3);
+    cout&lt;&lt;Compare()(n2,n1)&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+
+<h2>在STL中使用举例</h2>
+
+<pre><code class="C++">/**
+* for_each函数实现的源码就用到了仿函数，Functor就是一个仿函* 数，它作为for_each的一个参数
+**/
+
+template &lt; typename Iterator, typename Functor &gt;   
+void for_each( Iterator begin, Iterator end, Fucntor func )   
+{   
+for( ; begin!=end; begin++ )   
+func( *begin );   
+} 
+
+
+/**
+*使用for_each打印vector所有元素
+**/
+
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;functional&gt;
+using namespace std;
+
+struct Print :unary_function&lt;int,void&gt;{
+    void operator()(int i){
+        cout&lt;&lt;i&lt;&lt;endl;
+    }
+};
+
+int main(int argc, const char * argv[]) {
+   vector&lt;int&gt; ve = {1,2,3};
+   for_each(ve.begin(), ve.end(), Print());
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[C++ Split()函数的实现]]></title>
