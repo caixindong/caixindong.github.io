@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-16T14:02:23+08:00</updated>
+  <updated>2016-02-16T14:04:20+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -20,7 +20,7 @@
     <id>http://caixindong.github.io/blog/2016/02/16/ios51</id>
     <content type="html"><![CDATA[<h2>何为仿函数</h2>
 
-<p>仿函数这个词经常出现在C++的模板库(STL)里，就自己浅陋的理解，仿函数就是能够实现跟函数一样的功能的东西，通常以结构体或类的形式呈现出来。实现的关键一步就是重载()这个操作符。</p>
+<p>仿函数这个词经常出现在C++的模板库(STL)里，就自己浅陋的理解，仿函数就是能够实现跟函数一样的功能的东西，通常以结构体或类的形式呈现出来。实现的关键就是重载()这个操作符。</p>
 
 <h2>为什么要用仿函数</h2>
 
