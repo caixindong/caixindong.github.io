@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-19T15:22:33+08:00</updated>
+  <updated>2016-02-19T15:33:53+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,102 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[图的遍历]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/19/ios54/"/>
+    <updated>2016-02-19T15:26:01+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/19/ios54</id>
+    <content type="html"><![CDATA[<h2>代码如下：</h2>
+
+<pre><code class="C++">#include &lt;stdio.h&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;stack&gt;
+#include &lt;queue&gt;
+
+/**
+ * 路径的权值为1，就是两个结点相连，为0，则为两个结点不相连
+ **/
+class Graphic {
+private:
+    std::vector&lt;std::vector&lt;int&gt;&gt; g;
+
+public:
+    Graphic(std::vector&lt;std::vector&lt;int&gt;&gt; &amp;g):g(g){
+
+    }
+
+    /**
+     *深度优先遍历（递归）
+     **/
+    void DFS_Recursive(int node_id){
+        //储存结点是否被访问
+        std::vector&lt;bool&gt; Visited(g.size());
+        visit(Visited,node_id);
+    }
+
+    /**
+     *深度优先遍历（非递归）
+     **/
+    void DFS(int node_id){
+        std::vector&lt;bool&gt; visited(g.size());
+        std::stack&lt;int&gt; stack;
+        stack.push(node_id);
+        while (stack.size()&gt;0) {
+            int visitedNode = stack.top();
+            stack.pop();
+            //判断是否访问过
+            if (!visited[visitedNode]) {
+                std::cout&lt;&lt;"dfs visit is "&lt;&lt;visitedNode&lt;&lt;std::endl;
+                visited[visitedNode] = true;
+                for (int i=0; i&lt;g.size(); i++) {
+                    if (visited[i]==false&amp;&amp;g[visitedNode][i]==1) {
+                        stack.push(i);
+                    }
+                }
+
+            }
+        }
+    }
+
+    /**
+     *广度优先遍历（非递归）
+     **/
+
+    void BFS(int node_id){
+        std::vector&lt;bool&gt; visited(g.size());
+        std::queue&lt;int&gt; queue;
+        queue.push(node_id);
+
+        while (queue.size()&gt;0) {
+            int visitedNode = queue.front();
+            queue.pop();
+            if (!visited[visitedNode]) {
+                std::cout&lt;&lt;"bfs visit is "&lt;&lt;visitedNode&lt;&lt;std::endl;
+                visited[visitedNode] = true;
+                for (int i=0; i&lt;g.size(); i++) {
+                    if (visited[i]==false&amp;&amp;g[visitedNode][i]==1) {
+                        queue.push(i);
+                    }
+                }
+            }
+        }
+    }
+private:
+    void visit(std::vector&lt;bool&gt; &amp;visited,int node_id){
+        visited[node_id] = true;
+        std::cout&lt;&lt;"dfs_recursive visit is "&lt;&lt;node_id&lt;&lt;std::endl;
+        for (int i=0; i&lt;visited.size(); i++) {
+            if (g[node_id][i]==1&amp;&amp;!visited[i]) {
+                visit(visited, i);
+            }
+        }
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[图的表达]]></title>
@@ -344,100 +440,6 @@ int main(int argc, const char * argv[]) {
     cout&lt;&lt;s-&gt;isPalindrome(1221)&lt;&lt;endl;
     return 0;
 }
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[判断一颗树是否是平衡二叉树]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/14/ios47/"/>
-    <updated>2016-02-14T11:21:07+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/14/ios47</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>判断一个树是否是平衡二叉树，何为平衡二叉树，就是它是一棵空树或它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树。</p>
-
-<h2>做法</h2>
-
-<p>由要求可看出判断一颗树是否是平衡二叉树的依据就是每个节点的左右子树的高度(深度)差的绝对值不超过1，那么我们可以通过计算节点的深度来判断，那如何计算节点的深度呢？我们发现树有个特点就是父节点的深度是子节点深度的最大值加1，由这个特点，我们可以计算节点的深度</p>
-
-<h2>代码如下</h2>
-
-<p>我提供两种代码思路</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-
-
-  struct TreeNode {
-      int val;
-      TreeNode *left;
-      TreeNode *right;
-      TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- };
-
-class Solution {
-public:
-
-    /**
-     *方法一
-     * 传统方法，计算每个节点的深度判断，时间复杂度为O(n^2)
-     **/
-    int depth(TreeNode* node){
-        if (node==nullptr) {
-            return 0;
-        }else if(!node-&gt;left&amp;&amp;!node-&gt;right){
-            return 1;
-        }
-        else{
-            int leftD = depth(node-&gt;left);
-            int rightD = depth(node-&gt;right);
-            return 1+(leftD&gt;rightD?leftD:rightD);
-        }
-    }
-    bool isBalanced(TreeNode* root) {
-        if (root==nullptr) {
-            return true;
-        }else{
-            int leftD = depth(root-&gt;left);
-            int rightD = depth(root-&gt;right);
-            if (abs(leftD-rightD)&gt;1) {
-                return false;
-            }else{
-                return isBalanced(root-&gt;left)&amp;&amp;isBalanced(root-&gt;right);
-            }
-        }
-    }
-
-    /**
-     *方法二
-     * 边计算深度边判断，时间复杂度为O(n)
-     **/
-    int depth2(TreeNode* node){
-        if (node==nullptr) {
-            return 0;
-        }else{
-            int leftD = depth2(node-&gt;left);
-            int rightD = depth2(node-&gt;right);
-            if (leftD==-1||rightD==-1||abs(leftD-rightD)&gt;1) {
-                return -1;
-            }else{
-                return (leftD&gt;rightD?leftD:rightD)+1;
-            }
-        }
-    }
-    bool isBanlanced2(TreeNode* root){
-        if (root==nullptr) {
-            return true;
-        }else{
-            if (depth2(root)==-1) {
-                return false;
-            }else{
-                return true;
-            }
-        }
-    }
-};
 </code></pre>
 ]]></content>
   </entry>
