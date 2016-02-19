@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-19T16:03:26+08:00</updated>
+  <updated>2016-02-19T16:11:07+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -22,9 +22,9 @@
 
 <p><code>1.</code> 图用邻接表表达（ <a href="http://caixindong.github.io/blog/2016/02/19/ios53/">http://caixindong.github.io/blog/2016/02/19/ios53/</a> ），每个图结点都储存一个值，记录源结点到结点的距离，一开始初始化为不可达，即距离设置为无穷大，而源结点的值为0，因为源结点到源结点的距离为0；  <br/>
 <code>2.</code> 从源结点开始，遍历从源结点出发的所有路径，某结点可达，它的值更新为源结点的值加上之间路径的值，不可达的结点保持原来的值；      <br/>
-<code>3.</code> 从那些非遍历的结点中取值最小的结点作为下一个遍历的结点；      <br/>
+<code>3.</code> 从那些未遍历的结点中取值最小的结点作为下一个遍历的结点；      <br/>
 <code>4.</code> 遍历从当前遍历结点出发的所有路径，某结点可达，比较当前遍历结点的值加上路径值的和与某结点的值的大小，哪个小就更新为哪个值；
-<code>5.</code> 继续从那些非遍历的结点中取值最小的结点作为下一个遍历的结点，继续步骤4的做法，直到所有结点都被遍历。</p>
+<code>5.</code> 继续从那些未遍历的结点中取值最小的结点作为下一个遍历的结点，继续步骤4的做法，直到所有结点都被遍历。</p>
 
 <h2>代码实现</h2>
 
@@ -127,6 +127,11 @@
 <span class='line-number'>97</span>
 <span class='line-number'>98</span>
 <span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
 </pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
 </span><span class='line'><span class="cp">#include &quot;graph.hpp&quot;</span>
 </span><span class='line'><span class="cp">#include &lt;climits&gt;</span>
@@ -135,7 +140,7 @@
 </span><span class='line'><span class="cm">/**</span>
 </span><span class='line'><span class="cm"> * 用于记录图结点数据</span>
 </span><span class='line'><span class="cm"> * id   结点id</span>
-</span><span class='line'><span class="cm"> * dist 源结点到节点的当前最短距离</span>
+</span><span class='line'><span class="cm"> * dist 源结点到当前结点的最短距离</span>
 </span><span class='line'><span class="cm"> * prev 最短路径的前一个结点</span>
 </span><span class='line'><span class="cm"> * processed 是否遍历过</span>
 </span><span class='line'><span class="cm"> **/</span>
@@ -149,6 +154,9 @@
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
 </span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm">* 用于比较距离大小的仿函数</span>
+</span><span class='line'><span class="cm">**/</span>
 </span><span class='line'><span class="k">struct</span> <span class="n">compare_node</span> <span class="p">{</span>
 </span><span class='line'>    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="n">node</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span><span class="n">node</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">){</span>
 </span><span class='line'>        <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">dist</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">dist</span><span class="p">;</span>
@@ -161,6 +169,7 @@
 </span><span class='line'><span class="cm"> * source 源结点</span>
 </span><span class='line'><span class="cm"> **/</span>
 </span><span class='line'><span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;</span> <span class="n">Dijkstra</span><span class="p">(</span><span class="n">Graph</span> <span class="o">&amp;</span><span class="n">g</span><span class="p">,</span><span class="kt">int</span> <span class="n">source</span><span class="p">){</span>
+</span><span class='line'>    <span class="c1">//获取图结点个数</span>
 </span><span class='line'>    <span class="kt">int</span> <span class="n">node_count</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">g</span><span class="p">.</span><span class="n">ad_vector</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="c1">//将遍历每个结点的结果存放在nodes容器</span>
@@ -172,6 +181,7 @@
 </span><span class='line'>
 </span><span class='line'>    <span class="n">nodes</span><span class="p">[</span><span class="n">source</span><span class="p">].</span><span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'>
+</span><span class='line'>    <span class="c1">//优先队列，dist小的先出队</span>
 </span><span class='line'>    <span class="n">priority_queue</span><span class="o">&lt;</span><span class="n">node</span><span class="p">,</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;</span><span class="p">,</span><span class="n">compare_node</span><span class="o">&gt;</span> <span class="n">node_pq</span><span class="p">;</span>
 </span><span class='line'>    <span class="n">node_pq</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">source</span><span class="p">]);</span>
 </span><span class='line'>
