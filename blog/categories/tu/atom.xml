@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 图 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/tu/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-19T16:02:06+08:00</updated>
+  <updated>2016-02-19T16:03:26+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -20,7 +20,7 @@
     <id>http://caixindong.github.io/blog/2016/02/19/ios55</id>
     <content type="html"><![CDATA[<h2>算法思路</h2>
 
-<p><code>1.</code> 图用邻接表表达（ <a href="http://caixindong.github.io/blog/2016/02/19/ios53/">http://caixindong.github.io/blog/2016/02/19/ios53/</a> ），每个图结点都储存一个值，记录源结点到结点的距离，一开始初始化都不可达，即距离设置为无穷大，而源结点的值为0，因为源结点到源结点的距离为0；  <br/>
+<p><code>1.</code> 图用邻接表表达（ <a href="http://caixindong.github.io/blog/2016/02/19/ios53/">http://caixindong.github.io/blog/2016/02/19/ios53/</a> ），每个图结点都储存一个值，记录源结点到结点的距离，一开始初始化为不可达，即距离设置为无穷大，而源结点的值为0，因为源结点到源结点的距离为0；  <br/>
 <code>2.</code> 从源结点开始，遍历从源结点出发的所有路径，某结点可达，它的值更新为源结点的值加上之间路径的值，不可达的结点保持原来的值；      <br/>
 <code>3.</code> 从那些非遍历的结点中取值最小的结点作为下一个遍历的结点；      <br/>
 <code>4.</code> 遍历从当前遍历结点出发的所有路径，某结点可达，比较当前遍历结点的值加上路径值的和与某结点的值的大小，哪个小就更新为哪个值；
