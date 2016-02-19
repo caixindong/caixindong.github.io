@@ -7,8 +7,8 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios, swift iOS多线程（NSOperation）(swift) NSOperation 相比于gcd，它更好地控制和处理大量的并发操作.
-NSOperation 封装了需要的代码,NSOperation是抽象基类，一般我们使用系统提供的子类或者自定义子类来继承它. &hellip;">
+	<meta name="description" content="ios, swift iOS多线程（NSThread）(swift) NSThread
+如果你用到的子线程要长时间使用，就用它 1、创建一个子线程 NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil) &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -86,6 +86,67 @@ NSOperation 封装了需要的代码,NSOperation是抽象基类，一般我们�
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-04T19:40:17+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios5/" itemprop="url">iOS多线程（NSThread）(swift)</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>NSThread
+如果你用到的子线程要长时间使用，就用它</p>
+
+<p>1、创建一个子线程</p>
+
+<pre><code>NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil)
+
+func go(){
+    //操作
+
+}
+</code></pre>
+
+<p>2、自定义的nsthread</p>
+
+<pre><code>import UIKit
+
+class myThread: NSThread {
+//重写main方法，把子线程要做的操作放进去
+    overridefunc main() {
+    //操作
+    println("123")
+    }
+}
+let thread1 =myThread()
+thread1.start()
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
