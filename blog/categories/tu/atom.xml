@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 图 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/tu/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-19T15:18:12+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[图的表达]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/19/ios53/"/>
+    <updated>2016-02-19T14:45:57+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/19/ios53</id>
+    <content type="html"><![CDATA[<h1>前言</h1>
+
+<p>图的表达有两种方式实现，一种是利用邻接矩阵，一种是利用邻接表。  <br/>
+<code>1.</code> 利用邻接矩阵：利用一个二维数组来储存图结点的数据，数组的下标对应结点的编号，值代表结点之间的权值；  <br/>
+<code>2.</code> 利用邻接表：实际上是利用一维数组和链表来实现的，链表用来存储某个结点到其他结点的路径，链表的第一个元素为到本结点的路径，数组用来储存各个链表；</p>
+
+<h2>比较</h2>
+
+<p>我们将图的结点个数设为V，图的路径个数设为E。  <br/>
+用第一种方式实现，它的空间复杂度为O(V<sup>2</sup>)；  <br/>
+用第二种方式实现，它的空间复杂度为O(V*E)。  <br/>
+所以当图里面的路径比较稀疏用第二种方式实现，如果比较密集，则两种都可以。</p>
+
+<h2>代码实现</h2>
+
+<h4>利用邻接矩阵实现</h4>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;stdio.h&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+class Graphic {
+private:
+    std::vector&lt;std::vector&lt;int&gt;&gt; g;
+
+public:
+    Graphic(std::vector&lt;std::vector&lt;int&gt;&gt; &amp;g):g(g){
+
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    vector&lt;vector&lt;int&gt;&gt; g =
+    {{0,0,1,1},{0,0,1,1},{0,1,0,0},{0,1,1,0}};
+
+    Graphic gr(g);
+    return 0;
+}
+</code></pre>
+
+<h4>利用邻接表实现</h4>
+
+<pre><code class="C++">#include &lt;stdio.h&gt;
+#include &lt;vector&gt;
+#include &lt;list&gt;
+#include &lt;iostream&gt;
+
+/**
+ * 图路径
+ * dest_id 目的结点的ID
+ * weight 路径权值
+ **/
+struct edge_node {
+    int dest_id;
+    int weight;
+
+    edge_node(int id,int weight)
+    :dest_id(id),weight(weight){
+
+    }
+
+};
+
+class Graph {
+
+    std::vector&lt;std::list&lt;edge_node&gt;&gt; ad_vector;
+
+public:
+    Graph(int n)
+    :ad_vector(n){
+
+    }
+
+    /**
+     * 添加图路径
+     **/
+    void add_edge(int source,int dist,int weight){
+        edge_node new_eage(dist,weight);
+        ad_vector[source].push_back(new_eage);
+    }
+
+    /**
+    * 打印所有路径
+    **/
+    void dump(){
+        for (int i=0; i&lt;ad_vector.size(); i++) {
+            for (auto pos = ad_vector[i].begin(); pos!=ad_vector[i].end(); pos++) {
+                std::cout&lt;&lt;"edge from "&lt;&lt;i&lt;&lt;" to "&lt;&lt;pos-&gt;dest_id;
+                std::cout&lt;&lt;" weight: "&lt;&lt;pos-&gt;weight&lt;&lt;std::endl;
+            }
+        }
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    Graph g(4);
+    g.add_edge(0, 1, 1);
+    g.add_edge(0, 3, 1);
+    g.add_edge(1, 2, 1);
+    g.add_edge(1, 3, 1);
+    g.add_edge(3, 2, 1);
+    g.dump();
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
