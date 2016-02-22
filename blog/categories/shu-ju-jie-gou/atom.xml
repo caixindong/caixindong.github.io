@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-22T21:07:32+08:00</updated>
+  <updated>2016-02-22T22:19:07+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,51 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[2sum问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/22/ios57/"/>
+    <updated>2016-02-22T21:20:53+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/22/ios57</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个数组和一个目标数，在数组里查找两个数，这两个数之和等于目标数，返回这两个数的下标。  <br/>
+例如 nums = [2,7,11,15],target = 9  <br/>
+      return [0,1]</p>
+
+<h2>做法</h2>
+
+<p>遍历数组，利用hash表存储这个数组，键为数组元素，值为数组下标。遍历过程中，如果hash表内存在(target-当前元素),则找到sum为target的两个数。这种做法的时间复杂度为O(n)。</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">class Solution {
+public:
+     vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; nums, int target) {
+        vector&lt;int&gt; result;
+        unordered_map&lt;int, int&gt; hash_map;
+        for (int i=0; i&lt;nums.size(); i++) {
+            if (hash_map.count(nums[i])==0) {
+                hash_map.insert(unordered_map&lt;int, int&gt;::value_type(nums[i],i));
+
+            }
+            if (hash_map.count(target-nums[i])==1) {
+                int index = hash_map.find(target-nums[i])-&gt;second;
+                if (i&lt;index) {
+                    result.push_back(i);
+                    result.push_back(index);
+                }else if(i&gt;index){
+                    result.push_back(index);
+                    result.push_back(i);
+                }
+            }
+        }
+        return result;
+    }
+};
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[C++中的set和unordered_set]]></title>
@@ -534,87 +579,6 @@ int main(int argc, const char * argv[]) {
     g.dump();
     return 0;
 }
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[最长回文字符串]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/14/ios50/"/>
-    <updated>2016-02-14T22:36:55+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/14/ios50</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>给定一个字符串，求它的最长回文子字符串</p>
-
-<h2>做法</h2>
-
-<p>最长回文字符串的长度可能为奇数，也可能为偶数，所以我们可以假定这两种情况来求。我们采用中间拓展法来获取回文子串：由一个字符向它的左右两边拓展，当左右相等时继续拓展，当不等时停止拓展，记录此时的长度n，获得一个n长度的回文子串。然后对下一个字符继续用中间拓展法。当遍历完字符串所有字符后，选取长度最大的回文子串。</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;string&gt;
-using namespace std;
-class Solution {
-public:
-    string longestPalindrome(string s) {
-        int n = (int)s.length();
-                if (n==1) {
-            return s;
-        }
-        //记录最长的回文子串长度
-        int max = 0;
-        int maxLeft = 0;
-        int maxRight = 0;
-        for(int i=0;i&lt;n;i++){
-            //假定回文子串的长度为奇数
-            int start = i-1;
-            int end = i+1;
-            int len = 1;
-            int left = start;
-            int right = end;
-            while (start&gt;=0&amp;&amp;end&lt;n) {
-                if (s[start]==s[end]) {
-                    len = len+2;
-                    left = start;
-                    right = end;
-                    start--;
-                    end++;
-                }else{
-                    break;
-                }
-            }
-            if (len&gt;max) {
-                max = len;
-                maxLeft = left;
-                maxRight = right;
-            }
-            //假定回文子串的长度为偶数
-            start = i;
-            end = i+1;
-            len = 0;
-            left = start;
-            right = end;
-            while (start&gt;=0&amp;&amp;end&lt;n) {
-                if (s[start]==s[end]) {
-                    len = len+2;
-                    left = start;
-                    right = end;
-                    start--;
-                    end++;
-                }else{
-                    break;
-                }
-            }
-            if (len&gt;max) {
-                max = len;
-                maxLeft = left;
-                maxRight = right;
-            }
-        }
-        return s.substr(maxLeft,maxRight-maxLeft+1);
-    }
-};
 </code></pre>
 ]]></content>
   </entry>
