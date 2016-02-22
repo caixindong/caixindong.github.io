@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-22T22:19:07+08:00</updated>
+  <updated>2016-02-22T22:21:52+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -14,19 +14,20 @@
 
   
   <entry>
-    <title type="html"><![CDATA[2sum问题]]></title>
+    <title type="html"><![CDATA[Two Sum问题]]></title>
     <link href="http://caixindong.github.io/blog/2016/02/22/ios57/"/>
     <updated>2016-02-22T21:20:53+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/02/22/ios57</id>
     <content type="html"><![CDATA[<h2>要求</h2>
 
 <p>给定一个数组和一个目标数，在数组里查找两个数，这两个数之和等于目标数，返回这两个数的下标。  <br/>
-例如 nums = [2,7,11,15],target = 9  <br/>
-      return [0,1]</p>
+例如：nums = [2,7,11,15],target = 9  <br/>
+     return [0,1]</p>
 
 <h2>做法</h2>
 
-<p>遍历数组，利用hash表存储这个数组，键为数组元素，值为数组下标。遍历过程中，如果hash表内存在(target-当前元素),则找到sum为target的两个数。这种做法的时间复杂度为O(n)。</p>
+<p>遍历数组，利用hash表存储这个数组，键为数组元素，值为数组下标。遍历过程中，如果hash表内存在(target-当前元素),则找到sum为target的两个数。  <br/>
+这种做法的时间复杂度为O(n)。</p>
 
 <h2>代码实现</h2>
 
