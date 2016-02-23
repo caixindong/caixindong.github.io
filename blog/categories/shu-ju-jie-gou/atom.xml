@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-23T17:39:43+08:00</updated>
+  <updated>2016-02-23T17:41:47+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -22,12 +22,12 @@
 
 <p>给定两个字符串，一个为起始字符串，一个为终点字符串，以及一个字典，求起始字符串转化为终点字符串的最短路径,返回转化路径的长度。</p>
 
-<h3>具体要求：</h3>
+<h4>具体要求：</h4>
 
 <p>1、一次只能变换一个单词；  <br/>
 2、转化过程出现的单词必须是字典里的。</p>
 
-<h3>例子</h3>
+<h4>例子：</h4>
 
 <p>beginWord = “hit”  <br/>
 endWord = “cog”  <br/>
