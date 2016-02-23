@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-23T16:56:10+08:00</updated>
+  <updated>2016-02-23T17:39:43+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,190 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Word Ladder]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/23/ios59/"/>
+    <updated>2016-02-23T17:06:59+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/23/ios59</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定两个字符串，一个为起始字符串，一个为终点字符串，以及一个字典，求起始字符串转化为终点字符串的最短路径,返回转化路径的长度。</p>
+
+<h3>具体要求：</h3>
+
+<p>1、一次只能变换一个单词；  <br/>
+2、转化过程出现的单词必须是字典里的。</p>
+
+<h3>例子</h3>
+
+<p>beginWord = “hit”  <br/>
+endWord = “cog”  <br/>
+dictionary = [&ldquo;hot&rdquo;,&ldquo;dot&rdquo;,&ldquo;dog&rdquo;,&ldquo;lot&rdquo;,&ldquo;log&rdquo;]  <br/>
+transformation："hit"->&ldquo;hot&rdquo;->&ldquo;dot&rdquo;->&ldquo;dog&rdquo;->&ldquo;cog&rdquo;  <br/>
+return its length 5</p>
+
+<h2>做法</h2>
+
+<p>既然要求最短，我们可以借助图BFS的思想来解决这个问题，这个问题可以转化为图的源最短路径问题，虽然解题过程中没有用到图，但用到图的思想。
+从源字符串出发，先遍历完当前字符串可能变化的情况，如果还没变成终点字符串，则继续下一层遍历，直到可以变成终点字符串，返回转化步数。如果所有情况都遍历完了还不能变成终点字符串，则返回0。</p>
+
+<h2>代码实现</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;queue&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;unordered_set&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;unordered_map&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * 记录源字符串转化当前字符串的路径</span>
+</span><span class='line'><span class="cm"> * word 当前字符串</span>
+</span><span class='line'><span class="cm"> * pre 前驱字符串</span>
+</span><span class='line'><span class="cm"> * isVisited 当前字符串是否被访问</span>
+</span><span class='line'><span class="cm"> * size 源字符串转化为当前字符串的过程经过的字符串的个数，即转化步数</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">Node</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">string</span> <span class="n">word</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">string</span> <span class="n">pre</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">isVisited</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
+</span><span class='line'>    <span class="o">:</span><span class="n">word</span><span class="p">(</span><span class="n">word</span><span class="p">),</span><span class="n">isVisited</span><span class="p">(</span><span class="nb">false</span><span class="p">),</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">ladderLength</span><span class="p">(</span><span class="n">string</span> <span class="n">beginWord</span><span class="p">,</span> <span class="n">string</span> <span class="n">endWord</span><span class="p">,</span> <span class="n">unordered_set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;&amp;</span> <span class="n">wordList</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">Node</span><span class="o">*&gt;</span> <span class="n">word_map</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">wordList</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">wordList</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">Node</span><span class="o">*</span> <span class="n">node</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">word_map</span><span class="p">[</span><span class="o">*</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="n">Node</span><span class="o">*</span> <span class="n">begin</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">beginWord</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">begin</span><span class="o">-&gt;</span><span class="n">isVisited</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">begin</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">word_map</span><span class="p">[</span><span class="n">beginWord</span><span class="p">]</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">Node</span><span class="o">*</span> <span class="n">end</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">endWord</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">word_map</span><span class="p">[</span><span class="n">endWord</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">queue</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">*&gt;</span> <span class="n">queue</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">queue</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">word_map</span><span class="p">[</span><span class="n">beginWord</span><span class="p">]);</span>
+</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">queue</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">Node</span><span class="o">*</span> <span class="n">current_node</span> <span class="o">=</span> <span class="n">queue</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
+</span><span class='line'>            <span class="n">queue</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
+</span><span class='line'>            <span class="c1">//遍历字符串每一个位置</span>
+</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">current_node</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">.</span><span class="n">length</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">for</span> <span class="p">(</span><span class="kt">char</span> <span class="n">j</span> <span class="o">=</span> <span class="sc">&#39;a&#39;</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;=</span><span class="sc">&#39;z&#39;</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="n">string</span> <span class="n">word</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+</span><span class='line'>                    <span class="c1">//替换字符，word变成一个新字符串</span>
+</span><span class='line'>                    <span class="n">word</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
+</span><span class='line'>                    <span class="k">if</span> <span class="p">(</span><span class="n">word</span><span class="o">==</span><span class="n">endWord</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">size</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>                        <span class="k">return</span> <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">;</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">word_map</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">word</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">isVisited</span><span class="o">==</span><span class="nb">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">isVisited</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">pre</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
+</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">size</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>                        <span class="n">queue</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]);</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">unordered_set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">wordList</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;hot&quot;</span><span class="p">,</span><span class="s">&quot;dot&quot;</span><span class="p">,</span><span class="s">&quot;dog&quot;</span><span class="p">,</span><span class="s">&quot;lot&quot;</span><span class="p">,</span><span class="s">&quot;log&quot;</span><span class="p">};</span>
+</span><span class='line'>    <span class="n">Solution</span> <span class="n">s</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">s</span><span class="p">.</span><span class="n">ladderLength</span><span class="p">(</span><span class="s">&quot;hit&quot;</span><span class="p">,</span> <span class="s">&quot;cog&quot;</span><span class="p">,</span> <span class="n">wordList</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[C++中的map和unordered_map]]></title>
@@ -3622,179 +3806,6 @@ unordered_set 容器支持正向迭代</p>
 </span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[C++ split()函数的实现]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/08/ios39/"/>
-    <updated>2016-02-08T19:32:26+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/08/ios39</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>java标准库提供split()函数用于字符型切割，但是C++的标准库并没有提供相应功能的方法，但是不用怕，今天我提供两种方法来实现我们自己的split()函数。</p>
-
-<h2>方法一</h2>
-
-<p>利用C++标准库提供s.find_first_of()函数和substr()函数的来解决。  <br/>
-代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;vector&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;string&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm">* s 指待分割的字符串</span>
-</span><span class='line'><span class="cm">* delim 指分割符</span>
-</span><span class='line'><span class="cm">* ret 用于存储分割结果的容器</span>
-</span><span class='line'><span class="cm">**/</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">split01</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span> <span class="n">s</span><span class="p">,</span><span class="k">const</span> <span class="n">string</span> <span class="n">delim</span><span class="p">,</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span> <span class="o">&gt;*</span> <span class="n">ret</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>  
-</span><span class='line'>  <span class="c1">//记录每次分割的起始位置</span>
-</span><span class='line'>    <span class="kt">size_t</span> <span class="n">last</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">//记录匹配delim这个字符的下标</span>
-</span><span class='line'>    <span class="kt">size_t</span> <span class="n">index</span><span class="o">=</span><span class="n">s</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="n">delim</span><span class="p">,</span><span class="n">last</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">//当=-1时表示查找不到</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">index</span><span class="o">!=-</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>      
-</span><span class='line'>        <span class="n">ret</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">last</span><span class="p">,</span><span class="n">index</span><span class="o">-</span><span class="n">last</span><span class="p">));</span>
-</span><span class='line'>        <span class="c1">//记录下一次分割的起始位置</span>
-</span><span class='line'>        <span class="n">last</span><span class="o">=</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">index</span><span class="o">=</span><span class="n">s</span><span class="p">.</span><span class="n">find_first_of</span><span class="p">(</span><span class="n">delim</span><span class="p">,</span><span class="n">last</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">//若最后一个分割符后面还有元素</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="o">-</span><span class="n">last</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">ret</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">last</span><span class="p">));</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>方法二</h2>
-
-<p>利用C++库提供的strtok()函数来解决。  <br/>
-函数说明：char * strtok(char <em>s, const char </em>delim)，参数s 指向欲分割的字符串，参数delim 则为分割字符串，当strtok()在参数s 的字符串中发现到参数delim 的分割字符时则会将该字符改为\0 字符。还有一个用于多线程的strtok_r()。  <br/>
-代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;vector&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;string&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="nf">split02</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span> <span class="n">mystr</span><span class="p">,</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">deli</span><span class="p">,</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;*</span> <span class="n">list</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">str</span> <span class="o">=</span> <span class="n">mystr</span><span class="p">.</span><span class="n">c_str</span><span class="p">();</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="n">mystr</span><span class="p">.</span><span class="n">length</span><span class="p">()];</span>
-</span><span class='line'>    <span class="c1">//从mystr拷贝（sizeof(buffer)+1）-1个字符到buffer中</span>
-</span><span class='line'>    <span class="n">snprintf</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">str</span><span class="p">);</span>
-</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">gg</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">char</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">strtok_r</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">deli</span><span class="p">,</span><span class="o">&amp;</span><span class="n">gg</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">list</span><span class="o">-&gt;</span><span class="n">clear</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">list</span><span class="o">-&gt;</span><span class="n">push_back</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">//往后的调用则将参数s 设置成NULL。每次调用成功则返回下一个分割后的字符串指针，设为NULL则默认指向这个指针</span>
-</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">strtok_r</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">deli</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">gg</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>附录:C++中string与char*和const char*互转的方法</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="c1">//string 转 const char*</span>
-</span><span class='line'><span class="n">string</span> <span class="n">s1</span> <span class="o">=</span> <span class="s">&quot;abc&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c1</span> <span class="o">=</span> <span class="n">s1</span><span class="p">.</span><span class="n">c_str</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//const char* 转 string</span>
-</span><span class='line'><span class="n">string</span> <span class="nf">s2</span><span class="p">(</span><span class="n">c1</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//string 转 char*</span>
-</span><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="n">c2</span><span class="p">;</span>
-</span><span class='line'><span class="n">c2</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="n">s1</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'><span class="n">strcpy</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">s1</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//char* 转 string</span>
-</span><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="n">c3</span> <span class="o">=</span> <span class="s">&quot;abc&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="n">string</span> <span class="nf">s3</span><span class="p">(</span><span class="n">c3</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//const char* 转为 char*</span>
-</span><span class='line'><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c4</span> <span class="o">=</span> <span class="s">&quot;123&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="kt">char</span><span class="o">*</span> <span class="n">c5</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
-</span><span class='line'><span class="n">strcpy</span><span class="p">(</span><span class="n">c5</span><span class="p">,</span> <span class="n">c4</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
