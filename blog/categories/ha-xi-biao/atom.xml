@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 哈希表 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ha-xi-biao/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-24T21:04:01+08:00</updated>
+  <updated>2016-02-24T21:05:00+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,71 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[利用哈希表的思想实现字符串匹配函数]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/24/ios62/"/>
+    <updated>2016-02-24T20:23:48+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/24/ios62</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>C语言有一个字符串匹配函数strstr(const char<em> source,const char</em> pattern)，可以获取匹配字符串在源字符串的位置。我们今天利用哈希表的思想来实现这个函数。</p>
+
+<h4>例子</h4>
+
+<p>源字符串：“abccbasd”
+匹配字符串：“ccba”</p>
+
+<h4>做法</h4>
+
+<p>我们可以求出匹配字符串的hashCode，至于如何求，我们可以定义自己的哈希函数，我们可以仿照Java标准库中字符串hashcode的求法，例如“abc”的hashcode等于（'a'*31+&lsquo;b'）*31+'c&rsquo; = 96354。我们根据我们自己的哈希函数求出匹配字符串的hashcode，接着我们遍历我们的源字符串，一开始是“abcc”，我们求出它的hashcode，如果他的hashcode跟匹配字符串相同，则遍历字符串看每一位是否相同，如果不同，则遍历下一串字符串“bccb”，判断方法如上，当遍历到“ccba”位置时，跟匹配字符串一样，返回匹配字符串的位置。</p>
+
+<h2>代码如下</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;string&gt;
+#define PRIM_BASE 31
+using namespace std;
+/**
+*计算hashcode的方法跟上面例子的方法一样
+*最坏时间复杂度为O(n-m)*m
+**/
+int rolling_hashCode_Strstr(const string &amp;source,const string &amp;pattern){
+    unsigned source_code = 0;
+    unsigned pattern_code = 0;
+    unsigned pow = 1;
+    size_t n = source.length();
+    size_t m = pattern.length();
+
+    for (int i=0; i &lt;m; i++) {
+        source_code = source_code*PRIM_BASE+source[i];
+        pattern_code = pattern_code*PRIM_BASE+pattern[i];
+        pow = pow*PRIM_BASE;
+    }
+    if (source_code==pattern_code&amp;&amp;source.substr(0,m)==pattern) {
+        return 0;
+    }else{
+        for (int i = (int)m; i&lt;n; i++) {
+            source_code = source_code*PRIM_BASE+source[i];
+            source_code = source_code - pow*source[i-m];
+            if (source_code==pattern_code&amp;&amp;source.substr(i-m+1,m)==pattern) {
+                return i-(int)m+1;
+            }
+        }
+
+    }
+    return -1;
+}
+
+
+
+int main(int argc, const char * argv[]) {
+    cout&lt;&lt;rolling_hashCode_Strstr("abcdjdbsuad", "djdb")&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Word Ladder]]></title>

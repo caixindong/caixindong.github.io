@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: 哈希表，数据结构 | Cool Guy]]></title>
-  <link href="http://caixindong.github.io/blog/categories/ha-xi-biao-,shu-ju-jie-gou/atom.xml" rel="self"/>
+  <title><![CDATA[Category: 字符串 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/zi-fu-chuan/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-24T21:04:01+08:00</updated>
+  <updated>2016-02-24T21:05:00+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
