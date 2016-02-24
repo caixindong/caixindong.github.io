@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-24T17:47:31+08:00</updated>
+  <updated>2016-02-24T20:18:22+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,75 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[斐波那契数列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/24/ios61/"/>
+    <updated>2016-02-24T18:29:04+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/24/ios61</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>斐波那契数列（Fibonacci sequence），又称黄金分割数列、因数学家列昂纳多·斐波那契（Leonardoda Fibonacci[1]  ），指的是这样一个数列：0、1、1、2、3、5、8、13、21、34、……在数学上，斐波纳契数列以如下被以递归的方法定义：F（0）=0，F（1）=1，F（n）=F(n-1)+F(n-2)（n≥2，n∈N*）</p>
+
+<h2>求斐波那契数列中第n个数</h2>
+
+<h3>递归解法(缺点:时间复杂度很大，非多项式时间)</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="nf">fb</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">fb02</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">fb02</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>动态规划解法</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="nf">fb</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span><span class="o">*</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[01背包问题]]></title>
@@ -3632,235 +3701,6 @@ unordered_set 容器支持正向迭代</p>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'>    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[二叉树的DFS遍历(非递归)]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/11/ios41/"/>
-    <updated>2016-02-11T13:54:08+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/11/ios41</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>递归是利用函数压栈实现，如果我们要将递归的写法转化为非递归写法，自然需要利用栈来实现。</p>
-
-<h2>二叉树的实现</h2>
-
-<p>代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">treeNode</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">position</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">val</span><span class="p">,</span><span class="kt">int</span> <span class="n">position</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">BinaryTree</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>  <span class="n">treeNode</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">BinartTree</span><span class="p">(){</span>
-</span><span class='line'>      <span class="n">root</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="kt">void</span> <span class="n">pre_order</span><span class="p">();</span>
-</span><span class='line'>  <span class="kt">void</span> <span class="nf">mid_order</span><span class="p">();</span>
-</span><span class='line'>  <span class="kt">void</span> <span class="n">back_order</span><span class="p">()</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>前序遍历非递归写法</h2>
-
-<p>代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> *前序遍历</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="kt">void</span> <span class="n">BinaryTree</span><span class="o">::</span><span class="n">pre_order</span><span class="p">(){</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">currentNode</span> <span class="o">=</span> <span class="n">root</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">stack</span><span class="o">&lt;</span><span class="n">treeNode</span><span class="o">*&gt;</span> <span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">currentNode</span><span class="o">||!</span><span class="n">stack</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">currentNode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">currentNode</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">stack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">stack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>中序遍历非递归写法</h2>
-
-<p>代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> *中序遍历</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="kt">void</span> <span class="n">BinaryTree</span><span class="o">::</span><span class="n">mid_order</span><span class="p">(){</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">currentNode</span> <span class="o">=</span> <span class="n">root</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">stack</span><span class="o">&lt;</span><span class="n">treeNode</span><span class="o">*&gt;</span> <span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">stack</span><span class="p">.</span><span class="n">empty</span><span class="p">()</span><span class="o">||</span><span class="n">currentNode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">currentNode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">currentNode</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">stack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">stack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>后序遍历非递归写法</h2>
-
-<p>代码如下：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> *后序遍历</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="kt">void</span> <span class="n">BinaryTree</span><span class="o">::</span><span class="n">back_order</span><span class="p">(){</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">currentNode</span> <span class="o">=</span> <span class="n">root</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">lastVisitNode</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">stack</span><span class="o">&lt;</span><span class="n">treeNode</span><span class="o">*&gt;</span> <span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">currentNode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">currentNode</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">stack</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">currentNode</span> <span class="o">=</span> <span class="n">stack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>        <span class="n">stack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">==</span><span class="k">nullptr</span><span class="o">||</span><span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">==</span><span class="n">lastVisitNode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">lastVisitNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">currentNode</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">currentNode</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">currentNode</span><span class="p">);</span>
-</span><span class='line'>                <span class="n">currentNode</span> <span class="o">=</span> <span class="n">currentNode</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 

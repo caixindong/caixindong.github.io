@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 算法 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-24T17:47:31+08:00</updated>
+  <updated>2016-02-24T20:18:22+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,49 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[斐波那契数列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/24/ios61/"/>
+    <updated>2016-02-24T18:29:04+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/24/ios61</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>斐波那契数列（Fibonacci sequence），又称黄金分割数列、因数学家列昂纳多·斐波那契（Leonardoda Fibonacci[1]  ），指的是这样一个数列：0、1、1、2、3、5、8、13、21、34、……在数学上，斐波纳契数列以如下被以递归的方法定义：F（0）=0，F（1）=1，F（n）=F(n-1)+F(n-2)（n≥2，n∈N*）</p>
+
+<h2>求斐波那契数列中第n个数</h2>
+
+<h3>递归解法(缺点:时间复杂度很大，非多项式时间)</h3>
+
+<pre><code class="C++">unsigned long long fb(int n){
+    if (n&lt;2) {
+        return n;
+    }else{
+        return fb02(n-1)+fb02(n-2);
+    }
+
+}
+</code></pre>
+
+<h3>动态规划解法</h3>
+
+<pre><code class="C++">unsigned long long fb(int n){
+    if (n&lt;2) {
+        return n;
+    }else{
+        unsigned long long* a = new unsigned long long[n+1];
+        a[0] = 0;
+        a[1] = 1;
+        for (int i = 2; i&lt;=n; i++) {
+            a[i] = a[i-1]+a[i-2];
+        }
+        return a[n];
+    }
+
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[01背包问题]]></title>
@@ -347,69 +390,6 @@ int main(int argc, const char * argv[]) {
     int a[] = {12,3,1,4,2,5,4,8,5,4,3,9,4,0};
     radixSort(a, 100, 14);
     for (int i=0; i&lt;14; i++) {
-        cout&lt;&lt;a[i]&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[八大排序算法--归并排序]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/06/ios32/"/>
-    <updated>2016-02-06T22:19:21+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/06/ios32</id>
-    <content type="html"><![CDATA[<h2>归并排序</h2>
-
-<p>代码如下</p>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-void mergeArr(int first,int mid,int last,int a[],int tmp[]){
-    int i = first;
-    int j = mid+1;
-    int n = mid ;
-    int m = last;
-    int k = 0;
-    while (i&lt;=n&amp;&amp;j&lt;=m) {
-        if (a[i]&lt;a[j]) {
-            tmp[k++] = a[i++];
-        }else{
-            tmp[k++] = a[j++];
-        }
-
-    }
-    while (i&lt;=n) {
-        tmp[k++] = a[i++];
-    }
-    while(j&lt;=m) {
-        tmp[k++] = a[j++];
-    }
-    for (int i=0; i&lt;k; i++) {
-        a[first+i] = tmp[i];
-    }
-}
-
-void mergeSort(int first ,int last,int a[],int tmp[]){
-    if (first&lt;last) {
-        int mid = (first+last)/2;
-        mergeSort(first, mid, a, tmp);
-        mergeSort(mid+1, last, a, tmp);
-        mergeArr(first, mid, last, a, tmp);
-    }
-}
-
-void MergeSort(int n,int a[]){
-    int *tmp = new int[n];
-    mergeSort(0, n-1, a, tmp);
-    delete [] tmp;
-}
-int main(int argc, const char * argv[]) {
-    int a[] = {2,4,1,8,6,7,9};
-    MergeSort(7,a);
-    for (int i=0; i&lt;7; i++) {
         cout&lt;&lt;a[i]&lt;&lt;" ";
     }
     cout&lt;&lt;endl;
