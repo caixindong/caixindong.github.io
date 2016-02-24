@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 动态规划 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/dong-tai-gui-hua/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-24T17:47:31+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[01背包问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/24/ios60/"/>
+    <updated>2016-02-24T16:54:00+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/24/ios60</id>
+    <content type="html"><![CDATA[<h2>问题描述</h2>
+
+<p>已知:有一个容量为W的背包和N件物品，第i件物品的重量是weight[i]，收益是cost[i]。  <br/>
+限制:每种物品只有一件，可以选择放或者不放  <br/>
+问题:在不超过背包容量的情况下，最多能获得多少价值或收益</p>
+
+<h2>算法思路</h2>
+
+<p>我们定义一个数据结构f[i][j],它代表前i个物品在j容量下的最大价值。  <br/>
+问题可以转化为解决这样的一个子问题，前i-1件物品已放入背包中，我们只考虑第i件物品的放入情况，如果不放则f[i][j] = f[i-1][j]；如果放入则f[i][j] = f[i-1][j-weight[i]]+cost[i],我们通过比较这两种情况f值得大小，来决定这件物品该不该放入</p>
+
+<h2>代码如下</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;climits&gt;
+using namespace std;
+
+int MAX(int a,int b){
+    return a&gt;b?a:b;
+}
+
+/**
+ * 时间复杂度为O(N*W)
+ * 空间复杂度为O(N*W)
+ **/
+int _01Package(int* weight,int* cost, int N, int W){
+    int f[N+1][W+1];
+    memset(f, 0, sizeof(f));
+    for (int i=1; i&lt;=N; i++) {
+        for (int j = 0; j &lt;=W; j++) {
+            f[i][j] = f[i-1][j];
+            if (weight[i]&lt;=j) {
+                f[i][j] = MAX(f[i-1][j], f[i-1][j-weight[i]]+cost[i]);
+            }
+        }
+    }
+    return f[N][W];
+}
+
+
+
+int main(int argc, const char * argv[]) {
+    const int N = 3;//物品个数
+    const int V = 5;//背包最大容量
+    int weight[N + 1] = {0,3,2,2};//物品重量
+    int value[N + 1] = {0,5,10,20};//物品价值
+    cout&lt;&lt;_01FillPackage02(weight, value, N, V)&lt;&lt;endl;
+    return 0;
+}
+</code></pre>
+
+<h2>优化空间复杂度</h2>
+
+<pre><code class="C++">/**
+ * 优化空间复杂度
+ * 空间复杂度为O(W)
+ **/
+int _01Package02(int* weight,int* cost, int N,int W){
+    int f[W+1];
+    memset(f, 0, sizeof(f));
+    for (int i=1; i&lt;=N; i++) {
+        for (int j = W; j&gt;=weight[i]; j--) {
+            f[j] = MAX(f[j], f[j-weight[i]]+cost[i]);
+        }
+    }
+    return f[W];
+}
+</code></pre>
+
+<p>逆序枚举容量的原因：
+上面那种做法实际上是根据方程f[i][j] = MAX(f[i-1][j], f[i-1][j-weight[i]]演化而来，当到达第i次循环时，在计算f[j]之间，f[j]已经保存上次循环求得的f值，即实际上在计算f[j]之前，f[j] = f[i-1][j],如果是顺序枚举容量，则此时f[j-weight[i]]+cost[i]实际上是f[i][j-weight[i]]+cost[i],则不符合题意，其实相当于重复装入某件物品，如果是解决完全背包问题，顺序枚举容量是最简洁的解决方案。</p>
+
+<h2>问题延伸</h2>
+
+<p>当前问题不要求把背包装满，如果把背包装满，那怎么解决呢？  <br/>
+其实解法跟上面问题的解法一样，只是在f数组的初始化上面有所不同。要求把背包装满，只有容量为0的背包时有合法解，价值为0，其他的容量均没有合法解，属于未定义状态，应该被复制为负无穷。</p>
+
+<h4>代码实现</h4>
+
+<pre><code class="C++">int _01FillPackage(int* weight,int* cost, int N, int W){
+    int f[N+1][W+1];
+    //注意初始化
+    for (int i=0; i&lt;=N; i++) {
+        for (int j = 0; j&lt;=W; j++) {
+            f[i][j] = INT_MIN;
+        }
+    }
+
+    for (int i=0; i&lt;=N; i++) {
+        f[i][0] = 0;
+    }
+    for (int i=1; i&lt;=N; i++) {
+        for (int j = 0; j &lt;=W; j++) {
+            f[i][j] = f[i-1][j];
+            if (weight[i]&lt;=j) {
+                f[i][j] = MAX(f[i-1][j], f[i-1][j-weight[i]]+cost[i]);
+            }
+        }
+    }
+    return f[N][W];
+}
+
+int _01FillPackage02(int* weight,int* cost, int N,int W){
+    int f[W+1];
+    //注意初始化
+    for (int i = 0; i&lt;=W;i++) {
+        f[i] = INT_MIN;
+    }
+    f[0] = 0;
+    for (int i=1; i&lt;=N; i++) {
+        for (int j = W; j&gt;=weight[i]; j--) {
+            f[j] = MAX(f[j], f[j-weight[i]]+cost[i]);
+        }
+    }
+    return f[W];
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
