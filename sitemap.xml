@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://caixindong.github.io/blog/2016/02/24/ios62/</loc>
+    <lastmod>2016-02-24T20:23:48+08:00</lastmod>
+  </url>
+  <url>
     <loc>http://caixindong.github.io/blog/2016/02/24/ios61/</loc>
     <lastmod>2016-02-24T18:29:04+08:00</lastmod>
   </url>
@@ -305,6 +309,27 @@
   </url>
   <url>
     <loc>http://caixindong.github.io/blog/categories/dong-tai-gui-hua/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/blog/categories/ha-xi-biao-,shu-ju-jie-gou/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/posts/2/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/posts/3/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/posts/4/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/posts/5/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/posts/6/</loc>
+  </url>
+  <url>
+    <loc>http://caixindong.github.io/posts/7/</loc>
   </url>
   <url>
     <loc>http://caixindong.github.io/baidu_verify_4KZcnsWG5l.html</loc>
