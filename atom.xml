@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-24T20:18:22+08:00</updated>
+  <updated>2016-02-24T20:19:54+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -45,7 +45,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>动态规划解法</h3>
+<h3>动态规划解法(时间复杂度为O(n))</h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
