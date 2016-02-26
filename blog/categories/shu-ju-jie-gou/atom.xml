@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-26T16:00:45+08:00</updated>
+  <updated>2016-02-26T17:50:48+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[最长公共子串]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/26/ios64/"/>
+    <updated>2016-02-26T16:02:00+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/26/ios64</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[利用哈希表的思想实现字符串匹配函数]]></title>
@@ -461,198 +470,6 @@ public:
         return result;
     }
 };
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[C++中的set和unordered_set]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/22/ios56/"/>
-    <updated>2016-02-22T20:28:12+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/22/ios56</id>
-    <content type="html"><![CDATA[<h1>set</h1>
-
-<h2>简介</h2>
-
-<p>集合（Set）容器是一个按特定顺序存储唯一元素的关联容器。</p>
-
-<h2>类模板</h2>
-
-<pre><code class="C++">template &lt; class T,
-           class Compare = less&lt;T&gt;,
-           class Alloc = allocator&lt;T&gt; &gt;
-&gt; class set;
-</code></pre>
-
-<h3>模板参数</h3>
-
-<p><code>1.</code> T：元素的类型。  <br/>
-<code>2.</code> Compare：一个二元谓词，以两个元素为参数返回一个 bool 值。(比较函数)  <br/>
-<code>3.</code> Alloc：容器内部用来管理内存分配及释放的内存分配器的类型。这个参数是可选的，它的默认值是 std::allocator<T>.</p>
-
-<h2>详细说明</h2>
-
-<p>在一个集合中，元素的值同时可以用来标志对应的元素（即值是自身的主键），每个值必须是唯一的。主键是不可修改的，因此在 set 中的元素不能被逐个修改（所有元素保持恒定），但是可以删除某个元素或插入新的元素。  <br/>
-set 容器中的所有元素都是按由类型为 Compare 的比较对象指定的严格弱序规则排序的。  <br/>
-在用主键访问单个元素时，set 容器通常比 unordered_set 容器低效，但 set 容器允许按顺序直接对某个子集进行迭代。  <br/>
-set 容器通常被实现为一个二叉搜索树（及其变型），该数据结构具有对数据自动排序的功能。
-支持双向迭代</p>
-
-<h2>相关函数使用说明</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;set&gt;
-#include &lt;unordered_set&gt;
-using namespace std;
-struct Node {
-    int val;
-    int id;
-    Node(int id,int val)
-    :val(val),id(id){
-
-    }
-};
-
-
-
-bool operator&lt;(const Node&amp; a,const Node &amp;b)
-{
-    return a.val&lt;b.val;
-}
-
-
-int main(int argc, const char * argv[]) {
-    cout&lt;&lt;"初始化一个set"&lt;&lt;endl;
-    set&lt;int&gt; test_set = {2,3,19,8,6,7};
-
-    cout&lt;&lt;"删除一个元素"&lt;&lt;endl;
-    test_set.erase(19);
-
-    cout&lt;&lt;"遍历set里面的元素"&lt;&lt;endl;
-    for (auto pos = test_set.begin(); pos!=test_set.end(); pos++) {
-        cout&lt;&lt;*pos&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-
-    cout&lt;&lt;"查找元素的个数，如果为1就是找到，为0就是找不到"&lt;&lt;endl;
-    if (test_set.count(5)==1) {
-        cout&lt;&lt;"have find"&lt;&lt;endl;
-    }else{
-        cout&lt;&lt;"no find"&lt;&lt;endl;
-    }
-
-    cout&lt;&lt;"查找元素的迭代器，找不到则返回最后一个元素的迭代器，找得到就返回元素的迭代器"&lt;&lt;endl;
-    if (test_set.find(5)!=test_set.end()) {
-        cout&lt;&lt;"have find"&lt;&lt;endl;
-    }else{
-        cout&lt;&lt;"no find"&lt;&lt;endl;
-    }
-
-    cout&lt;&lt;"有效元素个数"&lt;&lt;endl;
-    cout&lt;&lt;test_set.size()&lt;&lt;endl;
-
-    cout&lt;&lt;"自定义类型的set，默认是less函数(&lt;),所以必须重载&lt;操作符,其他用法跟标准的set一样"&lt;&lt;endl;
-    Node n1(1,5);
-    Node n2(2,3);
-    Node n3(3,9);
-    set&lt;Node&gt; node_set;
-    node_set.insert(n1);
-    node_set.insert(n2);
-    node_set.insert(n3);
-    cout&lt;&lt;"遍历自定义类型set里面的元素"&lt;&lt;endl;
-    for (auto pos = node_set.begin(); pos!=node_set.end(); pos++) {
-        cout&lt;&lt;pos-&gt;id&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-
-<h1>unordered_set</h1>
-
-<h2>简介</h2>
-
-<p>无序集合（Unordered Set）容器是一个存储唯一元素的关联容器，容器中的元素无特别的次序关系。该容器允许基于值地快速元素检索。</p>
-
-<h2>类模板</h2>
-
-<pre><code class="C++">// &lt;unordered_set&gt;
-template &lt; class Key,
-    class Hash = hash&lt;Key&gt;,
-    class Pred = equal_to&lt;Key&gt;,
-    class Alloc = allocator&lt;Key&gt;
-&gt; class unordered_set;
-</code></pre>
-
-<h3>模板参数</h3>
-
-<p><code>1.</code> Key：元素的类型。  <br/>
-<code>2.</code> Hash：一元谓词，以一个 Key 类型的对象为参数，返回一个基于该对象的 size_t 类型的唯一值（哈希函数）。  <br/>
-<code>3.</code> Pred：二元谓词，以两个 Key 类型的对象为参数，返回一个 bool 值，如果第一个参数等价于第二个参数，该 bool 值为 true，否则为 false。默认为 std::equal_to。      <br/>
-<code>4.</code> Alloc：容器内部用来管理内存分配及释放的内存分配器的类型。这个参数是可选的，它的默认值是 std::allocator<T>。</p>
-
-<h2>详细说明</h2>
-
-<p>在一个 unordered_set 容器中，元素的值同时可以用来标志对应的元素（即值是自身的主键），每个值必须是唯一的。主键是不可修改的，因此在 unordered_set 中的元素不能被逐个修改（所有元素保持恒定），但是可以删除某个元素或插入新的元素。  <br/>
-在 unordered_set 内部，元素不会按任何顺序排序，而是通过元素值的 hash 值将元素分组放置到各个槽（Bucket，也可译成“桶”）中，这样就能通过元素值快速地访问各个对应的元素（平均耗时为一个常量，即时间复杂度为 O(1)）。  <br/>
-在访问容器中的某个元素时，unordered_set 容器比 set 容器高效，而在迭代容器元素的某个子集时，前者比后者稍微低效了一点。  <br/>
-unordered_set 容器支持正向迭代</p>
-
-<h2>相关函数说明</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;set&gt;
-#include &lt;unordered_set&gt;
-
-using namespace std;
-struct Node {
-    int val;
-    int id;
-    Node(int id,int val)
-    :val(val),id(id){
-
-    }
-};
-
-struct node_hash_fun{
-    size_t operator()(const Node &amp;n)const{
-        return n.id*50+n.val;
-    }
-};
-
-struct node_equal_fun{
-    bool operator()(const Node &amp;n,const Node&amp;m)const{
-        return n.id==m.id&amp;&amp;n.val==m.val?true:false;
-    }
-};
-
-
-int main(int argc, const char * argv[]) {
-    cout&lt;&lt;"相当于java的hashSet,里面存放的元素是无序的,其他用法跟set大同小异"&lt;&lt;endl;
-    unordered_set&lt;int&gt; test_unordered_set = {2,5,3,6,7,1,9,0};
-
-    cout&lt;&lt;"遍历unordered_set"&lt;&lt;endl;
-    for (auto pos = test_unordered_set.begin(); pos!=test_unordered_set.end(); pos++) {
-        cout&lt;&lt;*pos&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-
-    Node n1(1,5);
-    Node n2(2,3);
-    Node n3(3,9);
-    cout&lt;&lt;"自定义类型unordered_set，必须重载hash_func和==操作符,其他用法跟标准的unordered_set一样"&lt;&lt;endl;   unordered_set&lt;Node,node_hash_fun,node_equal_fun,allocator&lt;Node&gt;&gt; node_unordered_set;
-    node_unordered_set.insert(n1);
-    node_unordered_set.insert(n2);
-    node_unordered_set.insert(n3);
-
-    cout&lt;&lt;"遍历自定义类型unordered_set"&lt;&lt;endl;
-    for (auto pos = node_unordered_set.begin(); pos!=node_unordered_set.end(); pos++) {
-        cout&lt;&lt;(*pos).id&lt;&lt;" ";
-    }
-    cout&lt;&lt;endl;
-
-    return 0;
-}
 </code></pre>
 ]]></content>
   </entry>
