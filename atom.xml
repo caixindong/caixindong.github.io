@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-24T21:05:00+08:00</updated>
+  <updated>2016-02-26T16:00:45+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,145 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[最长公共子序列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/26/ios63/"/>
+    <updated>2016-02-26T15:39:41+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/26/ios63</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定两个字符串，求他们的最长公共子序列的长度。</p>
+
+<h4>何为最长公共子序列？</h4>
+
+<p>一个序列 S ，如果分别是两个或多个已知序列的子序列，且是所有符合此条件序列中最长的，则 S 称为已知序列的最长公共子序列，序列不要求连续，区别于最长公共子串。</p>
+
+<h4>例子</h4>
+
+<p>X = “a,b,c,f,b,c”  <br/>
+Y = “a,b,f,c,a,b”  <br/>
+X和Y的最长公共子序列为“a,b,c,b”  <br/>
+X和Y的最长公共子串为“a,b”</p>
+
+<h2>做法</h2>
+
+<h4>递归法（不推荐，但作为一种思路）</h4>
+
+<h5>代码如下</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">int</span> <span class="nf">MAX</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="kt">int</span> <span class="n">b</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="o">?</span><span class="nl">a</span><span class="p">:</span><span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * 递归解法，时间复杂度为np，非多项式时间复杂度</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">lcs_recursive</span><span class="p">(</span><span class="kt">char</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">a_length</span><span class="p">,</span><span class="kt">char</span> <span class="n">b</span><span class="p">[],</span><span class="kt">int</span> <span class="n">b_length</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">a_length</span><span class="o">==</span><span class="mi">0</span><span class="o">||</span><span class="n">b_length</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">a_length</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">b</span><span class="p">[</span><span class="n">b_length</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">lcs_recursive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">a_length</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">b_length</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">a_next_length</span> <span class="o">=</span> <span class="n">lcs_recursive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a_length</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b_length</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">b_next_length</span> <span class="o">=</span> <span class="n">lcs_recursive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a_length</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b_length</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">MAX</span><span class="p">(</span><span class="n">a_next_length</span><span class="p">,</span> <span class="n">b_next_length</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>动态规划法(填表法)</h4>
+
+<p>定义一个二维数组C[i][j],记录str1(0~i)和str2(0~j)的最长公共子序列。</p>
+
+<h5>动态方程</h5>
+
+<p>if str1[i] == str2[j]  <br/>
+    c[i][j] = c[i-1][j-1] + 1;  <br/>
+if str1[i] != str2[j]  <br/>
+    c[i][j] = MAX(c[i-1][j],c[i][j-1])</p>
+
+<h5>代码如下</h5>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">int</span> <span class="nf">MAX</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="kt">int</span> <span class="n">b</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="o">?</span><span class="nl">a</span><span class="p">:</span><span class="n">b</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * 动态规划解法，时间复杂度为O(a_length*b_length)</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">lcs_dp</span><span class="p">(</span><span class="kt">char</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">a_length</span><span class="p">,</span><span class="kt">char</span> <span class="n">b</span><span class="p">[],</span><span class="kt">int</span> <span class="n">b_length</span><span class="p">){</span>
+</span><span class='line'>    <span class="c1">//字符串a到a_length位置的子字符串和字符串b到b_length位置的子字符串的最长公共子序列长度</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span><span class="p">[</span><span class="n">a_length</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">b_length</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">memset</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">count</span><span class="p">));</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">a_length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;=</span><span class="n">b_length</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">f_count1</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">f_count2</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">f_count1</span><span class="p">,</span> <span class="n">f_count2</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">[</span><span class="n">a_length</span><span class="p">][</span><span class="n">b_length</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[利用哈希表的思想实现字符串匹配函数]]></title>
@@ -3535,201 +3674,6 @@ unordered_set 容器支持正向迭代</p>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[利用二叉查找树来进行查找]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/13/ios43/"/>
-    <updated>2016-02-13T11:18:43+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/13/ios43</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>虽然二分法的查找速度快（O(log2n)）,但是有局限条件，就是查找的序列必须有序。  <br/>
-除此之外，我们还可以利用二叉查找树来进行查找，如果它的左右两个子树的高度差的绝对值不超过1，并且左右两个子树都是一棵平衡二叉树,查找时间的时间复杂度为O(log2n)；但是如果他的结点都集中于某一边，则查找时间的复杂度可能会变为O(n)。</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">treeNode</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">position</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">val</span><span class="p">,</span><span class="kt">int</span> <span class="n">position</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">BinarySearchTree</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">void</span> <span class="nf">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">value</span><span class="p">,</span><span class="kt">int</span> <span class="n">position</span><span class="p">,</span><span class="n">treeNode</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">throw</span> <span class="s">&quot;树为空&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">value</span> <span class="o">&lt;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">){</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="k">new</span> <span class="n">treeNode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">position</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                <span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="k">new</span> <span class="n">treeNode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">position</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                <span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">int</span> <span class="nf">search</span><span class="p">(</span><span class="kt">int</span> <span class="n">keyValue</span><span class="p">,</span><span class="n">treeNode</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">keyValue</span> <span class="o">&lt;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">){</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">search</span><span class="p">(</span><span class="n">keyValue</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">keyValue</span> <span class="o">&gt;</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">){</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">search</span><span class="p">(</span><span class="n">keyValue</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">position</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">public</span><span class="o">:</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     *添加结点</span>
-</span><span class='line'><span class="cm">     **/</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="n">add</span><span class="p">(</span><span class="kt">int</span> <span class="n">value</span><span class="p">,</span><span class="kt">int</span> <span class="n">position</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">root</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">root</span> <span class="o">=</span> <span class="k">new</span> <span class="n">treeNode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">position</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     *搜索</span>
-</span><span class='line'><span class="cm">     **/</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">search</span><span class="p">(</span><span class="kt">int</span> <span class="n">keyValue</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">search</span><span class="p">(</span><span class="n">keyValue</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">};</span>
-</span><span class='line'>    <span class="n">BinarySearchTree</span><span class="o">*</span> <span class="n">tree</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BinarySearchTree</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">9</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">tree</span><span class="o">-&gt;</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">20</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">tree</span><span class="o">-&gt;</span><span class="n">search</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="数据结构, 栈与队列 栈的实现(C++版) 栈 我利用数组来实现栈，实现方法： 1. 创建MAXSIZE大小的数组用于存放数据，MAXSIZE也为栈的最大容量； 2. 当压栈时，判断栈是否满了，如果不满，就往数组里添加数据，如果满了，就提示栈溢出； 3. 当弹栈时，判断栈是否为空，如果不为空， &hellip;">
+	<meta name="description" content="数据结构, 栈与队列 队列的实现(C++版) 队列 我利用链表来实现队列，实现方法： 1. 初始化一个头指针，并创建一个尾指针指向头指针 ； 2. 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点； 3. 出队时，判断队列是否为空，如果为空，则提示队列为空； &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,190 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T11:54:12+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/zhan-yu-dui-lie/'>栈与队列</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios23/" itemprop="url">队列的实现(C++版)</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>队列</h2>
+
+<p>我利用链表来实现队列，实现方法：  <br/>
+<code>1.</code> 初始化一个头指针，并创建一个尾指针指向头指针 ； <br/>
+<code>2.</code> 入队时，利用入队元素创建一个新的节点，添加到链表的尾部，此时尾指针指向新添加的这个节点；  <br/>
+<code>3.</code> 出队时，判断队列是否为空，如果为空，则提示队列为空；如果不为空，则取出头指针指向的节点，调整头指针指向该节点指向的下一个节点，再判断此时队列是否为空，如果为空，则调整尾指针指向头指针,返回节点的值，free这个节点；  <br/>
+代码实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="c1">//链表节点</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="p">(</span><span class="n">T</span> <span class="n">x</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">val</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">MyQueue</span><span class="p">{</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">last</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">MyQueue</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="o">~</span><span class="n">MyQueue</span><span class="p">(){</span>
+</span><span class='line'>        <span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//判断队列是否为空</span>
+</span><span class='line'>    <span class="kt">bool</span> <span class="n">isEmpty</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//入队</span>
+</span><span class='line'>    <span class="kt">void</span> <span class="n">offer</span><span class="p">(</span><span class="n">T</span> <span class="n">value</span><span class="p">){</span>
+</span><span class='line'>        <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">last</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">newNode</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">last</span> <span class="o">=</span> <span class="n">newNode</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//查看队头元素</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">peek</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;队列为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//出队</span>
+</span><span class='line'>    <span class="n">T</span> <span class="n">poll</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;队列为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">T</span> <span class="n">pVal</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">size</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">last</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">free</span><span class="p">(</span><span class="n">p</span><span class="p">);</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">pVal</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1031,65 +1215,6 @@ NSLog(@"guide error is %@",error);
     return nil;
 
 }
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-19T23:42:39+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/19/ios13/" itemprop="url">MKLocalSearch附近兴趣点的搜索</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>现在很多主流app都有涉及到O2O的模块，根据用户的需求和用户的位置，给用户提供最准确最贴心的服务。其中LBS功能可以帮我们实现这一点。这次刚好用到它，所以拿它出来说说。功能主要通过iOS原生方法MKLocalSearch实现。</p>
-
-<pre><code>//实例化一个搜索请求
-MKLocalSearchRequest* request = [[MKLocalSearchRequest alloc]init];
-
-//searchStr：搜索的内容
-request.naturalLanguageQuery = searchStr;
-
-//指定搜索范围，如果用的是模拟器，可以模拟一个经纬度(23.071123, 113.404434)
-request.region = MKCoordinateRegionMakeWithDistance(CLLocationCoordinate2DMake(23.071123, 113.404434),
- 1000, 1000);
-
-//实例化 MKLocalSearch
-MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
-
-//开始搜索
-[localSearch startWithCompletionHandler:^(MKLocalSearchResponse * _Nullable response,
- NSError * _Nullable error) {
-    if (response.mapItems.count==0||error!=nil) {
-        NSLog(@"error : %@",error);
-    }else{
-        //取得搜索后的结果 response.mapItems
-    }
-}];
 </code></pre>
 
 		

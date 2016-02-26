@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 数据结构，动态规划 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou-,dong-tai-gui-hua/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-02-26T16:00:45+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[最长公共子序列]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/26/ios63/"/>
+    <updated>2016-02-26T15:39:41+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/26/ios63</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定两个字符串，求他们的最长公共子序列的长度。</p>
+
+<h4>何为最长公共子序列？</h4>
+
+<p>一个序列 S ，如果分别是两个或多个已知序列的子序列，且是所有符合此条件序列中最长的，则 S 称为已知序列的最长公共子序列，序列不要求连续，区别于最长公共子串。</p>
+
+<h4>例子</h4>
+
+<p>X = “a,b,c,f,b,c”  <br/>
+Y = “a,b,f,c,a,b”  <br/>
+X和Y的最长公共子序列为“a,b,c,b”  <br/>
+X和Y的最长公共子串为“a,b”</p>
+
+<h2>做法</h2>
+
+<h4>递归法（不推荐，但作为一种思路）</h4>
+
+<h5>代码如下</h5>
+
+<pre><code class="C++">
+int MAX(int a,int b){
+    return a&gt;b?a:b;
+}
+/**
+ * 递归解法，时间复杂度为np，非多项式时间复杂度
+ **/
+
+int lcs_recursive(char a[],int a_length,char b[],int b_length){
+    if (a_length==0||b_length==0) {
+        return 0;
+    }else{
+        if (a[a_length-1]==b[b_length-1]) {
+            return 1+lcs_recursive(a,a_length-1,b,b_length-1);
+        }else{
+            int a_next_length = lcs_recursive(a, a_length, b, b_length-1);
+            int b_next_length = lcs_recursive(a, a_length-1, b, b_length);
+            return MAX(a_next_length, b_next_length);
+        }
+
+    }
+}
+</code></pre>
+
+<h4>动态规划法(填表法)</h4>
+
+<p>定义一个二维数组C[i][j],记录str1(0~i)和str2(0~j)的最长公共子序列。</p>
+
+<h5>动态方程</h5>
+
+<p>if str1[i] == str2[j]  <br/>
+    c[i][j] = c[i-1][j-1] + 1;  <br/>
+if str1[i] != str2[j]  <br/>
+    c[i][j] = MAX(c[i-1][j],c[i][j-1])</p>
+
+<h5>代码如下</h5>
+
+<pre><code class="C++">
+int MAX(int a,int b){
+    return a&gt;b?a:b;
+}
+
+/**
+ * 动态规划解法，时间复杂度为O(a_length*b_length)
+ **/
+int lcs_dp(char a[],int a_length,char b[],int b_length){
+    //字符串a到a_length位置的子字符串和字符串b到b_length位置的子字符串的最长公共子序列长度
+    int count[a_length+1][b_length+1];
+    memset(count, 0, sizeof(count));
+    for (int i=1; i&lt;=a_length; i++) {
+        for (int j=1; j&lt;=b_length; j++) {
+            int f_count1 = count[i-1][j];
+            int f_count2 = count[i][j-1];
+            if (a[i-1]==b[j-1]) {
+                count[i][j] = count[i-1][j-1]+1;
+            }else{
+                count[i][j] = MAX(f_count1, f_count2);
+            }
+        }
+    }
+    return count[a_length][b_length];
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>
