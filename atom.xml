@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-26T19:33:05+08:00</updated>
+  <updated>2016-02-26T23:52:35+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,178 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[简析SDWebImage]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/26/ios66/"/>
+    <updated>2016-02-26T22:31:56+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/26/ios66</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>SDWebImage是一个强大的第三方图片异步加载库，从事iOS开发的人或多或少用过它。今天我点开源码一看，里面一些实现细节确实令人玩味。</p>
+
+<h2>简析</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个是这个库里最常用的方法，传一个url，UIImageView就会将图片加载出来，这个方法看起来简单，可是背后的实现没那么容易，不禁感慨大神之牛，巧妙的设计和背后复杂的实现竟然浓缩成这样的一个接口函数。</p>
+
+<h2>command + Click</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">sd_setImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">placeholderImage</span><span class="p">:</span><span class="n">placeholder</span> <span class="nl">options</span><span class="p">:</span><span class="mi">0</span> <span class="nl">progress</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">completed</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个是原始接口</p>
+
+<h2>command + click</h2>
+
+<p>我可以看到这个函数体</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span> <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span> <span class="nf">progress:</span><span class="p">(</span><span class="n">SDWebImageDownloaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span> <span class="nf">completed:</span><span class="p">(</span><span class="n">SDWebImageCompletionBlock</span><span class="p">)</span><span class="nv">completedBlock</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个函数体就是就是sd_setImage的实现逻辑</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="n">sd_cancelCurrentImageLoad</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先，它先取消下载队列里正在进行的任务；
+如果有placeholder，就先将它显示出来；
+接着就是实现逻辑的主要部分</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="kt">id</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageManager</span><span class="p">.</span><span class="n">sharedManager</span> <span class="nl">downloadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">progress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">,</span> <span class="bp">NSURL</span> <span class="o">*</span><span class="n">imageURL</span><span class="p">)</span> <span class="p">{};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>command + click</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">__block</span> <span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageCombinedOperation</span> <span class="n">new</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先，先启动一个新的operation；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">@synchronized</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span> <span class="nl">containsObject</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">url</span> <span class="o">||</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRetryFailed</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isFailedUrl</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">dispatch_main_sync_safe</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSError</span> <span class="nl">errorWithDomain</span><span class="p">:</span><span class="n">NSURLErrorDomain</span> <span class="nl">code</span><span class="p">:</span><span class="n">NSURLErrorFileDoesNotExist</span> <span class="nl">userInfo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">completedBlock</span><span class="p">(</span><span class="nb">nil</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheTypeNone</span><span class="p">,</span> <span class="nb">YES</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">operation</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">@synchronized</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">operation</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接着我们可以看到一个实现的亮点，它用一个failedURLs集合来记录失败或者无效的url，如果传进来的url是failedURLs里或者是为空，则return出去,否则将operation添加到运行的operation数组中。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'> <span class="bp">NSString</span> <span class="o">*</span><span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">cacheKeyForURL</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它将url缓存起来,给他一个key值</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="n">operation</span><span class="p">.</span><span class="n">cacheOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageCache</span> <span class="nl">queryDiskCacheForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">done</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">)</span> <span class="p">{};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>根据缓存的url来寻找是否有对应的缓存</p>
+
+<h2>command + click</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">imageFromMemoryCacheForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">doneBlock</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">SDImageCacheTypeMemory</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先在内存里寻找，SDImage用的内存缓存是用NSCache实现的，如果有就是block回调，return；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'>  <span class="bp">UIImage</span> <span class="o">*</span><span class="n">diskImage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">diskImage</span> <span class="o">&amp;&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">shouldCacheImagesInMemory</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="bp">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">SDCacheCostForImage</span><span class="p">(</span><span class="n">diskImage</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">memCache</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">diskImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">];</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>                <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">SDImageCacheTypeDisk</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果没有，就从磁盘缓存里找，如果找到了，就将他缓存到内存中，block回调</p>
+
+<h2>如果都没找到</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="kt">id</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">subOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageDownloader</span> <span class="nl">downloadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">downloaderOptions</span> <span class="nl">progress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">downloadedImage</span><span class="p">,</span> <span class="bp">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>则开启下载operation下载图片，下载利用NSURLConnection实现</p>
+
+<h2>command + click</h2>
+
+<p>初始化和完善请求头，将下载operation添加到下载队列中</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="n">wself</span><span class="p">.</span><span class="n">lastAddedOperation</span> <span class="o">=</span> <span class="n">operation</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同时记录最后一个下载操作，return，成功block回调，用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[整形与字符串互转]]></title>
@@ -3458,215 +3630,6 @@ unordered_set 容器支持正向迭代</p>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[表达式求值问题]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/13/ios46/"/>
-    <updated>2016-02-13T14:45:50+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/13/ios46</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>我们给出一个表达式，将它转化为逆波兰式，传给树求值，例如1+2+3 转化为 12+3+</p>
-
-<h2>做法</h2>
-
-<p><code>匹配：</code> 初始化一个栈stack，然后遍历这个逆波兰式的字符串，如果遇到数字，则以这个数字的值生成一个新的树节点，将这个节点入栈；如果遇到操作符，就以操作符为值生成一个新的树节点，弹栈弹出一个节点作为该新节点的右孩子节点，再弹出一个节点作为该新节点的左孩子节点，最后将该新节点入栈。遍历结束后，判断栈里的元素个数是否为1，如果为1则匹配成功；如果不为1则逆波兰式是非法的。  <br/>
-<code>求值：</code> 遍历树进行求值，具体做法看代码。</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;stack&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">treeNode</span><span class="p">{</span>
-</span><span class='line'>    <span class="kt">char</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="p">(</span><span class="kt">char</span> <span class="n">val</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">BSTree</span><span class="p">{</span>
-</span><span class='line'>    <span class="n">treeNode</span><span class="o">*</span> <span class="n">root</span><span class="p">;</span>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">BSTree</span><span class="p">(){</span>
-</span><span class='line'>        <span class="n">root</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     *解析表达式字符串</span>
-</span><span class='line'><span class="cm">     **/</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="n">parse</span><span class="p">(</span><span class="kt">char</span> <span class="n">str</span><span class="p">[]){</span>
-</span><span class='line'>        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">str</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">stack</span><span class="o">&lt;</span><span class="n">treeNode</span><span class="o">*&gt;</span> <span class="n">stack</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="o">*</span><span class="n">p</span> <span class="o">!=</span> <span class="sc">&#39;\0&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="o">&gt;=</span><span class="sc">&#39;0&#39;</span> <span class="o">&amp;&amp;</span> <span class="o">*</span><span class="n">p</span><span class="o">&lt;=</span><span class="sc">&#39;9&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="k">new</span> <span class="n">treeNode</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">));</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                <span class="n">treeNode</span><span class="o">*</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">treeNode</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">);</span>
-</span><span class='line'>                <span class="n">treeNode</span><span class="o">*</span> <span class="n">rightNode</span> <span class="o">=</span> <span class="n">stack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">stack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">newNode</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="n">rightNode</span><span class="p">;</span>
-</span><span class='line'>                <span class="n">treeNode</span><span class="o">*</span> <span class="n">leftNode</span> <span class="o">=</span> <span class="n">stack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">stack</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>                <span class="n">newNode</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="n">leftNode</span><span class="p">;</span>
-</span><span class='line'>                <span class="n">stack</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">newNode</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="n">p</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">stack</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">!=</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;Illegal expression&quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">root</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">root</span> <span class="o">=</span> <span class="n">stack</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     *计算表达式的值</span>
-</span><span class='line'><span class="cm">     **/</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">evaluate</span><span class="p">(){</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">root</span><span class="o">==</span><span class="k">nullptr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>            <span class="c1">//如果表达式不规范返回int最小值</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;::</span><span class="n">min</span><span class="p">();</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="k">private</span><span class="o">:</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">treeNode</span><span class="o">*</span> <span class="n">node</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">switch</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">case</span> <span class="sc">&#39;+&#39;</span><span class="o">:</span>
-</span><span class='line'>                <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">+</span><span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">case</span> <span class="sc">&#39;-&#39;</span><span class="o">:</span>
-</span><span class='line'>                <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">-</span><span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">case</span> <span class="sc">&#39;*&#39;</span><span class="o">:</span>
-</span><span class='line'>                <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">*</span><span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="k">case</span> <span class="sc">&#39;/&#39;</span><span class="o">:</span>
-</span><span class='line'>                <span class="k">return</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">)</span><span class="o">/</span><span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
-</span><span class='line'>                <span class="p">;</span>
-</span><span class='line'>                <span class="c1">//叶子节点</span>
-</span><span class='line'>            <span class="k">default</span><span class="o">:</span>
-</span><span class='line'>                <span class="k">return</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">val</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">BSTree</span> <span class="n">tree</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">tree</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&quot;44+22+/&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">tree</span><span class="p">.</span><span class="n">evaluate</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

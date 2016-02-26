@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-26T19:33:05+08:00</updated>
+  <updated>2016-02-26T23:52:35+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,126 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[简析SDWebImage]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/26/ios66/"/>
+    <updated>2016-02-26T22:31:56+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/26/ios66</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>SDWebImage是一个强大的第三方图片异步加载库，从事iOS开发的人或多或少用过它。今天我点开源码一看，里面一些实现细节确实令人玩味。</p>
+
+<h2>简析</h2>
+
+<pre><code class="objC">- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder;
+</code></pre>
+
+<p>这个是这个库里最常用的方法，传一个url，UIImageView就会将图片加载出来，这个方法看起来简单，可是背后的实现没那么容易，不禁感慨大神之牛，巧妙的设计和背后复杂的实现竟然浓缩成这样的一个接口函数。</p>
+
+<h2>command + Click</h2>
+
+<pre><code class="objC">[self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:nil];
+</code></pre>
+
+<p>这个是原始接口</p>
+
+<h2>command + click</h2>
+
+<p>我可以看到这个函数体</p>
+
+<pre><code class="objc">- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock 
+</code></pre>
+
+<p>这个函数体就是就是sd_setImage的实现逻辑</p>
+
+<pre><code class="objC">[self sd_cancelCurrentImageLoad];
+</code></pre>
+
+<p>首先，它先取消下载队列里正在进行的任务；
+如果有placeholder，就先将它显示出来；
+接着就是实现逻辑的主要部分</p>
+
+<pre><code class="objC">id &lt;SDWebImageOperation&gt; operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {};
+</code></pre>
+
+<h2>command + click</h2>
+
+<pre><code class="objC">__block SDWebImageCombinedOperation *operation = [SDWebImageCombinedOperation new];
+</code></pre>
+
+<p>首先，先启动一个新的operation；</p>
+
+<pre><code class="objC">    @synchronized (self.failedURLs) {
+        isFailedUrl = [self.failedURLs containsObject:url];
+    }
+
+    if (!url || (!(options &amp; SDWebImageRetryFailed) &amp;&amp; isFailedUrl)) {
+        dispatch_main_sync_safe(^{
+            NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorFileDoesNotExist userInfo:nil];
+            completedBlock(nil, error, SDImageCacheTypeNone, YES, url);
+        });
+        return operation;
+    }
+    @synchronized (self.runningOperations) {
+        [self.runningOperations addObject:operation];
+    }
+</code></pre>
+
+<p>接着我们可以看到一个实现的亮点，它用一个failedURLs集合来记录失败或者无效的url，如果传进来的url是failedURLs里或者是为空，则return出去,否则将operation添加到运行的operation数组中。</p>
+
+<pre><code class="objC"> NSString *key = [self cacheKeyForURL:url];
+    }
+</code></pre>
+
+<p>它将url缓存起来,给他一个key值</p>
+
+<pre><code class="objC">operation.cacheOperation = [self.imageCache queryDiskCacheForKey:key done:^(UIImage *image, SDImageCacheType cacheType) {};
+</code></pre>
+
+<p>根据缓存的url来寻找是否有对应的缓存</p>
+
+<h2>command + click</h2>
+
+<pre><code class="objC">UIImage *image = [self imageFromMemoryCacheForKey:key];
+if (image) {
+        doneBlock(image, SDImageCacheTypeMemory);
+        return nil;
+    }
+</code></pre>
+
+<p>先在内存里寻找，SDImage用的内存缓存是用NSCache实现的，如果有就是block回调，return；</p>
+
+<pre><code class="objC">  UIImage *diskImage = [self diskImageForKey:key];
+            if (diskImage &amp;&amp; self.shouldCacheImagesInMemory) {
+                NSUInteger cost = SDCacheCostForImage(diskImage);
+                [self.memCache setObject:diskImage forKey:key cost:cost];
+            }
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                doneBlock(diskImage, SDImageCacheTypeDisk);
+            });
+</code></pre>
+
+<p>如果没有，就从磁盘缓存里找，如果找到了，就将他缓存到内存中，block回调</p>
+
+<h2>如果都没找到</h2>
+
+<pre><code class="objC">id &lt;SDWebImageOperation&gt; subOperation = [self.imageDownloader downloadImageWithURL:url options:downloaderOptions progress:progressBlock completed:^(UIImage *downloadedImage, NSData *data, NSError *error, BOOL finished) {};
+</code></pre>
+
+<p>则开启下载operation下载图片，下载利用NSURLConnection实现</p>
+
+<h2>command + click</h2>
+
+<p>初始化和完善请求头，将下载operation添加到下载队列中</p>
+
+<pre><code class="objC">wself.lastAddedOperation = operation;
+</code></pre>
+
+<p>同时记录最后一个下载操作，return，成功block回调，用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS本地推送功能实现]]></title>
@@ -226,15 +346,6 @@ kCAMediaTimingFunctionLinear]];
 [self.navigationController.view.layer addAnimation:animation forKey:nil];
 [self.navigationController pushViewController:tvc animated:NO];
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS开发过程中遇过的一些小bug（一）]]></title>
-    <link href="http://caixindong.github.io/blog/2015/11/19/ios16/"/>
-    <updated>2015-11-19T16:20:47+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/11/19/ios16</id>
-    <content type="html"><![CDATA[<p>  当我们在使用<code>UITableView</code>的时候或者其他类<code>UIScrollView</code>的UI组件时，我们可能会遇到UITableView顶部留有一段空白区域的情况，那是因为<code>iOS 7</code> viewcontroller新增属性<code>automaticallyAdjustsScrollViewInsets</code>，即是否根据按所在界面的navigationbar与tabbar的高度，自动调整scrollview的 inset。如果我们不想要那段空白，将<code>automaticallyAdjustsScrollViewInsets</code>这个值设为<code>NO</code>就可以解决这个问题了</p>
 ]]></content>
   </entry>
   
