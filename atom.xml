@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-27T11:42:11+08:00</updated>
+  <updated>2016-02-27T11:43:27+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -18,11 +18,11 @@
     <link href="http://caixindong.github.io/blog/2016/02/26/ios66/"/>
     <updated>2016-02-26T22:31:56+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/02/26/ios66</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
+    <content type="html"><![CDATA[<h1>前言</h1>
 
 <p>SDWebImage是一个强大的第三方图片异步加载库，从事iOS开发的人或多或少用过它。今天我点开源码一看，里面一些实现细节确实令人玩味。</p>
 
-<h2>简析</h2>
+<h1>简析</h1>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span><span class="p">;</span>
