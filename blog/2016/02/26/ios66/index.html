@@ -99,7 +99,7 @@
 
 <p>这个是这个库里最常用的方法，传一个url，UIImageView就会将图片加载出来，这个方法看起来简单，可是背后的实现没那么容易，不禁感慨大神之牛，巧妙的设计和背后复杂的实现竟然浓缩成这样的一个接口函数。</p>
 
-<h2>command + Click</h2>
+<h2>点进去看源码</h2>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">sd_setImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">placeholderImage</span><span class="p">:</span><span class="n">placeholder</span> <span class="nl">options</span><span class="p">:</span><span class="mi">0</span> <span class="nl">progress</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">completed</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
@@ -108,7 +108,7 @@
 
 <p>这个是原始接口</p>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <p>我可以看到这个函数体</p>
 
@@ -133,7 +133,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">__block</span> <span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageCombinedOperation</span> <span class="n">new</span><span class="p">];</span>
@@ -191,7 +191,7 @@
 
 <p>根据缓存的url来寻找是否有对应的缓存</p>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -240,7 +240,7 @@
 
 <p>则开启下载operation下载图片，下载利用NSURLConnection实现</p>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <p>初始化和完善请求头，将下载operation添加到下载队列中</p>
 
@@ -249,7 +249,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>同时记录最后一个下载操作，return，成功block回调，用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url</p>
+<p>同时记录最后一个下载操作，return，成功block回调，利用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url，成功则加载图片，主线程刷新UI。</p>
 </div>
 
 </article>

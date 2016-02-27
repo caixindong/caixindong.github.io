@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-26T23:52:35+08:00</updated>
+  <updated>2016-02-27T11:42:11+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -29,14 +29,14 @@
 
 <p>这个是这个库里最常用的方法，传一个url，UIImageView就会将图片加载出来，这个方法看起来简单，可是背后的实现没那么容易，不禁感慨大神之牛，巧妙的设计和背后复杂的实现竟然浓缩成这样的一个接口函数。</p>
 
-<h2>command + Click</h2>
+<h2>点进去看源码</h2>
 
 <pre><code class="objC">[self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:nil];
 </code></pre>
 
 <p>这个是原始接口</p>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <p>我可以看到这个函数体</p>
 
@@ -55,7 +55,7 @@
 <pre><code class="objC">id &lt;SDWebImageOperation&gt; operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {};
 </code></pre>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <pre><code class="objC">__block SDWebImageCombinedOperation *operation = [SDWebImageCombinedOperation new];
 </code></pre>
@@ -91,7 +91,7 @@
 
 <p>根据缓存的url来寻找是否有对应的缓存</p>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <pre><code class="objC">UIImage *image = [self imageFromMemoryCacheForKey:key];
 if (image) {
@@ -122,14 +122,14 @@ if (image) {
 
 <p>则开启下载operation下载图片，下载利用NSURLConnection实现</p>
 
-<h2>command + click</h2>
+<h2>点进去看源码</h2>
 
 <p>初始化和完善请求头，将下载operation添加到下载队列中</p>
 
 <pre><code class="objC">wself.lastAddedOperation = operation;
 </code></pre>
 
-<p>同时记录最后一个下载操作，return，成功block回调，用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url</p>
+<p>同时记录最后一个下载操作，return，成功block回调，利用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url，成功则加载图片，主线程刷新UI。</p>
 ]]></content>
   </entry>
   
