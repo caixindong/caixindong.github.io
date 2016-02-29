@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 图 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/tu/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-02-29T14:34:27+08:00</updated>
+  <updated>2016-02-29T22:22:46+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,103 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[图多源最短路径问题(Floyd算法)]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/29/ios67/"/>
+    <updated>2016-02-29T21:54:48+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/29/ios67</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>求图多源最短路径问题有一种简洁优雅的算法&ndash;Floyd算法。</p>
+
+<h2>做法</h2>
+
+<p><code>1.</code> 定义一个二维数组dist，dist[i][j]代表i到j的最短路径，如果i和j不可达，就初始化为无穷大，为了方便计算，我这里设为9999。  <br/>
+<code>2.</code> 定义一个二维数组next，next[i][j]代表i到j这条路径中i的下一个站点，如果i和j不可达，就初始化为-1。  <br/>
+<code>3.</code> 我们假设所有点经过k一定会到达另一个点，i到j如果可达，那么它有两条路径i->j和i->k—>j，我们通过比较这两条路径的大小来决定dist[i][j]的值，我们可以转化为一个动态方程来理解下：  <br/>
+dist[i][j] = Min{dist[i][j],dist[i][k]+dist[k][j]}  <br/>
+<code>4.</code> 同时我们还要记录next[i][j]的值，如果经过k的路径比较短，那么next[i][j] = next[i][k]</p>
+
+<h2>代码如下</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+/**
+ * 利用了动态规划
+ * 时间复杂度为O(n^3)
+ **/
+void floyd(vector&lt;vector&lt;int&gt;&gt; &amp;dist,vector&lt;vector&lt;int&gt;&gt; &amp;next){
+    size_t size = dist.size();
+    for (int k = 0; k&lt;size; k++) {
+        for (int i = 0; i &lt;size; i++) {
+            for (int j = 0; j&lt;size; j++) {
+                if (dist[i][k]+dist[k][j]&lt;dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                    next[i][j] = next[i][k];
+                }
+            }
+        }
+    }
+}
+
+
+void printPath(int i,int j,vector&lt;vector&lt;int&gt;&gt; &amp;next){
+    if (next[i][j]==-1) {
+        cout&lt;&lt;i&lt;&lt;" to "&lt;&lt;j&lt;&lt;" no path"&lt;&lt;endl;
+        return;
+    }
+    cout&lt;&lt;i;
+    while (i!=j) {
+        i = next[i][j];
+        cout&lt;&lt;"-&gt;"&lt;&lt;i;
+    }
+    cout&lt;&lt;endl;
+}
+
+int main(int argc, const char * argv[]) {
+    vector&lt;vector&lt;int&gt;&gt; dist =
+    {
+        {0,9999,-2,9999},
+        {4,0,3,9999},
+        {9999,9999,0,2},
+        {9999,-1,9999,0}
+
+    };
+
+    vector&lt;vector&lt;int&gt;&gt; next =
+    {
+        {-1,-1,2,-1},
+        {0,-1,2,-1},
+        {-1,-1,-1,3},
+        {-1,1,-1,-1}
+    };
+
+    floyd(dist, next);
+
+    for (int i = 0; i&lt;dist.size(); i++) {
+        for (int j = 0; j&lt;dist.size(); j++) {
+            cout&lt;&lt;dist[i][j]&lt;&lt;" ";
+        }
+        cout&lt;&lt;endl;
+    }
+    cout&lt;&lt;endl;
+
+    for (int i = 0; i&lt;dist.size(); i++) {
+        for (int j = 0; j&lt;dist.size(); j++) {
+            printPath(i, j, next);
+        }
+        cout&lt;&lt;endl;
+    }
+    cout&lt;&lt;endl;
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[图单源最短路径问题(Dijkstra算法)]]></title>
