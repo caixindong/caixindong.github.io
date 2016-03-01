@@ -98,7 +98,7 @@ s 可以拆分成"word",&ldquo;break&rdquo;,&ldquo;problem&rdquo;</p>
 <h2>做法</h2>
 
 <p><code>1.</code> 初始化一个数组ve，假设字符串为"wordbreakproblem"，字典为[&ldquo;word&rdquo;,&ldquo;break&rdquo;,&ldquo;problem&rdquo;,&ldquo;big&rdquo;,&ldquo;other&rdquo;]，ve[1] = &ldquo;"，表示字符串的子串"w"没有符合字典的单词，ve[4] = "word&rdquo;,表示字符串子串"word"有第一个符合字典的单词"word",ve[8] = &ldquo;break&rdquo;,表示字符串子串"wordbreak"有第二个符合字典的单词"break"（因为word已经在之前记录了，所以在该子串不要记录）；      <br/>
-<code>2.</code> 遍历取字符串的子串，如果子串存在字典里面的单词，就在对应子串记录该单词；</p>
+<code>2.</code> 遍历取字符串的子串，如果子串存在字典里面的单词，就在对应子串记录该单词，已经记录的单词就不再记录；</p>
 
 <h2>代码如下</h2>
 
