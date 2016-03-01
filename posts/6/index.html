@@ -7,12 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 几个比较有趣的界面过渡动画 动画的类型依次为立方，吸走，翻转，水波，翻页，翻页回，打开相机，关闭相机 NSString *Types[]={@"cube",
-@"suckEffect",
-@"oglFlip",
-@"rippleEffect",
-@"pageCurl",
-@" &hellip;">
+	<meta name="description" content="ios iOS开发过程中遇过的一些小bug（二） 1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候 2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,6 +85,43 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-18T21:12:27+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/12/18/ios18/" itemprop="url">iOS开发过程中遇过的一些小bug（二）</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候</p>
+
+<p>2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no。苹果文档是这样说的：bitcode是被编译程序的一种中间形式的代码，包含bitcode配置的程序将会在App store上被编译和链接，bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -718,41 +750,6 @@ initWithTarget:selfaction:@selector(touchView:)];
 </code></pre>
 
 <p>加入上述代码后，当点击屏幕的任意地方，手机的键盘就会收起来</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T20:11:07+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios8/" itemprop="url">UIBarButtonItem随着屏幕切换变化的问题</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>将item里面的view中的autoresizingMask 设为UIViewAutoresizingNone，item就不会随着屏幕的切换而变化</p>
 
 		
 		
