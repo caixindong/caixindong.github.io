@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-04T21:04:45+08:00</updated>
+  <updated>2016-03-04T21:30:43+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,77 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[旋转链表]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/04/ios70/"/>
+    <updated>2016-03-04T21:18:17+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/04/ios70</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4->5->NULL和一个k=2，返回4->5->1->2->3->NULL</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct ListNode {
+         int val;
+         ListNode *next;
+         ListNode(int x) : val(x), next(NULL) {}
+};
+
+class Solution {
+public:
+    int length(ListNode* head){
+        int count = 0;
+        ListNode* p = head;
+        while (p!=NULL) {
+            count++;
+            p = p-&gt;next;
+        }
+        return count;
+    }
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return head;
+        }else if(k==0){
+            return head;
+        }else{
+            int n = length(head);
+            //如果k大于链表长度则取余
+            k = k%n;
+            if (k==0) {
+                return head;
+            }
+
+            //关键步骤
+            ListNode* p = head;
+            for (int i =0; i&lt;n-k-1; i++) {
+                p = p-&gt;next;
+            }
+
+            //取得新链表的头和尾
+            ListNode* newEnd = p;
+            ListNode* newHead = p-&gt;next;
+
+            while (p-&gt;next!=NULL) {
+                p = p-&gt;next;
+            }
+            ListNode* touch = p;
+            touch-&gt;next = head;
+            newEnd-&gt;next = NULL;
+            return newHead;
+        }
+    }
+};
+int main(int argc, const char * argv[]) {
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[链表成对交换问题]]></title>
@@ -288,113 +359,6 @@ int rolling_hashCode_Strstr(const string &amp;source,const string &amp;pattern){
 
 int main(int argc, const char * argv[]) {
     cout&lt;&lt;rolling_hashCode_Strstr("abcdjdbsuad", "djdb")&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Word Ladder]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/23/ios59/"/>
-    <updated>2016-02-23T17:06:59+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/23/ios59</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>给定两个字符串，一个为起始字符串，一个为终点字符串，以及一个字典，求起始字符串转化为终点字符串的最短路径,返回转化路径的长度。</p>
-
-<h4>具体要求：</h4>
-
-<p>1、一次只能变换一个单词；  <br/>
-2、转化过程出现的单词必须是字典里的。</p>
-
-<h4>例子：</h4>
-
-<p>beginWord = “hit”  <br/>
-endWord = “cog”  <br/>
-dictionary = [&ldquo;hot&rdquo;,&ldquo;dot&rdquo;,&ldquo;dog&rdquo;,&ldquo;lot&rdquo;,&ldquo;log&rdquo;]  <br/>
-transformation："hit"->&ldquo;hot&rdquo;->&ldquo;dot&rdquo;->&ldquo;dog&rdquo;->&ldquo;cog&rdquo;  <br/>
-return its length 5</p>
-
-<h2>做法</h2>
-
-<p>既然要求最短，我们可以借助图BFS的思想来解决这个问题，这个问题可以转化为图的源最短路径问题，虽然解题过程中没有用到图，但用到图的思想。
-从源字符串出发，先遍历完当前字符串可能变化的情况，如果还没变成终点字符串，则继续下一层遍历，直到可以变成终点字符串，返回转化步数。如果所有情况都遍历完了还不能变成终点字符串，则返回0。</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;queue&gt;
-#include &lt;unordered_set&gt;
-#include &lt;unordered_map&gt;
-using namespace std;
-/**
- * 记录源字符串转化当前字符串的路径
- * word 当前字符串
- * pre 前驱字符串
- * isVisited 当前字符串是否被访问
- * size 源字符串转化为当前字符串的过程经过的字符串的个数，即转化步数
- **/
-
-struct Node {
-    string word;
-    string pre;
-    bool isVisited;
-    int size;
-    Node(string word)
-    :word(word),isVisited(false),size(0){
-
-    }
-};
-
-class Solution {
-public:
-    int ladderLength(string beginWord, string endWord, unordered_set&lt;string&gt;&amp; wordList) {
-        unordered_map&lt;string, Node*&gt; word_map;
-        for (auto pos = wordList.begin(); pos!=wordList.end(); pos++) {
-            Node* node = new Node(*pos);
-            word_map[*pos] = node;
-        }
-        Node* begin = new Node(beginWord);
-        begin-&gt;isVisited = true;
-        begin-&gt;size = 1;
-        word_map[beginWord] = begin;
-
-        Node* end = new Node(endWord);
-        word_map[endWord] = end;
-
-        queue&lt;Node*&gt; queue;
-        queue.push(word_map[beginWord]);
-        while (!queue.empty()) {
-            Node* current_node = queue.front();
-            queue.pop();
-            //遍历字符串每一个位置
-            for (int i = 0; i&lt;current_node-&gt;word.length(); i++) {
-                for (char j = 'a'; j&lt;='z'; j++) {
-                    string word = current_node-&gt;word;
-                    //替换字符，word变成一个新字符串
-                    word[i] = j;
-                    if (word==endWord) {
-                        word_map[word]-&gt;size = current_node-&gt;size+1;
-                        return word_map[word]-&gt;size;
-                    }
-                    else if (word_map.count(word)==1&amp;&amp;word_map[word]-&gt;isVisited==false) {
-                        word_map[word]-&gt;isVisited = true;
-                        word_map[word]-&gt;pre = current_node-&gt;word;
-                        word_map[word]-&gt;size = current_node-&gt;size+1;
-                        queue.push(word_map[word]);
-                    }
-                }
-            }
-        }
-        return 0;
-    }
-};
-
-int main(int argc, const char * argv[]) {
-    unordered_set&lt;string&gt; wordList = {"hot","dot","dog","lot","log"};
-    Solution s;
-    cout&lt;&lt;s.ladderLength("hit", "cog", wordList)&lt;&lt;endl;
     return 0;
 }
 </code></pre>

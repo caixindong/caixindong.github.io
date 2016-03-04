@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 链表 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/lian-biao/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-04T21:04:45+08:00</updated>
+  <updated>2016-03-04T21:30:43+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,77 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[旋转链表]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/04/ios70/"/>
+    <updated>2016-03-04T21:18:17+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/04/ios70</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4->5->NULL和一个k=2，返回4->5->1->2->3->NULL</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct ListNode {
+         int val;
+         ListNode *next;
+         ListNode(int x) : val(x), next(NULL) {}
+};
+
+class Solution {
+public:
+    int length(ListNode* head){
+        int count = 0;
+        ListNode* p = head;
+        while (p!=NULL) {
+            count++;
+            p = p-&gt;next;
+        }
+        return count;
+    }
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return head;
+        }else if(k==0){
+            return head;
+        }else{
+            int n = length(head);
+            //如果k大于链表长度则取余
+            k = k%n;
+            if (k==0) {
+                return head;
+            }
+
+            //关键步骤
+            ListNode* p = head;
+            for (int i =0; i&lt;n-k-1; i++) {
+                p = p-&gt;next;
+            }
+
+            //取得新链表的头和尾
+            ListNode* newEnd = p;
+            ListNode* newHead = p-&gt;next;
+
+            while (p-&gt;next!=NULL) {
+                p = p-&gt;next;
+            }
+            ListNode* touch = p;
+            touch-&gt;next = head;
+            newEnd-&gt;next = NULL;
+            return newHead;
+        }
+    }
+};
+int main(int argc, const char * argv[]) {
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[链表成对交换问题]]></title>
