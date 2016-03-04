@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-01T21:17:46+08:00</updated>
+  <updated>2016-03-04T21:04:45+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,104 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[链表成对交换问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/04/ios69/"/>
+    <updated>2016-03-04T20:58:34+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/04/ios69</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4,你会返回2->1->4->3</p>
+
+<h2>代码实现</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>         <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">swapPairs</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="o">||</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">nh</span> <span class="o">=</span> <span class="n">newHead</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">pre</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">nh</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">nh</span> <span class="o">=</span> <span class="n">pre</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="n">pre</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// insert code here...</span>
+</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello, World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[word break 问题]]></title>
@@ -3504,120 +3602,6 @@ unordered_set 容器支持正向迭代</p>
 </span><span class='line'>        <span class="k">return</span> <span class="n">s</span><span class="p">.</span><span class="n">substr</span><span class="p">(</span><span class="n">maxLeft</span><span class="p">,</span><span class="n">maxRight</span><span class="o">-</span><span class="n">maxLeft</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[判断是否是回文字符串]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/14/ios49/"/>
-    <updated>2016-02-14T13:41:59+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/14/ios49</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>判断是否是回文字符串</p>
-
-<h2>做法</h2>
-
-<p>先将字符串转化为小写字符串，接着初始化一个头指针和尾指针，遍历字符串，遍历的时候注意字符是否是‘1’~‘9’或‘a’~&lsquo;z'，如果不是就跳过遍历。如果头尾指针遍历到的字符不同就返回false，否则继续遍历。</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span><span class="o">::</span><span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 判断是否是1~9或a~b之中的字符</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'>    <span class="kt">bool</span> <span class="n">isNormalChar</span><span class="p">(</span><span class="kt">char</span> <span class="n">c</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="sc">&#39;a&#39;</span><span class="o">&lt;=</span><span class="n">c</span><span class="o">&amp;&amp;</span><span class="n">c</span><span class="o">&lt;=</span><span class="sc">&#39;z&#39;</span><span class="p">)</span><span class="o">||</span><span class="p">(</span><span class="sc">&#39;0&#39;</span><span class="o">&lt;=</span><span class="n">c</span><span class="o">&amp;&amp;</span><span class="n">c</span><span class="o">&lt;=</span><span class="sc">&#39;9&#39;</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">bool</span> <span class="n">isPalindrome</span><span class="p">(</span><span class="n">string</span> <span class="n">s</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">()</span><span class="o">&lt;=</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="c1">//将字符串中的大写转化为小写</span>
-</span><span class='line'>        <span class="n">transform</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">s</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">s</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="o">::</span><span class="n">tolower</span><span class="p">);</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">s</span><span class="p">.</span><span class="n">length</span><span class="p">();</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="n">i</span><span class="o">&lt;</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="n">s</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>                <span class="n">j</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">isNormalChar</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="n">i</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">isNormalChar</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">j</span><span class="p">])){</span>
-</span><span class='line'>                    <span class="n">j</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">Solution</span><span class="o">*</span> <span class="n">s</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Solution</span><span class="p">();</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">isPalindrome</span><span class="p">(</span><span class="s">&quot;ab&quot;</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

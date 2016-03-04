@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="算法 八大排序算法--简单选择排序 简单选择排序 代码如下 1
+	<meta name="description" content="算法 八大排序算法--堆排序 堆排序 代码如下 1
 2
 3
 4
@@ -39,8 +39,18 @@
 30
 31
 32
-#include &lt;iostream&gt;
-using &hellip;">
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -118,6 +128,154 @@ using &hellip;">
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T22:12:33+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/suan-fa/'>算法</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios29/" itemprop="url">八大排序算法--堆排序</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>堆排序</h2>
+
+<p>代码如下</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">mySwap</span><span class="p">(</span><span class="kt">int</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span><span class="kt">int</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">tmp</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">tmp</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">b</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//堆调整</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">heapAdjuct</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">size</span><span class="p">,</span><span class="kt">int</span> <span class="n">i</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">lchild</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">rchild</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">lchild</span><span class="o">&lt;=</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">a</span><span class="p">[</span><span class="n">lchild</span><span class="p">]</span><span class="o">&gt;</span><span class="n">a</span><span class="p">[</span><span class="n">max</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">max</span> <span class="o">=</span> <span class="n">lchild</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">rchild</span><span class="o">&lt;=</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">a</span><span class="p">[</span><span class="n">rchild</span><span class="p">]</span><span class="o">&gt;</span><span class="n">a</span><span class="p">[</span><span class="n">max</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">max</span> <span class="o">=</span> <span class="n">rchild</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">max</span><span class="o">!=</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">mySwap</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="n">max</span><span class="p">]);</span>
+</span><span class='line'>            <span class="n">heapAdjuct</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//初始化堆</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">setupNewHeap</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">heapAdjuct</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">heapSort</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">size</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">setupNewHeap</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">mySwap</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span><span class='line'>        <span class="n">heapAdjuct</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">};</span>
+</span><span class='line'>    <span class="n">heapSort</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="mi">9</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="mi">9</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1427,141 +1585,6 @@ queue 的基本操作有：  <br/>
 
 
 <p></p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-12-31T22:51:47+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/12/31/ios19/" itemprop="url">iOS图片压缩及上传</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>1、在工具类定义压缩图片的方法,传入图片和所要压缩的尺寸</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">+(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nf">imageWithImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">image</span> <span class="nl">scaleToSize</span> <span class="p">:(</span><span class="bp">CGSize</span> <span class="p">)</span><span class="n">newSize</span><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">UIGraphicsBeginImageContext</span><span class="p">(</span><span class="n">newSize</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">[</span><span class="n">image</span> <span class="nl">drawInRect</span><span class="p">:</span><span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">newSize</span><span class="p">.</span><span class="n">height</span><span class="p">)];</span>
-</span><span class='line'>
-</span><span class='line'><span class="bp">UIImage</span><span class="o">*</span> <span class="n">newImage</span> <span class="o">=</span> <span class="n">UIGraphicsGetImageFromCurrentImageContext</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">UIGraphicsEndImageContext</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">return</span> <span class="n">newImage</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>2、利用AFNetworking做图片上传功能</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">+(</span><span class="kt">void</span><span class="p">)</span><span class="nf">POSTToUrl:</span><span class="p">(</span><span class="bp">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">WithData:</span><span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span>
-</span><span class='line'>  <span class="nf">WithReturnBlock:</span><span class="p">(</span><span class="n">ReturnValueBlock</span><span class="p">)</span><span class="nv">block</span>        
-</span><span class='line'>  <span class="nf">WithErrorCodeBlock:</span><span class="p">(</span><span class="n">ErrorCodeBlock</span><span class="p">)</span><span class="nv">errorBlock</span>      
-</span><span class='line'>  <span class="nf">WithFailtureBlock:</span><span class="p">(</span><span class="n">FailureBlock</span><span class="p">)</span><span class="nv">failtureBlock</span><span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">AFHTTPRequestOperationManager</span><span class="o">*</span> <span class="n">manager</span> <span class="o">=</span> <span class="p">[[</span><span class="n">AFHTTPRequestOperationManager</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">requestSerializer</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFHTTPRequestSerializer</span> <span class="n">serializer</span><span class="p">];</span>
-</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span> <span class="o">=</span> <span class="p">[</span><span class="n">AFJSONResponseSerializer</span> <span class="n">serializer</span><span class="p">];</span>     
-</span><span class='line'>  
-</span><span class='line'>  <span class="c1">//不设置可能会出现404的bug</span>
-</span><span class='line'>  <span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span><span class="p">.</span><span class="n">acceptableContentTypes</span> <span class="o">=</span>       <span class="p">[</span><span class="n">manager</span><span class="p">.</span><span class="n">responseSerializer</span><span class="p">.</span><span class="n">acceptableContentTypes</span>   <span class="nl">setByAddingObject</span><span class="p">:</span><span class="s">@&quot;text/html&quot;</span><span class="p">];</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="p">[</span><span class="n">manager</span> <span class="nl">POST</span><span class="p">:</span><span class="n">url</span> <span class="nl">parameters</span><span class="p">:</span><span class="nb">nil</span>
-</span><span class='line'>  <span class="nl">constructingBodyWithBlock</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span><span class="o">&lt;</span><span class="n">AFMultipartFormData</span><span class="o">&gt;</span> <span class="n">formData</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">//以上传的时间为图片名</span>
-</span><span class='line'>      <span class="bp">NSDateFormatter</span> <span class="o">*</span><span class="n">formatter</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSDateFormatter</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
-</span><span class='line'>      <span class="n">formatter</span><span class="p">.</span><span class="n">dateFormat</span> <span class="o">=</span> <span class="s">@&quot;yyyyMMddHHmmss&quot;</span><span class="p">;</span>
-</span><span class='line'>          <span class="bp">NSString</span> <span class="o">*</span><span class="n">str</span> <span class="o">=</span> <span class="p">[</span><span class="n">formatter</span> <span class="nl">stringFromDate</span><span class="p">:[</span><span class="bp">NSDate</span> <span class="n">date</span><span class="p">]];</span>
-</span><span class='line'>      <span class="bp">NSString</span> <span class="o">*</span><span class="n">fileName</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:</span><span class="s">@&quot;%@.png&quot;</span><span class="p">,</span> <span class="n">str</span><span class="p">];</span>
-</span><span class='line'>      
-</span><span class='line'>          <span class="p">[</span><span class="n">formData</span> <span class="nl">appendPartWithFileData</span><span class="p">:</span><span class="n">data</span>
-</span><span class='line'>          <span class="nl">name</span><span class="p">:</span><span class="s">@&quot;upload&quot;</span> <span class="c1">//upload.php处理文件的字段</span>
-</span><span class='line'>          <span class="nl">fileName</span><span class="p">:</span><span class="n">fileName</span> <span class="c1">//图片名字 </span>
-</span><span class='line'>          <span class="nl">mimeType</span><span class="p">:</span><span class="s">@&quot;image/png&quot;</span><span class="p">];</span>
-</span><span class='line'>          
-</span><span class='line'>  <span class="p">}</span><span class="nl">success</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">AFHTTPRequestOperation</span> <span class="o">*</span><span class="n">operation</span><span class="p">,</span><span class="kt">id</span> <span class="n">responseObject</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">//上传成功</span>
-</span><span class='line'>  <span class="p">}</span><span class="nl">failure</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">AFHTTPRequestOperation</span> <span class="o">*</span><span class="n">operation</span><span class="p">,</span><span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">//上传失败</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
 
 		
 		

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: 链表 | Cool Guy]]></title>
+  <link href="http://caixindong.github.io/blog/categories/lian-biao/atom.xml" rel="self"/>
+  <link href="http://caixindong.github.io/"/>
+  <updated>2016-03-04T21:04:45+08:00</updated>
+  <id>http://caixindong.github.io/</id>
+  <author>
+    <name><![CDATA[Xindong]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[链表成对交换问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/04/ios69/"/>
+    <updated>2016-03-04T20:58:34+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/04/ios69</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4,你会返回2->1->4->3</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+using namespace std;
+struct ListNode {
+         int val;
+         ListNode *next;
+         ListNode(int x) : val(x), next(NULL) {}
+};
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return head;
+        }else{
+            ListNode* newHead = new ListNode(0);
+            ListNode* pre = head;
+            ListNode* p = pre-&gt;next;
+            ListNode* next = NULL;
+            ListNode* nh = newHead;
+            while (p!=NULL) {
+                next = p-&gt;next;
+                p-&gt;next = pre;
+                pre-&gt;next = next;
+                nh-&gt;next = p;
+                nh = pre;
+                if (next==NULL) {
+                    break;
+                }
+                pre = next;
+                p = pre-&gt;next;
+
+            }
+            return newHead-&gt;next;
+        }
+    }
+};
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout &lt;&lt; "Hello, World!\n";
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

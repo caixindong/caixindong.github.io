@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-01T21:17:46+08:00</updated>
+  <updated>2016-03-04T21:04:45+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,62 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[链表成对交换问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/04/ios69/"/>
+    <updated>2016-03-04T20:58:34+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/04/ios69</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4,你会返回2->1->4->3</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">
+#include &lt;iostream&gt;
+using namespace std;
+struct ListNode {
+         int val;
+         ListNode *next;
+         ListNode(int x) : val(x), next(NULL) {}
+};
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return head;
+        }else{
+            ListNode* newHead = new ListNode(0);
+            ListNode* pre = head;
+            ListNode* p = pre-&gt;next;
+            ListNode* next = NULL;
+            ListNode* nh = newHead;
+            while (p!=NULL) {
+                next = p-&gt;next;
+                p-&gt;next = pre;
+                pre-&gt;next = next;
+                nh-&gt;next = p;
+                nh = pre;
+                if (next==NULL) {
+                    break;
+                }
+                pre = next;
+                p = pre-&gt;next;
+
+            }
+            return newHead-&gt;next;
+        }
+    }
+};
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout &lt;&lt; "Hello, World!\n";
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[图多源最短路径问题(Floyd算法)]]></title>
@@ -339,240 +395,6 @@ int main(int argc, const char * argv[]) {
     unordered_set&lt;string&gt; wordList = {"hot","dot","dog","lot","log"};
     Solution s;
     cout&lt;&lt;s.ladderLength("hit", "cog", wordList)&lt;&lt;endl;
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[C++中的map和unordered_map]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/23/ios58/"/>
-    <updated>2016-02-23T16:08:04+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/23/ios58</id>
-    <content type="html"><![CDATA[<h1>map</h1>
-
-<h2>简介</h2>
-
-<p>映射表（Map）容器是一个按特定顺序存储以键值对组合而成的元素的关联容器。</p>
-
-<h2>类模板</h2>
-
-<pre><code class="C++">// &lt;map&gt;
-template &lt; class Key,
-    class T,
-    class Compare = less&lt;Key&gt;,
-    class Alloc = allocator&lt;pair&lt;const Key,T&gt; &gt;
-&gt; class map
-</code></pre>
-
-<h3>模板参数</h3>
-
-<p><code>1.</code> key：主键的类型；  <br/>
-<code>2.</code> T：被映射的值得类型；  <br/>
-<code>3.</code> Compare：一个二元谓词，以两个元素的主键为参数返回一个 bool 值。  <br/>
-<code>4.</code> Alloc：容器内部用来管理内存分配及释放的内存分配器的类型。这个参数是可选的，它的默认值是 std::allocator<T>，这个是一个最简单的非值依赖的（Value-independent）内存分配器。</p>
-
-<h2>详细说明</h2>
-
-<p>在一个映射表容器中，主键通常被用来排序及唯一标志一个元素，而被映射的值保存了与该主键关联的内容。主键与被映射值的类型可以不同，在模板内部，这两种类型合并绑定成成员类型 value_type。由上述描述可知，value_type 是一个双元组类型（Pair type），具体定义如下：</p>
-
-<pre><code class="C++">typedef pair&lt;const Key, T&gt; value_type;
-</code></pre>
-
-<p>map 容器中的所有元素都是按由类型为 Compare 的比较对象指定的严格弱序规则排序的。  <br/>
-在用主键访问单个元素时，map 容器通常比 unordered_map 容器低效，但 map 容器允许按顺序直接对某个子集进行迭代。  <br/>
-map 容器通常被实现为一个二叉搜索树（及其变型），该数据结构具有对数据自动排序的功能。  <br/>
-在所有关联容器中，map 容器唯一具有的一个特点：实现了直接访问操作符（operator[]），使得可以直接访问被映射的值。  <br/>
-map 容器支持双向迭代。</p>
-
-<h2>相关函数使用说明</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;map&gt;
-#include &lt;unordered_map&gt;
-#include &lt;string&gt;
-using namespace std;
-struct Node {
-    int id;
-    int val;
-    Node(int id,int val)
-    :id(id),val(val){
-
-    }
-};
-
-struct compare{
-    bool operator()(const Node &amp;a,const Node &amp;b)const{
-        return a.val&lt;b.val;
-    }
-};
-
-bool operator&lt;(const Node &amp;a,const Node &amp;b){
-    return a.val&lt;b.val;
-}
-
-int main(int argc, const char * argv[]) {
-    cout&lt;&lt;"初始化一个map，有序的，默认是升序"&lt;&lt;endl;
-    map&lt;string,int&gt; test_map;
-
-
-
-    cout&lt;&lt;"添加数据方式一,插入key值一样的pair，不会改变原本pair"&lt;&lt;endl;
-    test_map.insert(pair&lt;string, int&gt;("a",2));
-    test_map.insert(pair&lt;string, int&gt;("b",3));
-    test_map.insert(pair&lt;string, int&gt;("d",4));
-    test_map.insert(pair&lt;string, int&gt;("c",6));
-
-
-    cout&lt;&lt;"添加数据方式二,可以通过[]来修改key对应的值"&lt;&lt;endl;
-    test_map["a"] = 2;
-    test_map["b"] = 3;
-    test_map["d"] = 4;
-    test_map["c"] = 6;
-
-    cout&lt;&lt;"传入key值删除元素"&lt;&lt;endl;
-    test_map.erase("a");
-
-    cout&lt;&lt;"map的大小"&lt;&lt;endl;
-    cout&lt;&lt;test_map.size()&lt;&lt;endl;
-
-    cout&lt;&lt;"遍历map"&lt;&lt;endl;
-    for (auto pos = test_map.begin(); pos!=test_map.end(); pos++) {
-        cout&lt;&lt;"key:"&lt;&lt;pos-&gt;first&lt;&lt;" value:"&lt;&lt;pos-&gt;second&lt;&lt;endl;
-    }
-    cout&lt;&lt;endl;
-
-    cout&lt;&lt;"计算key为d的元素个数，为1即有，为0即没有"&lt;&lt;endl;
-    if(test_map.count("d")==1){
-        cout&lt;&lt;"find d"&lt;&lt;endl;
-    }else{
-        cout&lt;&lt;"no find"&lt;&lt;endl;
-    }
-
-    cout&lt;&lt;"寻找key为d的元素，若找到的返回对象元素的迭代器，否则返回最后一个元素的迭代器"&lt;&lt;endl;
-    if (test_map.find("d")!=test_map.end()) {
-        cout&lt;&lt;"find d value is "&lt;&lt;test_map.find("d")-&gt;second&lt;&lt;endl;
-    }else{
-        cout&lt;&lt;"no find"&lt;&lt;endl;
-    }
-
-    cout&lt;&lt;"自定义类型的map,需要重新compare函数或者重载&lt;运算符，其他用法参照上面"&lt;&lt;endl;
-    map&lt;Node, int, compare&gt; node_map;
-
-    //需要重载&lt;运算符，系统默认的compare是less
-    //map&lt;Node, int&gt; node_map;
-    Node n1(1,2);
-    Node n2(3,1);
-    Node n3(4,5);
-
-    node_map.insert(pair&lt;Node, int&gt;(n1,1));
-    node_map.insert(pair&lt;Node, int&gt;(n2,2));
-    node_map.insert(pair&lt;Node, int&gt;(n3,3));
-
-    for (auto pos = node_map.begin(); pos!=node_map.end(); pos++) {
-        cout&lt;&lt;"Node value is "&lt;&lt;pos-&gt;second&lt;&lt;endl;
-    }
-    cout&lt;&lt;endl;
-
-    return 0;
-}
-</code></pre>
-
-<h1>unordered_map</h1>
-
-<h2>简介</h2>
-
-<p>无序映射表（Unordered Map）容器是一个存储以键值对组合而成的元素的关联容器，容器中的元素无特别的次序关系。该容器允许基于主键地快速检索各个元素</p>
-
-<h2>类模板</h2>
-
-<pre><code class="C++">// &lt;unordered_map&gt;
-template &lt; class Key,
-    class T,
-    class Hash = hash&lt;Key&gt;,
-    class Pred = equal_to&lt;Key&gt;,
-    class Alloc = allocator&lt; pair&lt;const Key,T&gt; &gt;
-&gt; class unordered_map;
-</code></pre>
-
-<h3>模板参数</h3>
-
-<p><code>1.</code> key：主键类型；  <br/>
-<code>2.</code>  T：被映射的值的类型；  <br/>
-<code>3.</code> Hash：一元谓词，以一个 Key 类型的对象为参数，返回一个基于该对象的 size_t 类型的唯一值；  <br/>
-<code>4.</code> Pred：二元谓词，以两个 Key 类型的对象为参数，返回一个 bool 值，如果第一个参数等价于第二个参数，该 bool 值为 true，否则为 false。默认为 std::equal_to；  <br/>
-<code>5.</code> Alloc：容器内部用来管理内存分配及释放的内存分配器的类型。这个参数是可选的，它的默认值是 std::allocator<T>，这个是一个最简单的非值依赖的（Value-independent）内存分配器。</p>
-
-<h2>详细说明</h2>
-
-<p>在一个 unordered_map 容器中，主键通常被用来唯一标志（Uniquely identify）一个元素，而被映射的值保存了与该主键关联的内容。主键与被映射值的类型可以不同，在模板内部，这两种类型合并绑定成成员类型 value_type。由上述描述可知，value_type 是一个双元组类型（Pair type），具体定义如下：</p>
-
-<pre><code class="C++">typedef pair&lt;const Key, T&gt; value_type;
-</code></pre>
-
-<p>在 unordered_map 内部，元素不会按任何顺序排序，而是通过主键的 hash 值将元素分组放置到各个槽（Bucket，也可译成“桶”）中，这样就能通过主键快速地访问各个对应的元素（平均耗时为一个常量，即时间复杂度为 O(1)）。  <br/>
-在访问容器中的某个元素时，unordered_map 容器比 map 容器高效，而在迭代容器元素的某个子集时，前者比后者稍微低效了一点。  <br/>
-unordered_map 实现了直接访问操作符（operator[]），使得可以通过主键（Key value）直接访问被映射的值（Mapped value）。  <br/>
-unordered_map 容器支持正向迭代。</p>
-
-<h2>相关函数说明</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-#include &lt;map&gt;
-#include &lt;unordered_map&gt;
-#include &lt;string&gt;
-using namespace std;
-struct Node {
-    int id;
-    int val;
-    Node(int id,int val)
-    :id(id),val(val){
-
-    }
-};
-
-struct hash_func{
-    size_t operator()(const Node &amp;n)const{
-        return n.id*99+n.val;
-    }
-};
-
-struct equal_to_func{
-    bool operator()(const Node &amp;a,const Node &amp;b)const{
-        return a.id==b.id&amp;&amp;a.val==b.val?true:false;
-    }
-};
-
-int main(int argc, const char * argv[]) {
-    Node n1(1,2);
-    Node n2(3,1);
-    Node n3(4,5);
-
-
-    cout&lt;&lt;"初始化一个unordered_map"&lt;&lt;endl;
-    unordered_map&lt;string, int&gt; test_unordered_map;
-    test_unordered_map["a"] = 1;
-    test_unordered_map["b"] = 2;
-    test_unordered_map["c"] = 3;
-    cout&lt;&lt;"遍历unordered_map"&lt;&lt;endl;
-    for (auto pos = test_unordered_map.begin(); pos!=test_unordered_map.end(); pos++) {
-        cout&lt;&lt;"key:"&lt;&lt;pos-&gt;first&lt;&lt;" value:"&lt;&lt;pos-&gt;second&lt;&lt;endl;
-    }
-    cout&lt;&lt;endl;
-
-    cout&lt;&lt;"初始化一个自定义类型unordered_map，需要重写hash函数和pred函数"&lt;&lt;endl;
-    unordered_map&lt;Node, int,hash_func,equal_to_func&gt; node_unordered_map;
-    node_unordered_map[n1] = 1;
-    node_unordered_map[n2] = 2;
-    node_unordered_map[n3] = 3;
-    cout&lt;&lt;"遍历node_unordered_map"&lt;&lt;endl;
-    for (auto pos = node_unordered_map.begin(); pos!=node_unordered_map.end(); pos++) {
-        cout&lt;&lt;"key id:"&lt;&lt;pos-&gt;first.id&lt;&lt;" value:"&lt;&lt;pos-&gt;second&lt;&lt;endl;
-    }
-    cout&lt;&lt;endl;
-
-
     return 0;
 }
 </code></pre>
