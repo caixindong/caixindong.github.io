@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 链表 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/lian-biao/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-04T21:44:52+08:00</updated>
+  <updated>2016-03-04T22:27:54+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,76 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[翻转链表中的一部分]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/04/ios72/"/>
+    <updated>2016-03-04T22:23:26+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/04/ios72</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>翻转链表的第m到第n部分，例如：1->2->3->4->5->NULL,m=2,n=4,返回1->4->3->2->5->NULL</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace::std;
+
+
+struct ListNode {
+      int val;
+      ListNode *next;
+      ListNode(int x) : val(x), next(NULL) {}
+};
+class Solution {
+public:
+
+
+    ListNode* reverseBetween(ListNode* head, int m, int n) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return head;
+        }else if (m==n){
+            return head;
+        }else{
+            ListNode* newHead = new ListNode(0);
+            newHead-&gt;next = head;
+
+            //first为第m-1个结点
+            ListNode* first = newHead;
+            for (int i=1; i&lt;m; i++) {
+                first = first-&gt;next;
+            }
+
+
+            ListNode* pre = first-&gt;next;
+            ListNode* p = pre-&gt;next;
+            ListNode* next = NULL;
+
+            //top为第m个结点，也是翻转部分翻转后的尾结点
+            ListNode* top = pre;
+            for (int i =m; i&lt;n; i++) {
+                next = p-&gt;next;
+                p-&gt;next = pre;
+                pre = p;
+                p = next;
+            }
+            //这时候p为第n+1个结点，pre为翻转部分翻转后的头结点
+
+            top-&gt;next = p;
+            first-&gt;next = pre;
+
+            return newHead-&gt;next;
+        }
+    }
+};
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout &lt;&lt; "Hello, World!\n";
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[旋转链表]]></title>
