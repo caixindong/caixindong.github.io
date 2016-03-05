@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 算法 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/suan-fa/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-05T20:35:02+08:00</updated>
+  <updated>2016-03-05T20:45:29+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,59 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[删除链表元素]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/05/ios73/"/>
-    <updated>2016-03-05T20:20:46+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/05/ios73</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>删除链表中值为val的结点，例如：1->2->3->4->5->NULL,val = 4,返回1->2->3->5->NULL</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace::std;
-
-struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
-};
-
-class Solution {
-public:
-    ListNode* removeElements(ListNode* head, int val) {
-        if (head==NULL) {
-            return head;
-        }else{
-            ListNode* newHead = new ListNode(0);
-            newHead-&gt;next = head;
-            ListNode* pre = newHead;
-            ListNode* p = newHead-&gt;next;
-            while (p!=NULL) {
-                if (p-&gt;val == val) {
-                    pre-&gt;next = p-&gt;next;
-                    p = p-&gt;next;
-
-                }else{
-                    pre = pre-&gt;next;
-                    p = p-&gt;next;
-                }
-            }
-            return newHead-&gt;next;
-        }
-    }
-};
-
-int main(int argc, const char * argv[]) {
-
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[斐波那契数列]]></title>
@@ -383,6 +330,70 @@ int main(int argc, const char * argv[]) {
         }
     }
     return -1;
+}
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[八大排序算法--基数排序]]></title>
+    <link href="http://caixindong.github.io/blog/2016/02/06/ios33/"/>
+    <updated>2016-02-06T22:22:28+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/02/06/ios33</id>
+    <content type="html"><![CDATA[<h2>基数排序</h2>
+
+<p>代码如下</p>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+/**
+ arr 排列的数组
+ d 数据的位数 （1,10,100）
+ n 数据的个数
+ **/
+void radixSort(int arr[],int d,int n){
+    //当前位数
+    int currentD = 1;
+    //arr的索引
+    int k = 0;
+    //10个桶,记得初始化
+    int countInBucket[10]  = {0};
+    //存储每次桶排序后的结果
+    int bucket[10][n];
+
+    while (currentD&lt;d) {
+        for (int i=0; i&lt;n; i++) {
+            //用于比较的位上的数
+            int j = (arr[i]/currentD)%10;
+            bucket[j][countInBucket[j]] = arr[i];
+            //桶内元素个数+1
+            countInBucket[j]++;
+        }
+        for (int i=0; i&lt;10; i++) {
+                //桶内有元素
+            if (countInBucket[i]!=0) {
+                for (int j =0; j&lt;countInBucket[i]; j++) {
+                    arr[k] = bucket[i][j];
+                    k++;
+                }
+            }
+            countInBucket[i] = 0;
+        }
+        k = 0;
+        currentD = currentD*10;
+    }
+
+}
+
+
+int main(int argc, const char * argv[]) {
+    int a[] = {12,3,1,4,2,5,4,8,5,4,3,9,4,0};
+    radixSort(a, 100, 14);
+    for (int i=0; i&lt;14; i++) {
+        cout&lt;&lt;a[i]&lt;&lt;" ";
+    }
+    cout&lt;&lt;endl;
+    return 0;
 }
 </code></pre>
 ]]></content>
