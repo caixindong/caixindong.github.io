@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 链表 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/lian-biao/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-05T20:45:29+08:00</updated>
+  <updated>2016-03-05T21:02:18+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,56 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[删除链表中倒数第n个元素]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/05/ios74/"/>
+    <updated>2016-03-05T20:48:54+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/05/ios74</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>删除链表中倒数第n个元素，例如1->2->3->4->5->6,n=2,返回1->2->3->4->6</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+struct ListNode {
+         int val;
+         ListNode *next;
+         ListNode(int x) : val(x), next(NULL) {}
+};
+
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if (head==NULL) {
+            return head;
+        }else{
+            ListNode* newHead = new ListNode(0);
+            newHead-&gt;next = head;
+            ListNode* pre = newHead;
+            ListNode* p = newHead;
+            for (int i=0; i&lt;n; i++) {
+                p = p-&gt;next;
+            }
+            while (p-&gt;next!=NULL) {
+                pre = pre-&gt;next;
+                p = p-&gt;next;
+            }
+            pre-&gt;next = pre-&gt;next-&gt;next;
+            return newHead-&gt;next;
+        }
+    }
+};
+int main(int argc, const char * argv[]) {
+    // insert code here...
+    std::cout &lt;&lt; "Hello, World!\n";
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[删除链表元素]]></title>
