@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="数据结构, 链表 删除链表的重复元素(一) 要求 删除链表里的重复元素，例如1->2->2->3->3->4->5->5->6，返回1->2->3->4->5->6 代码实现 1
+	<meta name="description" content="数据结构, 链表 删除链表的重复元素(二) 要求 删除链表中的重复元素,例如1->1->1->2->3->3->4->4->5，返回2->5 代码实现 1
 2
 3
 4
@@ -29,7 +29,11 @@
 20
 21
 22
-23 &hellip;">
+23
+24
+25
+26
+27 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -107,6 +111,130 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-05T21:27:35+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/lian-biao/'>链表</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/03/05/ios76/" itemprop="url">删除链表的重复元素(二)</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>要求</h2>
+
+<p>删除链表中的重复元素,例如1->1->1->2->3->3->4->4->5，返回2->5</p>
+
+<h2>代码实现</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>         <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">deleteDuplicates</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="o">||</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">newHead</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="o">&amp;&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">==</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="k">while</span> <span class="p">(</span><span class="n">next</span><span class="o">!=</span><span class="nb">NULL</span><span class="o">&amp;&amp;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">==</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="n">next</span> <span class="o">=</span> <span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                    <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                    <span class="n">p</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                    <span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                    <span class="n">p</span> <span class="o">=</span>  <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1324,204 +1452,6 @@ dist[i][j] = Min{dist[i][j],dist[i][k]+dist[k][j]}  <br/>
 
 
 
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-26T22:31:56+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/02/26/ios66/" itemprop="url">简析SDWebImage</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>前言</h1>
-
-<p>SDWebImage是一个强大的第三方图片异步加载库，从事iOS开发的人或多或少用过它。今天我点开源码一看，里面一些实现细节确实令人玩味。</p>
-
-<h1>简析</h1>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个是这个库里最常用的方法，传一个url，UIImageView就会将图片加载出来，这个方法看起来简单，可是背后的实现没那么容易，不禁感慨大神之牛，巧妙的设计和背后复杂的实现竟然浓缩成这样的一个接口函数。</p>
-
-<h2>点进去看源码</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">sd_setImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">placeholderImage</span><span class="p">:</span><span class="n">placeholder</span> <span class="nl">options</span><span class="p">:</span><span class="mi">0</span> <span class="nl">progress</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">completed</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个是原始接口</p>
-
-<h2>点进去看源码</h2>
-
-<p>我可以看到这个函数体</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span> <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span> <span class="nf">progress:</span><span class="p">(</span><span class="n">SDWebImageDownloaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span> <span class="nf">completed:</span><span class="p">(</span><span class="n">SDWebImageCompletionBlock</span><span class="p">)</span><span class="nv">completedBlock</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这个函数体就是就是sd_setImage的实现逻辑</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="n">sd_cancelCurrentImageLoad</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>首先，它先取消下载队列里正在进行的任务；
-如果有placeholder，就先将它显示出来；
-接着就是实现逻辑的主要部分</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="kt">id</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageManager</span><span class="p">.</span><span class="n">sharedManager</span> <span class="nl">downloadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">progress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">,</span> <span class="bp">NSURL</span> <span class="o">*</span><span class="n">imageURL</span><span class="p">)</span> <span class="p">{};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>点进去看源码</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">__block</span> <span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageCombinedOperation</span> <span class="n">new</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>首先，先启动一个新的operation；</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">@synchronized</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span> <span class="nl">containsObject</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">url</span> <span class="o">||</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRetryFailed</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isFailedUrl</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">dispatch_main_sync_safe</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
-</span><span class='line'>        <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSError</span> <span class="nl">errorWithDomain</span><span class="p">:</span><span class="n">NSURLErrorDomain</span> <span class="nl">code</span><span class="p">:</span><span class="n">NSURLErrorFileDoesNotExist</span> <span class="nl">userInfo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-</span><span class='line'>        <span class="n">completedBlock</span><span class="p">(</span><span class="nb">nil</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheTypeNone</span><span class="p">,</span> <span class="nb">YES</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">operation</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="k">@synchronized</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">operation</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>接着我们可以看到一个实现的亮点，它用一个failedURLs集合来记录失败或者无效的url，如果传进来的url是failedURLs里或者是为空，则return出去,否则将operation添加到运行的operation数组中。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'> <span class="bp">NSString</span> <span class="o">*</span><span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">cacheKeyForURL</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
-</span><span class='line'>    <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>它将url缓存起来,给他一个key值</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="n">operation</span><span class="p">.</span><span class="n">cacheOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageCache</span> <span class="nl">queryDiskCacheForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">done</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">)</span> <span class="p">{};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>根据缓存的url来寻找是否有对应的缓存</p>
-
-<h2>点进去看源码</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">imageFromMemoryCacheForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">doneBlock</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">SDImageCacheTypeMemory</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>先在内存里寻找，SDImage用的内存缓存是用NSCache实现的，如果有就是block回调，return；</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'>  <span class="bp">UIImage</span> <span class="o">*</span><span class="n">diskImage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">diskImage</span> <span class="o">&amp;&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">shouldCacheImagesInMemory</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="bp">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">SDCacheCostForImage</span><span class="p">(</span><span class="n">diskImage</span><span class="p">);</span>
-</span><span class='line'>                <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">memCache</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">diskImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">];</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>                <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">SDImageCacheTypeDisk</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如果没有，就从磁盘缓存里找，如果找到了，就将他缓存到内存中，block回调</p>
-
-<h2>如果都没找到</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="kt">id</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">subOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageDownloader</span> <span class="nl">downloadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">downloaderOptions</span> <span class="nl">progress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">downloadedImage</span><span class="p">,</span> <span class="bp">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>则开启下载operation下载图片，下载利用NSURLConnection实现</p>
-
-<h2>点进去看源码</h2>
-
-<p>初始化和完善请求头，将下载operation添加到下载队列中</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="n">wself</span><span class="p">.</span><span class="n">lastAddedOperation</span> <span class="o">=</span> <span class="n">operation</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>同时记录最后一个下载操作，return，成功block回调，利用SDImageCache将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url，成功则加载图片，主线程刷新UI。</p>
 
 		
 		
