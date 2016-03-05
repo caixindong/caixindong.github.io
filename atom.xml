@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-04T22:27:54+08:00</updated>
+  <updated>2016-03-05T20:35:02+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[删除链表元素]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/05/ios73/"/>
+    <updated>2016-03-05T20:20:46+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/05/ios73</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>删除链表中值为val的结点，例如：1->2->3->4->5->NULL,val = 4,返回1->2->3->5->NULL</p>
+
+<h2>代码实现</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span><span class="o">::</span><span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">removeElements</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">,</span> <span class="kt">int</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">newHead</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span> <span class="o">==</span> <span class="n">val</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                    <span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[翻转链表中的一部分]]></title>
@@ -3097,216 +3191,6 @@ unordered_set 容器支持正向迭代</p>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[图的表达]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/19/ios53/"/>
-    <updated>2016-02-19T14:45:57+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/19/ios53</id>
-    <content type="html"><![CDATA[<h1>前言</h1>
-
-<p>图的表达有两种方式实现，一种是利用邻接矩阵，一种是利用邻接表。  <br/>
-<code>1.</code> 利用邻接矩阵：利用一个二维数组来储存图结点的数据，数组的下标对应结点的编号，值代表结点之间的权值；  <br/>
-<code>2.</code> 利用邻接表：实际上是利用一维数组和链表来实现的，链表用来存储某个结点到其他结点的路径，链表的第一个元素为到本结点的路径，数组用来储存各个链表；</p>
-
-<h2>比较</h2>
-
-<p>我们将图的结点个数设为V，图的路径个数设为E。  <br/>
-用第一种方式实现，它的空间复杂度为O(V<sup>2</sup>)；  <br/>
-用第二种方式实现，它的空间复杂度为O(V*E)。  <br/>
-所以当图里面的路径比较稀疏用第二种方式实现，如果比较密集，则两种都可以。</p>
-
-<h2>代码实现</h2>
-
-<h4>利用邻接矩阵实现</h4>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;vector&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">Graphic</span> <span class="p">{</span>
-</span><span class='line'><span class="k">private</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">g</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">Graphic</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="o">&amp;</span><span class="n">g</span><span class="p">)</span><span class="o">:</span><span class="n">g</span><span class="p">(</span><span class="n">g</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">g</span> <span class="o">=</span><span class="p">{</span>
-</span><span class='line'>      <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span>
-</span><span class='line'>      <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span>
-</span><span class='line'>      <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">},</span>
-</span><span class='line'>      <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">Graphic</span> <span class="n">gr</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>利用邻接表实现</h4>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;vector&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;list&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 图路径</span>
-</span><span class='line'><span class="cm"> * dest_id 目的结点的ID</span>
-</span><span class='line'><span class="cm"> * weight 路径权值</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">edge_node</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">dest_id</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">weight</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">edge_node</span><span class="p">(</span><span class="kt">int</span> <span class="n">id</span><span class="p">,</span><span class="kt">int</span> <span class="n">weight</span><span class="p">)</span>
-</span><span class='line'>    <span class="o">:</span><span class="n">dest_id</span><span class="p">(</span><span class="n">id</span><span class="p">),</span><span class="n">weight</span><span class="p">(</span><span class="n">weight</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">Graph</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">list</span><span class="o">&lt;</span><span class="n">edge_node</span><span class="o">&gt;&gt;</span> <span class="n">ad_vector</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">Graph</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>
-</span><span class='line'>    <span class="o">:</span><span class="n">ad_vector</span><span class="p">(</span><span class="n">n</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">     * 添加图路径</span>
-</span><span class='line'><span class="cm">     **/</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="n">add_edge</span><span class="p">(</span><span class="kt">int</span> <span class="n">source</span><span class="p">,</span><span class="kt">int</span> <span class="n">dist</span><span class="p">,</span><span class="kt">int</span> <span class="n">weight</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">edge_node</span> <span class="n">new_eage</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span><span class="n">weight</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">ad_vector</span><span class="p">[</span><span class="n">source</span><span class="p">].</span><span class="n">push_back</span><span class="p">(</span><span class="n">new_eage</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">    * 打印所有路径</span>
-</span><span class='line'><span class="cm">    **/</span>
-</span><span class='line'>    <span class="kt">void</span> <span class="n">dump</span><span class="p">(){</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">ad_vector</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">ad_vector</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">ad_vector</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;edge from &quot;</span><span class="o">&lt;&lt;</span><span class="n">i</span><span class="o">&lt;&lt;</span><span class="s">&quot; to &quot;</span><span class="o">&lt;&lt;</span><span class="n">pos</span><span class="o">-&gt;</span><span class="n">dest_id</span><span class="p">;</span>
-</span><span class='line'>                <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot; weight: &quot;</span><span class="o">&lt;&lt;</span><span class="n">pos</span><span class="o">-&gt;</span><span class="n">weight</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">Graph</span> <span class="n">g</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">dump</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

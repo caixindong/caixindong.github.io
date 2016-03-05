@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-04T22:27:54+08:00</updated>
+  <updated>2016-03-05T20:35:02+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,59 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[删除链表元素]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/05/ios73/"/>
+    <updated>2016-03-05T20:20:46+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/05/ios73</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>删除链表中值为val的结点，例如：1->2->3->4->5->NULL,val = 4,返回1->2->3->5->NULL</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace::std;
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
+class Solution {
+public:
+    ListNode* removeElements(ListNode* head, int val) {
+        if (head==NULL) {
+            return head;
+        }else{
+            ListNode* newHead = new ListNode(0);
+            newHead-&gt;next = head;
+            ListNode* pre = newHead;
+            ListNode* p = newHead-&gt;next;
+            while (p!=NULL) {
+                if (p-&gt;val == val) {
+                    pre-&gt;next = p-&gt;next;
+                    p = p-&gt;next;
+
+                }else{
+                    pre = pre-&gt;next;
+                    p = p-&gt;next;
+                }
+            }
+            return newHead-&gt;next;
+        }
+    }
+};
+
+int main(int argc, const char * argv[]) {
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[翻转链表中的一部分]]></title>
@@ -301,69 +354,6 @@ int main(int argc, const char * argv[]) {
     }
     cout&lt;&lt;endl;
 
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[最长公共子串]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/26/ios64/"/>
-    <updated>2016-02-26T16:02:00+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/26/ios64</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>它比最长公共子序列多了一个要求，就是要求子串是连续的，做法跟最长公共子序列的做法大致相同，只是在一处判断的处理改变了。</p>
-
-<h2>做法</h2>
-
-<p>定义一个二维数组C[i][j],记录str1(0~i)和str2(0~j)的最长公共子串。  <br/>
-定义一个max，记录填表过程中出现的最大值。</p>
-
-<h5>动态方程</h5>
-
-<p>if str1[i] == str2[j]  <br/>
-    c[i][j] = c[i-1][j-1] + 1;  <br/>
-if str1[i] != str2[j]  <br/>
-    c[i][j] = 0; //因为i和j位置上面的字符不等，那么到该位置公共子串就不连续，所以此时的最长公共子串的长度为0</p>
-
-<h2>代码如下</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace std;
-
-int lcs(char a[],char b[],int n,int m){
-    if (n==0||m==0) {
-        return 0;
-    }else{
-        int count[n+1][m+1];
-        int max = 0;
-        memset(count, 0, sizeof(count));
-        for (int i=1; i&lt;=n; i++) {
-            for (int j=1; j&lt;=m; j++) {
-                if (a[i-1]==b[j-1]) {
-                    count[i][j] = count[i-1][j-1]+1;
-                    if (count[i][j]&gt;max) {
-                        max = count[i][j];
-                    }
-                }else{
-                    count[i][j] = 0;
-                }
-           }
-        }
-        return max;
-    }
-
-}
-
-
-
-
-int main(int argc, const char * argv[]) {
-    char a[] = "abccbd";
-    char b[] = "bbccbd";
-    cout&lt;&lt;lcs(a,b,6,6)&lt;&lt;endl;
     return 0;
 }
 </code></pre>
