@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-06T12:19:34+08:00</updated>
+  <updated>2016-03-06T12:27:49+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,58 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS9适配]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/06/ios77/"/>
+    <updated>2016-03-06T12:22:31+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/06/ios77</id>
+    <content type="html"><![CDATA[<h2>MARK</h2>
+
+<p>开发遇到适配iOS9的问题，这里mark一下</p>
+
+<p><code>1.</code> 默认使用HTTPS请求  <br/>
+如果在Xcode 9之前使用的时http请求，那么在XCode 9上编译的App是不能联网的，会提示如下错误:
+App Transport Security has blocked a cleartext HTTP (<a href="http://">http://</a>) resource load since it is insecure. Temporary exceptions can be configured via your app&rsquo;s Info.plist file.  <br/>
+修改方法是要么使服务器支持https访问，要么关闭https的使用。第一种方法对于个人开发者来说代价还是比较大的，因此推荐使用后面一种方法，具体的做法是:在工程的Info.plist文件里添加NSAppTransportSecurity字典类型的，添加一个元素：key为NSAllowsArbitraryLoads，值为YES。</p>
+
+<p><code>2.</code> iOS 9使用URL scheme必须将其加入白名单  <br/>
+否则会提示类似如下错误:  <br/>
+canOpenURL: failed for URL: &ldquo;mqqopensdkapiV2://qqapp&rdquo; - error: &ldquo;This app is not allowed to query for scheme mqqopensdkapiV2”  <br/>
+修正方法是，Info.plist文件中添加一个key为LSApplicationQueriesSchemes的数组值，里面包含需要添加白名单的string类型的scheme。特酷吧在项目中使用了qq，微信等分享登录功能，需要添加的值为：  <br/>
+mqqopensdkapiV2  <br/>
+mqqOpensdkSSoLogin  <br/>
+mqq  <br/>
+mqzoneopensdkapiV2  <br/>
+mqzoneopensdkapi19  <br/>
+mqzoneopensdkapi  <br/>
+mqzoneopensdk  <br/>
+mqzone  <br/>
+weixin  <br/>
+wechat  <br/>
+更多其他适配点后续不断跟进。</p>
+
+<p><code>3.</code> bitcode  <br/>
+使用Xcode7编译提示：XXX does not contain bitcode. You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. for architecture arm64  <br/>
+bitcode是被编译程序的一种中间形式的代码。包含bitcode配置的程序将会在App store上被编译和链接。    bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。  <br/>
+Xcode7 默认开启了bitcode，如果App使用的第三方类库不支持bitcode会提示错误，只需要在”Build Settings”->”Enable Bitcode”选项中看关闭bitcode即可。  <br/>
+开启Bitcode编译后，编译产生的文件体积会变大 (因为是中间代码，不是用户下载的包)，且dSYM文件不能用来崩溃日志的符号化 (用户下载的包是Apple服务重新编译产生的，有产生新的符号文件)。通过Archive方式上传AppStore的包，可以在 Xcode的Organizer工具中下载对应安装包的新的符号文件。</p>
+
+<p><code>4.</code> 使用XCode7链接第三方库提示warning  <br/>
+Lots of warnings when building with Xcode 7 with 3rd party libraries  <br/>
+warning: Could not resolve external type c:objc(cs)NSString  <br/>
+warning: Could not resolve external type c:objc(cs)NSDictionary  <br/>
+warning: Could not resolve external type c:objc(cs)NSMutableString  <br/>
+warning: Could not resolve external type c:objc(cs)NSError  <br/>
+<a href="https://forums.developer.apple.com/thread/17921">https://forums.developer.apple.com/thread/17921</a>  <br/>
+目前没发现好的解决办法，可以尝试如下:  <br/>
+I had this problem too.  Here&rsquo;s how I fixed it.  <br/>
+1)  Go to Build Settings -> Build Options -> Debug Information Format  <br/>
+2)  Change the Debug setting from &ldquo;DWARF with dSYM File&rdquo; to &ldquo;DWARF&rdquo;  <br/>
+3)  Leave the Release setting at &ldquo;DWARF with dSYM File&rdquo;  <br/>
+The problem appears to be that Xcode was trying to create dSYM files for Debug     builds.  You don&rsquo;t need dSYM files for Debug builds &ndash; it&rsquo;s release builds where you need them.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[简析SDWebImage]]></title>
@@ -360,38 +412,6 @@ wself.lastAddedOperation = operation;
     <content type="html"><![CDATA[<p>1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候</p>
 
 <p>2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no。苹果文档是这样说的：bitcode是被编译程序的一种中间形式的代码，包含bitcode配置的程序将会在App store上被编译和链接，bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[几个比较有趣的界面过渡动画]]></title>
-    <link href="http://caixindong.github.io/blog/2015/11/19/ios17/"/>
-    <updated>2015-11-19T16:35:49+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/11/19/ios17</id>
-    <content type="html"><![CDATA[<p>动画的类型依次为立方，吸走，翻转，水波，翻页，翻页回，打开相机，关闭相机</p>
-
-<pre><code>NSString *Types[]={@"cube",
-@"suckEffect",
-@"oglFlip",
-@"rippleEffect",
-@"pageCurl",
-@"pageUnCurl",
-@"cameraIrisHollowOpen",
-@"cameraIrisHollowClose"};
-</code></pre>
-
-<p>直接贴代码</p>
-
-<pre><code>CATransition *animation = [CATransition animation];
-[animation setDuration:0.8];
-//设置动画的类型
-[animation setType: @"rippleEffect"];
-//设置动画变化快慢得函数
-[animation setTimingFunction:[CAMediaTimingFunction functionWithName:
-kCAMediaTimingFunctionLinear]];
-[self.navigationController.view.layer addAnimation:animation forKey:nil];
-[self.navigationController pushViewController:tvc animated:NO];
-</code></pre>
 ]]></content>
   </entry>
   
