@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 数据结构 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/shu-ju-jie-gou/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-06T12:27:49+08:00</updated>
+  <updated>2016-03-07T16:42:24+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,86 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[判断是否是回文链表]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/07/ios78/"/>
+    <updated>2016-03-07T16:40:05+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/07/ios78</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>判断一个链表是否是回文链表，例如：1->2->3->3->2->1->NULL 这是回文链表</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">#include &lt;iostream&gt;
+using namespace std;
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+//1,2,3,4,3,2,1  1,2,3,3,2,1
+class Solution {
+public:
+    int lengthOfList(ListNode* head){
+        ListNode* p = head;
+        int count = 0;
+        while (p!=NULL) {
+            p = p-&gt;next;
+            count++;
+        }
+        return count;
+    }
+    ListNode* reveseList(ListNode* head){
+        ListNode* pre = head;
+        ListNode* p = head-&gt;next;
+        ListNode* next  = NULL;
+        while (p!=NULL) {
+            next = p-&gt;next;
+            p-&gt;next = pre;
+            pre = p;
+            p = next;
+        }
+        head-&gt;next = NULL;
+        return pre;
+    }
+    bool isPalindrome(ListNode* head) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return true;
+        }else{
+            int len = lengthOfList(head);
+            int half = len/2;
+            ListNode* leftStart = head;
+            ListNode* rightStart = head;
+            if (len%2!=0) {
+                half++;
+            }
+            for (int i=0; i&lt;half; i++) {
+                rightStart = rightStart-&gt;next;
+            }
+            rightStart = reveseList(rightStart);
+            while (rightStart!=NULL) {
+                if (leftStart-&gt;val==rightStart-&gt;val) {
+                    leftStart = leftStart-&gt;next;
+                    rightStart = rightStart-&gt;next;
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+
+    }
+};
+int main(int argc, const char * argv[]) {
+
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[删除链表的重复元素(二)]]></title>
@@ -214,76 +294,6 @@ public:
 
 int main(int argc, const char * argv[]) {
 
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[翻转链表中的一部分]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/04/ios72/"/>
-    <updated>2016-03-04T22:23:26+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/04/ios72</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>翻转链表的第m到第n部分，例如：1->2->3->4->5->NULL,m=2,n=4,返回1->4->3->2->5->NULL</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace::std;
-
-
-struct ListNode {
-      int val;
-      ListNode *next;
-      ListNode(int x) : val(x), next(NULL) {}
-};
-class Solution {
-public:
-
-
-    ListNode* reverseBetween(ListNode* head, int m, int n) {
-        if (head==NULL||head-&gt;next==NULL) {
-            return head;
-        }else if (m==n){
-            return head;
-        }else{
-            ListNode* newHead = new ListNode(0);
-            newHead-&gt;next = head;
-
-            //first为第m-1个结点
-            ListNode* first = newHead;
-            for (int i=1; i&lt;m; i++) {
-                first = first-&gt;next;
-            }
-
-
-            ListNode* pre = first-&gt;next;
-            ListNode* p = pre-&gt;next;
-            ListNode* next = NULL;
-
-            //top为第m个结点，也是翻转部分翻转后的尾结点
-            ListNode* top = pre;
-            for (int i =m; i&lt;n; i++) {
-                next = p-&gt;next;
-                p-&gt;next = pre;
-                pre = p;
-                p = next;
-            }
-            //这时候p为第n+1个结点，pre为翻转部分翻转后的头结点
-
-            top-&gt;next = p;
-            first-&gt;next = pre;
-
-            return newHead-&gt;next;
-        }
-    }
-};
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout &lt;&lt; "Hello, World!\n";
     return 0;
 }
 </code></pre>
