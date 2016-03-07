@@ -4,7 +4,7 @@
   <title><![CDATA[Category: 链表 | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/lian-biao/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-07T16:42:24+08:00</updated>
+  <updated>2016-03-07T17:04:20+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[重新整理链表]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/07/ios79/"/>
+    <updated>2016-03-07T16:59:25+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/07/ios79</id>
+    <content type="html"><![CDATA[<h2>要求</h2>
+
+<p>例如原链表为 1->2->3->4->5 ,重新整理后为 1->4->2->5->3</p>
+
+<h2>代码实现</h2>
+
+<pre><code class="C++">
+/**
+* 跟着算法走一遍就知道如何重新整理
+**/
+#include &lt;iostream&gt;
+using namespace::std;
+
+struct ListNode {
+      int val;
+      ListNode *next;
+      ListNode(int x) : val(x), next(NULL) {}
+};
+
+class Solution {
+public:
+    //1,2,4,5 -&gt; 1,4,2,5  1,2,3,4,5 -&gt; 1,4,2,5,3
+    int lengthOfList(ListNode* head){
+        ListNode* p = head;
+        int count = 0;
+        while (p!=NULL) {
+            p = p-&gt;next;
+            count++;
+        }
+        return count;
+    }
+
+    /**
+    * 翻转链表
+    **/
+    ListNode* reverseList(ListNode* head){
+        ListNode* pre = head;
+        ListNode* p = pre-&gt;next;
+        ListNode* next = NULL;
+        while (p!=NULL) {
+            next = p-&gt;next;
+            p-&gt;next = pre;
+            pre = p;
+            p = next;
+        }
+        head-&gt;next=NULL;
+        return pre;
+    }
+
+    void reorderList(ListNode* head) {
+        if (head==NULL||head-&gt;next==NULL) {
+            return;
+        }else{
+            int n = lengthOfList(head);
+            int half = n/2;
+            if (n%2!=0) {
+                half++;
+            }
+            ListNode* leftEnd = head;
+            for (int i=0; i&lt;half-1; i++) {
+                leftEnd = leftEnd-&gt;next;
+            }
+
+            ListNode* rightStart = leftEnd-&gt;next;
+            rightStart = reverseList(rightStart);
+
+            leftEnd-&gt;next =NULL;
+            ListNode* left = head;
+            ListNode* right = rightStart;
+            ListNode* next = NULL;
+
+            //重新链接
+            bool flag = true;
+            while (right!=NULL) {
+                if (flag) {
+                    next = left-&gt;next;
+                    left-&gt;next = right;
+                    left = next;
+                }else{
+                    next = right-&gt;next;
+                    right-&gt;next = left;
+                    right = next;
+                }
+                flag = !flag;
+            }
+        }
+
+    }
+};
+int main(int argc, const char * argv[]) {
+    return 0;
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[判断是否是回文链表]]></title>
@@ -241,59 +342,6 @@ public:
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout &lt;&lt; "Hello, World!\n";
-    return 0;
-}
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[删除链表元素]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/05/ios73/"/>
-    <updated>2016-03-05T20:20:46+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/05/ios73</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>删除链表中值为val的结点，例如：1->2->3->4->5->NULL,val = 4,返回1->2->3->5->NULL</p>
-
-<h2>代码实现</h2>
-
-<pre><code class="C++">#include &lt;iostream&gt;
-using namespace::std;
-
-struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
-};
-
-class Solution {
-public:
-    ListNode* removeElements(ListNode* head, int val) {
-        if (head==NULL) {
-            return head;
-        }else{
-            ListNode* newHead = new ListNode(0);
-            newHead-&gt;next = head;
-            ListNode* pre = newHead;
-            ListNode* p = newHead-&gt;next;
-            while (p!=NULL) {
-                if (p-&gt;val == val) {
-                    pre-&gt;next = p-&gt;next;
-                    p = p-&gt;next;
-
-                }else{
-                    pre = pre-&gt;next;
-                    p = p-&gt;next;
-                }
-            }
-            return newHead-&gt;next;
-        }
-    }
-};
-
-int main(int argc, const char * argv[]) {
-
     return 0;
 }
 </code></pre>
