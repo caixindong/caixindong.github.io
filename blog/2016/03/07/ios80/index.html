@@ -1,0 +1,290 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>iOS 网络编程 - Cool Guy</title>
+	<meta name="author" content="Xindong">
+
+	
+	<meta name="description" content="iOS 网络编程 前言 最近要给quanta的小朋友讲iOS网络编程的相关知识，所以提前在这里梳理。 何为HTTP 首先我们必须了解HTTP协议，何为HTTP?超文本传送协议，它是基于应用层的通信规范，是一个设计来使客户端和服务器顺利进行通讯的协议。
+HTTP做了以下几方面的规定： 1. &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://caixindong.github.io/blog/2016/03/07/ios80/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img alt='Profile Picture' src='/images/touxiang.jpeg' style='width: 160px;'>");
+	</script>
+</div>
+<h1><a href="/">Cool Guy</a></h1>
+<p class="subtitle">Blog like a hacker.</p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/aboutme">AboutMe</a></li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/3872004666/profile?topnav=1&wvr=6" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="https://github.com/caixindong" title="GitHub">GitHub</a>
+		
+		
+		<a class="dribbble" href="http://www.dribbble.com/allenhsu" title="Dribbble">Dribbble</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+<hgroup>
+
+</hgroup>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">iOS 网络编程</h1>
+	<div class="entry-content" itemprop="articleBody"><h2>前言</h2>
+
+<p>最近要给quanta的小朋友讲iOS网络编程的相关知识，所以提前在这里梳理。</p>
+
+<h2>何为HTTP</h2>
+
+<p>首先我们必须了解HTTP协议，何为HTTP?超文本传送协议，它是基于应用层的通信规范，是一个设计来使客户端和服务器顺利进行通讯的协议。
+HTTP做了以下几方面的规定：  <br/>
+<code>1.</code> request和response的格式；  <br/>
+<code>2.</code> 建立连接的方法，有持久连接和非持久连接。HTTP1.1默认是带流水的持久连接；  <br/>
+         非持久连接：服务器发出一个对象后，相应TCP连接关闭，每个TCP连接只用于传输一个请求消息和一个响应消息；  <br/>
+         持久连接：单个持久TCP连接，它分为不带流水线和流水线。不带流水线的只有收到上个请求响应再请求；
+<code>3.</code> 缓存机制（减少发送请求）；      <br/>
+<code>4.</code> 响应授权激发机制，用于服务器激发客户端请求并授权；</p>
+
+<p>过程：客户端先建立一个TCP连接，再发送一个请求，服务器收到请求处理后响应，传送数据，客户端可以继续发生请求或关闭TCP</p>
+
+<h2>GET与POST</h2>
+
+<p>GET与POST是两种请求方式，GET主要用于从指定的服务器中获取数据，POST主要用于提交数据给指定服务器
+区别：  <br/>
+GET请求能够被缓存，POST请求不能被缓存下来
+GET提交的数据放在url(以？分割url和传输数据，参数之间以&amp;相连)      <br/>
+GET请求会保存在浏览器的浏览记录中，POST请求不会保存在浏览器浏览记录中  <br/>
+以GET请求的URL能够保存为浏览器书签，以POST请求的URL无法保存为浏览器书签  <br/>
+GET请求有长度限制，POST请求无长度限制
+GET安全性没有POST好，因为GET提交的参数是可见</p>
+
+<h2>iOS网络编程</h2>
+
+<p>在iOS9之前，我们主要利用NSURLConnection来进行网络请求操作，在iOS9以后，苹果推荐使用NSURLSession。具体如何使用这些类来进行网络请求，我以代码加注释的形式呈现出来。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * 可变请求与不可变请求的区别：</span>
+</span><span class='line'><span class="cm"> * 1、不可变请求在初始化的时候需要指定url，而可变请求可以以后指定</span>
+</span><span class='line'><span class="cm"> * 2、cachePolicy缓存策略 timeoutInterval超时时间</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'>
+</span><span class='line'><span class="bp">NSURLRequest</span><span class="o">*</span> <span class="n">request</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURLRequest</span> <span class="nl">requestWithURL</span><span class="p">:[</span><span class="bp">NSURL</span> <span class="nl">URLWithString</span><span class="p">:</span><span class="s">@&quot;http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png&quot;</span><span class="p">]</span> <span class="nl">cachePolicy</span><span class="p">:</span><span class="n">NSURLRequestReloadIgnoringLocalCacheData</span> <span class="nl">timeoutInterval</span><span class="p">:</span><span class="mi">60</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * iOS 9以前 请求,默认是GET</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="p">[</span><span class="bp">NSURLConnection</span> <span class="nl">sendAsynchronousRequest</span><span class="p">:</span><span class="n">request</span> <span class="nl">queue</span><span class="p">:[</span><span class="bp">NSOperationQueue</span> <span class="n">mainQueue</span><span class="p">]</span> <span class="nl">completionHandler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">NSURLResponse</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">response</span><span class="p">,</span> <span class="bp">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">data</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">//解析json数据</span>
+</span><span class='line'>    <span class="bp">NSDictionary</span><span class="o">*</span> <span class="n">dict</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSJSONSerialization</span> <span class="nl">JSONObjectWithData</span><span class="p">:</span><span class="n">data</span> <span class="nl">options</span><span class="p">:</span><span class="n">NSJSONReadingMutableLeaves</span> <span class="nl">error</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;%@&quot;</span><span class="p">,</span><span class="n">dict</span><span class="p">);</span>
+</span><span class='line'>   <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>       <span class="n">_imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIImage</span> <span class="nl">imageWithData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
+</span><span class='line'>   <span class="p">});</span>
+</span><span class='line'><span class="p">}];</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * iOS 9 请求</span>
+</span><span class='line'><span class="cm">**/</span>
+</span><span class='line'><span class="bp">NSMutableURLRequest</span><span class="o">*</span> <span class="n">request2</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'><span class="n">request2</span><span class="p">.</span><span class="n">URL</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURL</span> <span class="nl">URLWithString</span><span class="p">:</span><span class="s">@&quot;http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="n">request2</span><span class="p">.</span><span class="n">HTTPMethod</span> <span class="o">=</span> <span class="s">@&quot;GET&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="bp">NSURLSession</span><span class="o">*</span> <span class="n">session</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURLSession</span> <span class="n">sharedSession</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[[</span><span class="n">session</span> <span class="nl">dataTaskWithRequest</span><span class="p">:</span><span class="n">request2</span> <span class="nl">completionHandler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">data</span><span class="p">,</span> <span class="bp">NSURLResponse</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">response</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;%@&quot;</span><span class="p">,</span><span class="n">data</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">_imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIImage</span> <span class="nl">imageWithData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">}]</span> <span class="n">resume</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//记得resume 唤醒 suspend 暂停</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * 上传 用POST，具体可以看这个链接 http://borissun.iteye.com/blog/1338991</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="bp">NSMutableURLRequest</span><span class="o">*</span> <span class="n">postRequest</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'><span class="n">postRequest</span><span class="p">.</span><span class="n">URL</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURL</span> <span class="nl">URLWithString</span><span class="p">:</span><span class="s">@&quot;&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="bp">NSInputStream</span><span class="o">*</span> <span class="n">inStream</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSInputStream</span> <span class="nl">inputStreamWithFileAtPath</span><span class="p">:</span><span class="s">@&quot;&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="n">postRequest</span><span class="p">.</span><span class="n">HTTPBodyStream</span> <span class="o">=</span> <span class="n">inStream</span><span class="p">;</span>
+</span><span class='line'><span class="n">postRequest</span><span class="p">.</span><span class="n">HTTPMethod</span> <span class="o">=</span> <span class="s">@&quot;POST&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+ 
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2016/03/07/ios80" data-title="iOS 网络编程" data-url="http://caixindong.github.io/blog/2016/03/07/ios80/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Xindong -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

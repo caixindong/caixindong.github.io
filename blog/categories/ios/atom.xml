@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-07T17:04:20+08:00</updated>
+  <updated>2016-03-08T19:25:44+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,95 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS 网络编程]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/07/ios80/"/>
+    <updated>2016-03-07T22:45:23+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/07/ios80</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>最近要给quanta的小朋友讲iOS网络编程的相关知识，所以提前在这里梳理。</p>
+
+<h2>何为HTTP</h2>
+
+<p>首先我们必须了解HTTP协议，何为HTTP?超文本传送协议，它是基于应用层的通信规范，是一个设计来使客户端和服务器顺利进行通讯的协议。
+HTTP做了以下几方面的规定：  <br/>
+<code>1.</code> request和response的格式；  <br/>
+<code>2.</code> 建立连接的方法，有持久连接和非持久连接。HTTP1.1默认是带流水的持久连接；  <br/>
+         非持久连接：服务器发出一个对象后，相应TCP连接关闭，每个TCP连接只用于传输一个请求消息和一个响应消息；  <br/>
+         持久连接：单个持久TCP连接，它分为不带流水线和流水线。不带流水线的只有收到上个请求响应再请求；
+<code>3.</code> 缓存机制（减少发送请求）；      <br/>
+<code>4.</code> 响应授权激发机制，用于服务器激发客户端请求并授权；</p>
+
+<p>过程：客户端先建立一个TCP连接，再发送一个请求，服务器收到请求处理后响应，传送数据，客户端可以继续发生请求或关闭TCP</p>
+
+<h2>GET与POST</h2>
+
+<p>GET与POST是两种请求方式，GET主要用于从指定的服务器中获取数据，POST主要用于提交数据给指定服务器
+区别：  <br/>
+GET请求能够被缓存，POST请求不能被缓存下来
+GET提交的数据放在url(以？分割url和传输数据，参数之间以&amp;相连)      <br/>
+GET请求会保存在浏览器的浏览记录中，POST请求不会保存在浏览器浏览记录中  <br/>
+以GET请求的URL能够保存为浏览器书签，以POST请求的URL无法保存为浏览器书签  <br/>
+GET请求有长度限制，POST请求无长度限制
+GET安全性没有POST好，因为GET提交的参数是可见</p>
+
+<h2>iOS网络编程</h2>
+
+<p>在iOS9之前，我们主要利用NSURLConnection来进行网络请求操作，在iOS9以后，苹果推荐使用NSURLSession。具体如何使用这些类来进行网络请求，我以代码加注释的形式呈现出来。</p>
+
+<pre><code class="ObjC">    /**
+     * 可变请求与不可变请求的区别：
+     * 1、不可变请求在初始化的时候需要指定url，而可变请求可以以后指定
+     * 2、cachePolicy缓存策略 timeoutInterval超时时间
+     **/
+
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60];
+
+
+
+    /**
+     * iOS 9以前 请求,默认是GET
+     **/
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse * _Nullable response, NSData * _Nullable data, NSError * _Nullable connectionError) {
+        //解析json数据
+        NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
+        NSLog(@"%@",dict);
+       dispatch_async(dispatch_get_main_queue(), ^{
+           _imageView.image = [UIImage imageWithData:data];
+       });
+    }];
+
+
+    /**
+     * iOS 9 请求
+    **/
+    NSMutableURLRequest* request2 = [[NSMutableURLRequest alloc]init];
+    request2.URL = [NSURL URLWithString:@"http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png"];
+    request2.HTTPMethod = @"GET";
+
+    NSURLSession* session = [NSURLSession sharedSession];
+
+    [[session dataTaskWithRequest:request2 completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"%@",data);
+            _imageView.image = [UIImage imageWithData:data];
+        });
+    }] resume];
+    //记得resume 唤醒 suspend 暂停
+
+    /**
+     * 上传 用POST，具体可以看这个链接 http://borissun.iteye.com/blog/1338991
+     **/
+    NSMutableURLRequest* postRequest = [[NSMutableURLRequest alloc]init];
+    postRequest.URL = [NSURL URLWithString:@""];
+    NSInputStream* inStream = [NSInputStream inputStreamWithFileAtPath:@""];
+    postRequest.HTTPBodyStream = inStream;
+    postRequest.HTTPMethod = @"POST";
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS9适配]]></title>
@@ -401,17 +490,6 @@ wself.lastAddedOperation = operation;
         }
     }
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS开发过程中遇过的一些小bug（二）]]></title>
-    <link href="http://caixindong.github.io/blog/2015/12/18/ios18/"/>
-    <updated>2015-12-18T21:12:27+08:00</updated>
-    <id>http://caixindong.github.io/blog/2015/12/18/ios18</id>
-    <content type="html"><![CDATA[<p>1、block会release，所以在使用的时候记得非空判断，特别在使用AFNetworking block交互的时候</p>
-
-<p>2、有时候在真机测试的时，某些第三方库编译不通过，可能bitcode没关，可以在build setting里面将这个值设为no。苹果文档是这样说的：bitcode是被编译程序的一种中间形式的代码，包含bitcode配置的程序将会在App store上被编译和链接，bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。</p>
 ]]></content>
   </entry>
   
