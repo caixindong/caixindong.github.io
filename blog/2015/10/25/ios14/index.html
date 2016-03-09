@@ -7,7 +7,15 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="为项目添加定位和导航功能 现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。 1、添加MapView并且实例化它 MKMapView* myMapView = = [[ &hellip;">
+	<meta name="description" content="为项目添加定位和导航功能 现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。 1、添加MapView并且实例化它 1
+2
+3
+4
+5
+6
+7
+8
+MKMapView* &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -89,137 +97,256 @@
 
 <p>1、添加MapView并且实例化它</p>
 
-<pre><code>MKMapView* myMapView = = [[MKMapView alloc]initWithFrame:self.view.frame];
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">MKMapView</span><span class="o">*</span> <span class="n">myMapView</span> <span class="o">=</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKMapView</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithFrame</span><span class="p">:</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">frame</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//让MapView显示当前位置</span>
+</span><span class='line'><span class="p">[</span><span class="n">myMapView</span> <span class="nl">setShowsUserLocation</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//设置代理（MKMapViewDelegate）</span>
+</span><span class='line'><span class="n">myMapView</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span> <span class="nl">addSubview</span><span class="p">:</span><span class="n">myMapView</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
 
-//让MapView显示当前位置
-[myMapView setShowsUserLocation:YES];
-
-//设置代理（MKMapViewDelegate）
-myMapView.delegate = self;
-[self.view addSubview:myMapView];
-</code></pre>
 
 <p>2、声明CLLocationManager并且实例化它，实现定位功能</p>
 
-<pre><code>CLLocationManager* manager;
-if (manager==nil) {
-    manager = [[CLLocationManager alloc]init];
-    if ([manager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
-        [_manager requestWhenInUseAuthorization];
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CLLocationManager</span><span class="o">*</span> <span class="n">manager</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">manager</span><span class="o">==</span><span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">manager</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CLLocationManager</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">([</span><span class="n">manager</span> <span class="nl">respondsToSelector</span><span class="p">:</span><span class="k">@selector</span><span class="p">(</span><span class="n">requestWhenInUseAuthorization</span><span class="p">)])</span> <span class="p">{</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">_manager</span> <span class="n">requestWhenInUseAuthorization</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//设置代理（CLLocationManagerDelegate）</span>
+</span><span class='line'>        <span class="n">manager</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="nb">self</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//设置定位精度</span>
+</span><span class='line'>        <span class="n">manager</span><span class="p">.</span><span class="n">desiredAccuracy</span> <span class="o">=</span> <span class="n">kCLLocationAccuracyBest</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">//设置距离筛选</span>
+</span><span class='line'>        <span class="n">manager</span><span class="p">.</span><span class="n">distanceFilter</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//开始定位</span>
+</span><span class='line'><span class="p">[</span><span class="n">manager</span> <span class="n">startUpdatingLocation</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
 
-        //设置代理（CLLocationManagerDelegate）
-        manager.delegate = self;
-
-        //设置定位精度
-        manager.desiredAccuracy = kCLLocationAccuracyBest;
-
-        //设置距离筛选
-        manager.distanceFilter = 100;
-    }
-}
-//开始定位
-[manager startUpdatingLocation];
-</code></pre>
 
 <p>注意：使用定位时记得在Info.plist添加NSLocationWhenInUseUsageDescription这个键值</p>
 
 <p>3、实现CLLocationManagerDelegate的方法</p>
 
-<pre><code>//定位成功的回调
--(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray&lt;CLLocation *&gt; *)locations{
-    //获取定位成功的经纬度
-    CLLocation* location1 = locations.firstObject;
-    CLLocationCoordinate2D centerCoordinate2D = location1.coordinate;
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">//定位成功的回调</span>
+</span><span class='line'><span class="p">-(</span><span class="kt">void</span><span class="p">)</span><span class="nf">locationManager:</span><span class="p">(</span><span class="bp">CLLocationManager</span> <span class="o">*</span><span class="p">)</span><span class="nv">manager</span> <span class="nf">didUpdateLocations:</span><span class="p">(</span><span class="bp">NSArray</span><span class="o">&lt;</span><span class="bp">CLLocation</span> <span class="o">*&gt;</span> <span class="o">*</span><span class="p">)</span><span class="nv">locations</span><span class="p">{</span>
+</span><span class='line'>  <span class="c1">//获取定位成功的经纬度</span>
+</span><span class='line'>  <span class="bp">CLLocation</span><span class="o">*</span> <span class="n">location1</span> <span class="o">=</span> <span class="n">locations</span><span class="p">.</span><span class="n">firstObject</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">CLLocationCoordinate2D</span> <span class="n">centerCoordinate2D</span> <span class="o">=</span> <span class="n">location1</span><span class="p">.</span><span class="n">coordinate</span><span class="p">;</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//为MapView添加大头针</span>
+</span><span class='line'>           <span class="bp">MKPointAnnotation</span><span class="o">*</span> <span class="n">localAnnotstion</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKPointAnnotation</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>  <span class="n">localAnnotstion</span><span class="p">.</span><span class="n">coordinate</span> <span class="o">=</span> <span class="n">centerCoordinate2D</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">localAnnotstion</span><span class="p">.</span><span class="n">title</span> <span class="o">=</span> <span class="s">@&quot;当前位置&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">[</span><span class="n">_myMapView</span> <span class="nl">addAnnotation</span><span class="p">:</span><span class="n">localAnnotstion</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//设置MapView的显示区域</span>
+</span><span class='line'>  <span class="n">MKCoordinateRegion</span> <span class="n">region1</span> <span class="o">=</span> <span class="n">MKCoordinateRegionMakeWithDistance</span><span class="p">(</span><span class="n">centerCoordinate2D</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">[</span><span class="n">myMapView</span> <span class="nl">setRegion</span><span class="p">:[</span><span class="n">myMapView</span> <span class="nl">regionThatFits</span><span class="p">:</span><span class="n">region1</span><span class="p">]</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//定位成功就导航，设置导航路线的起点</span>
+</span><span class='line'>  <span class="bp">MKPlacemark</span><span class="o">*</span> <span class="n">localPlacemark</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKPlacemark</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithCoordinate</span><span class="p">:</span><span class="n">centerCoordinate2D</span> <span class="nl">addressDictionary</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>  <span class="bp">MKMapItem</span><span class="o">*</span> <span class="n">fromItem</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKMapItem</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithPlacemark</span><span class="p">:</span><span class="n">localPlacemark</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//createLineFromCurrentSite是我自己写的方法，用来获取导航路线和获取导航步骤</span>
+</span><span class='line'>  <span class="c1">//myItem指导航的终点，它实例化参考上面fromItem的实例化</span>
+</span><span class='line'>  <span class="p">[</span><span class="nb">self</span> <span class="nl">createLineFromCurrentSite</span><span class="p">:</span><span class="n">fromItem</span> <span class="nl">to</span><span class="p">:</span><span class="n">myItem</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//停止定位</span>
+</span><span class='line'>  <span class="p">[</span><span class="n">manager</span> <span class="n">stopUpdatingLocation</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//定位失败的回调</span>
+</span><span class='line'><span class="p">-(</span><span class="kt">void</span><span class="p">)</span><span class="nf">locationManager:</span><span class="p">(</span><span class="bp">CLLocationManager</span> <span class="o">*</span><span class="p">)</span><span class="nv">manager</span> <span class="nf">didFailWithError:</span><span class="p">(</span><span class="bp">NSError</span> <span class="o">*</span><span class="p">)</span><span class="nv">error</span><span class="p">{</span>
+</span><span class='line'><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;guide error is %@&quot;</span><span class="p">,</span><span class="n">error</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-    //为MapView添加大头针
-     MKPointAnnotation* localAnnotstion = [[MKPointAnnotation alloc]init];
-    localAnnotstion.coordinate = centerCoordinate2D;
-    localAnnotstion.title = @"当前位置";
-    [_myMapView addAnnotation:localAnnotstion];
-
-    //设置MapView的显示区域
-    MKCoordinateRegion region1 = MKCoordinateRegionMakeWithDistance(centerCoordinate2D, 500, 500);
-    [myMapView setRegion:[myMapView regionThatFits:region1] animated:YES];
-
-    //定位成功就导航，设置导航路线的起点
-    MKPlacemark* localPlacemark = [[MKPlacemark alloc]initWithCoordinate:centerCoordinate2D addressDictionary:nil];
-    MKMapItem* fromItem = [[MKMapItem alloc]initWithPlacemark:localPlacemark];
-
-    //createLineFromCurrentSite是我自己写的方法，用来获取导航路线和获取导航步骤
-    //myItem指导航的终点，它实例化参考上面fromItem的实例化
-    [self createLineFromCurrentSite:fromItem to:myItem];
-
-    //停止定位
-    [manager stopUpdatingLocation];
-
-}
-
-//定位失败的回调
--(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error{
-NSLog(@"guide error is %@",error);
-}
-</code></pre>
 
 <p>4、createLineFromCurrentSite方法的实现，用来用来获取导航路线和获取导航步骤</p>
 
-<pre><code>-(void)createLineFromCurrentSite:(MKMapItem*) fromItem to:(MKMapItem*)toItem{
-    //实例化导航请求
-    MKDirectionsRequest* request = [[MKDirectionsRequest alloc]init];
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="p">-(</span><span class="kt">void</span><span class="p">)</span><span class="nf">createLineFromCurrentSite:</span><span class="p">(</span><span class="bp">MKMapItem</span><span class="o">*</span><span class="p">)</span> <span class="nv">fromItem</span> <span class="nf">to:</span><span class="p">(</span><span class="bp">MKMapItem</span><span class="o">*</span><span class="p">)</span><span class="nv">toItem</span><span class="p">{</span>
+</span><span class='line'>  <span class="c1">//实例化导航请求</span>
+</span><span class='line'>  <span class="bp">MKDirectionsRequest</span><span class="o">*</span> <span class="n">request</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKDirectionsRequest</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//设置导航的起点和终点</span>
+</span><span class='line'>  <span class="n">request</span><span class="p">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">fromItem</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">request</span><span class="p">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">toItem</span><span class="p">;</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//为no时只显示一条导航路线</span>
+</span><span class='line'>  <span class="n">request</span><span class="p">.</span><span class="n">requestsAlternateRoutes</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//实例化MKDirections</span>
+</span><span class='line'>  <span class="bp">MKDirections</span><span class="o">*</span> <span class="n">directions</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKDirections</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithRequest</span><span class="p">:</span><span class="n">request</span><span class="p">];</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">//如果当前导航好没结束，就取消下一次导航请求</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">directions</span><span class="p">.</span><span class="n">calculating</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="p">[</span><span class="n">directions</span> <span class="n">cancel</span><span class="p">];</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//开始导航，在block里面写回调的方法</span>
+</span><span class='line'>  <span class="p">[</span><span class="n">directions</span> <span class="nl">calculateDirectionsWithCompletionHandler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">MKDirectionsResponse</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">response</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">routes</span><span class="p">.</span><span class="n">count</span><span class="o">==</span><span class="mi">0</span><span class="o">||</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//导航失败</span>
+</span><span class='line'>          <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;directions error is %@&quot;</span><span class="p">,</span><span class="n">error</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>      <span class="c1">//导航成功</span>
+</span><span class='line'>          <span class="k">for</span> <span class="p">(</span><span class="bp">MKRoute</span><span class="o">*</span> <span class="n">route</span> <span class="k">in</span> <span class="n">response</span><span class="p">.</span><span class="n">routes</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">for</span> <span class="p">(</span><span class="bp">MKRouteStep</span><span class="o">*</span> <span class="n">step</span> <span class="k">in</span> <span class="n">route</span><span class="p">.</span><span class="n">steps</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>               <span class="c1">//打印导航的步骤</span>
+</span><span class='line'>                <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;导航:%@&quot;</span><span class="p">,</span> <span class="n">step</span><span class="p">.</span><span class="n">instructions</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="c1">//将导航路线添加到MapView上面</span>
+</span><span class='line'>        <span class="p">[</span><span class="n">myMapView</span> <span class="nl">addOverlay</span><span class="p">:</span><span class="n">route</span><span class="p">.</span><span class="n">polyline</span> <span class="nl">level</span><span class="p">:</span><span class="n">MKOverlayLevelAboveRoads</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-    //设置导航的起点和终点
-    request.source = fromItem;
-    request.destination = toItem;
-
-    //为no时只显示一条导航路线
-    request.requestsAlternateRoutes = NO;
-
-    //实例化MKDirections
-    MKDirections* directions = [[MKDirections alloc]initWithRequest:request];
-
-    //如果当前导航好没结束，就取消下一次导航请求
-    if (directions.calculating) {
-        [directions cancel];
-    }
-
-    //开始导航，在block里面写回调的方法
-    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse * _Nullable response, NSError * _Nullable error) {
-        if (response.routes.count==0|| error) {
-        //导航失败
-            NSLog(@"directions error is %@",error);
-        }else{
-        //导航成功
-            for (MKRoute* route in response.routes) {
-                for (MKRouteStep* step in route.steps) {
-               //打印导航的步骤
-                NSLog(@"导航:%@", step.instructions);
-            }
-        //将导航路线添加到MapView上面
-        [myMapView addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
-        }
-    }
-    }];
-}
-</code></pre>
 
 <p>5、实现MKMapViewDelegate的方法</p>
 
-<pre><code>//通过这个方法来帮我们绘制导航路线
--(MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id&lt;MKOverlay&gt;)overlay{
-    if ([overlay isKindOfClass:[MKPolyline class]]) {
-        //设置渲染器
-        MKPolylineRenderer* renderer = [[MKPolylineRenderer alloc]initWithPolyline:overlay];
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">//通过这个方法来帮我们绘制导航路线</span>
+</span><span class='line'><span class="p">-(</span><span class="bp">MKOverlayRenderer</span> <span class="o">*</span><span class="p">)</span><span class="nf">mapView:</span><span class="p">(</span><span class="bp">MKMapView</span> <span class="o">*</span><span class="p">)</span><span class="nv">mapView</span> <span class="nf">rendererForOverlay:</span><span class="p">(</span><span class="kt">id</span><span class="o">&lt;</span><span class="bp">MKOverlay</span><span class="o">&gt;</span><span class="p">)</span><span class="nv">overlay</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">([</span><span class="n">overlay</span> <span class="nl">isKindOfClass</span><span class="p">:[</span><span class="bp">MKPolyline</span> <span class="k">class</span><span class="p">]])</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">//设置渲染器</span>
+</span><span class='line'>      <span class="bp">MKPolylineRenderer</span><span class="o">*</span> <span class="n">renderer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">MKPolylineRenderer</span> <span class="n">alloc</span><span class="p">]</span><span class="nl">initWithPolyline</span><span class="p">:</span><span class="n">overlay</span><span class="p">];</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">//设置线的长度</span>
+</span><span class='line'>      <span class="p">[</span><span class="n">renderer</span> <span class="nl">setLineWidth</span><span class="p">:</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c1">//设置线的颜色</span>
+</span><span class='line'>      <span class="p">[</span><span class="n">renderer</span> <span class="nl">setStrokeColor</span><span class="p">:[</span><span class="bp">UIColor</span> <span class="n">redColor</span><span class="p">]];</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">renderer</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-        //设置线的长度
-        [renderer setLineWidth:2];
 
-        //设置线的颜色
-        [renderer setStrokeColor:[UIColor redColor]];
-        return renderer;
-}
-    return nil;
 
-}
-</code></pre>
 </div>
 
 </article>
