@@ -7,7 +7,25 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 为app实现渐变的遮罩效果 ios iOS 网络编程 前言 最近要给quanta的小朋友讲iOS网络编程的相关知识，所以提前在这里梳理。 何为HTTP 首先我们必须了解HTTP协议，何为HTTP?超文本传送协议，它是基于应用层的通信规范，是一个设计来使客户端和服务器顺利进行通讯的协议。 &hellip;">
+	<meta name="description" content="ios 为app实现渐变的遮罩效果 效果图如下 实现代码如下 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+//blackView为你想加上遮罩的视图 CGColorRef opaqueBlackColor = [UIColor &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -113,7 +131,52 @@
 	</div>
 	<h1 class="title" itemprop="name"><a href="/blog/2016/03/17/ios81/" itemprop="url">为app实现渐变的遮罩效果</a></h1>
 	<div class="entry-content" itemprop="articleBody">
-		<p><img src="/source/images/exampleImg1.png" alt="exampleImg1" /></p>
+		<h2>效果图如下</h2>
+
+<p><img src="/images/exampleImg1.png"></p>
+
+<h2>实现代码如下</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">//blackView为你想加上遮罩的视图</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">CGColorRef</span> <span class="n">opaqueBlackColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="nl">colorWithRed</span><span class="p">:</span><span class="mi">0</span> <span class="nl">green</span><span class="p">:</span><span class="mi">0</span> <span class="nl">blue</span><span class="p">:</span><span class="mi">0</span> <span class="nl">alpha</span><span class="p">:</span><span class="mi">1</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">CGColorRef</span> <span class="n">transparentBalckColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="nl">colorWithRed</span><span class="p">:</span><span class="mi">0</span> <span class="nl">green</span><span class="p">:</span><span class="mi">0</span> <span class="nl">blue</span><span class="p">:</span><span class="mi">0</span> <span class="nl">alpha</span><span class="p">:</span><span class="mf">0.4</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="c1">//遮罩效果由CAGradientLayer实现</span>
+</span><span class='line'>    <span class="bp">CAGradientLayer</span> <span class="o">*</span> <span class="n">layer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CAGradientLayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">WIDTH</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//设置渐变的方向</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">startPoint</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">endPoint</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//设置渐变得颜色范围</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">colors</span> <span class="o">=</span> <span class="l">@[</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">opaqueBlackColor</span><span class="p">,(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">transparentBalckColor</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">layer</span> <span class="nl">insertSublayer</span><span class="p">:</span><span class="n">layer</span> <span class="nl">atIndex</span><span class="p">:</span><span class="mi">0</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
 
 		
 		

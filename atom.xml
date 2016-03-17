@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-17T20:35:06+08:00</updated>
+  <updated>2016-03-17T20:46:55+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -18,7 +18,52 @@
     <link href="http://caixindong.github.io/blog/2016/03/17/ios81/"/>
     <updated>2016-03-17T20:17:14+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/03/17/ios81</id>
-    <content type="html"><![CDATA[<p><img src="http://caixindong.github.io/source/images/exampleImg1.png" alt="exampleImg1" /></p>
+    <content type="html"><![CDATA[<h2>效果图如下</h2>
+
+<p><img src="http://caixindong.github.io/images/exampleImg1.png"></p>
+
+<h2>实现代码如下</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">//blackView为你想加上遮罩的视图</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>   <span class="n">CGColorRef</span> <span class="n">opaqueBlackColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="nl">colorWithRed</span><span class="p">:</span><span class="mi">0</span> <span class="nl">green</span><span class="p">:</span><span class="mi">0</span> <span class="nl">blue</span><span class="p">:</span><span class="mi">0</span> <span class="nl">alpha</span><span class="p">:</span><span class="mi">1</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">CGColorRef</span> <span class="n">transparentBalckColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="nl">colorWithRed</span><span class="p">:</span><span class="mi">0</span> <span class="nl">green</span><span class="p">:</span><span class="mi">0</span> <span class="nl">blue</span><span class="p">:</span><span class="mi">0</span> <span class="nl">alpha</span><span class="p">:</span><span class="mf">0.4</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="c1">//遮罩效果由CAGradientLayer实现</span>
+</span><span class='line'>    <span class="bp">CAGradientLayer</span> <span class="o">*</span> <span class="n">layer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CAGradientLayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">WIDTH</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//设置渐变的方向</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">startPoint</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">endPoint</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//设置渐变得颜色范围</span>
+</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">colors</span> <span class="o">=</span> <span class="l">@[</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">opaqueBlackColor</span><span class="p">,(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">transparentBalckColor</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">layer</span> <span class="nl">insertSublayer</span><span class="p">:</span><span class="n">layer</span> <span class="nl">atIndex</span><span class="p">:</span><span class="mi">0</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
 ]]></content>
   </entry>
   
