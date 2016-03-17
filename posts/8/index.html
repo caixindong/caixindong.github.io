@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 抽屉视图（MMDrawerController使用） 1、初始化MMDrawerController，用这个controller装载我们的不同视图控制器 MMDrawerController* drawerController = [[MMDrawerController alloc] &hellip;">
+	<meta name="description" content="ios 利用Parse为我们的app构建后台服务 一、什么是Parse? Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。 二、如何导入Parse的iOS &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,101 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-15T16:26:52+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/10/15/ios12/" itemprop="url">利用Parse为我们的app构建后台服务</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>一、什么是Parse?</p>
+
+<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
+
+<p>二、如何导入Parse的iOS SDK?</p>
+
+<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
+
+<p>三、如何使用Parse为我们app实现登录注册功能</p>
+
+<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
+
+<pre><code>#import &lt;Parse/Parse.h&gt;
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
+- (NSDictionary *)launchOptions {
+// Initialize Parse.
+[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
+              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
+return YES;
+} 
+</code></pre>
+
+<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
+
+<pre><code>PFUser* myuser = [[PFUser alloc]init];
+myuser.username = userPhoneNum;//用户名
+myuser.password = userPassword;//密码
+myuser.email = userEmail;//邮箱
+
+[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (!succeeded) {
+        //注册失败
+    }else{
+        //注册成功
+   }
+}];
+</code></pre>
+
+<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
+
+<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
+    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
+    //username和password是你提交的登录信息
+    if (user!=nil) {
+        //登录成功
+    }else{
+        //登录失败
+    }
+}];
+</code></pre>
+
+<p>4、退出当前账号</p>
+
+<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
+    if (error) {
+      //退出失败  
+    }else{
+       //退出成功 
+    }
+}];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -753,43 +848,6 @@ dispatch_group_wait(mygroup,DISPATCH_TIME_FOREVER)
 
 <pre><code>    dispatch_resume(myQueue)
 </code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T00:51:03+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios2/" itemprop="url">iOS TableView</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>iOS TableView 的header for section无法加载的问题</h1>
-
-<p>最近在练习的一个项目遇到重写header不加载的问题，在这里提醒下大家，重写的header要被调用，一定要重写delegate的height for header的方法才会被调用</p>
 
 		
 		
