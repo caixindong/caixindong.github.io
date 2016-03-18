@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-17T20:59:00+08:00</updated>
+  <updated>2016-03-18T21:57:49+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,283 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Core Foundation(C对象)与 Foundation(OC对象)之间的转换的理解]]></title>
+    <link href="http://caixindong.github.io/blog/2016/03/18/ios83/"/>
+    <updated>2016-03-18T21:43:11+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/03/18/ios83</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>最近在做一个UI效果的时候，用到__bridge这个关键字，查了资料发现它是Objective-C的对象类型转换为 void* 类型的一个关键字，于是继续查资料深入学习，发现了一遍好文章，在这里MARK一下。</p>
+
+<h2>转载自<a href="http://blog.sina.com.cn/s/blog_7c8dc2d50101ll9d.html">http://blog.sina.com.cn/s/blog_7c8dc2d50101ll9d.html</a></h2>
+
+<h4>Core Foundation 框架</h4>
+
+<p>Core Foundation框架 (CoreFoundation.framework) 是一组C语言接口，它们为iOS应用程序提供基本数据管理和服务功能。下面列举该框架支持进行管理的数据以及可提供的服务：  <br/>
+群体数据类型 (数组、集合等)  <br/>
+程序包  <br/>
+字符串管理  <br/>
+日期和时间管理  <br/>
+原始数据块管理  <br/>
+偏好管理  <br/>
+URL及数据流操作  <br/>
+线程和RunLoop  <br/>
+端口和soket通讯  <br/>
+Core Foundation框架和Foundation框架紧密相关，它们为相同功能提供接口，但Foundation框架提供Objective-C接口。如果您将Foundation对象和Core Foundation类型掺杂使用，则可利用两个框架之间的 “toll-free bridging”。所谓的Toll-free bridging是说您可以在某个框架的方法或函数同时使用Core Foundatio和Foundation 框架中的某些类型。很多数据类型支持这一特性，其中包括群体和字符串数据类型。每个框架的类和类型描述都会对某个对象是否为 toll-free bridged，应和什么对象桥接进行说明。  <br/>
+如需进一步信息，请阅读Core Foundation 框架参考。</p>
+
+<p>自 Xcode4.2 开始导入ARC机制后，为了支持对象间的转型，Apple又增加了许多转型用的关键字。这一讲我们就来了解其用法，以及产生的理由。  <br/>
+引子  <br/>
+我们先来看一下ARC无效的时候，我们写id类型转void*类型的写法：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSObject</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'><span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">obj</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>反过来，当把void*对象变回id类型时，只是简单地如下来写，</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">obj</span> <span class="k">release</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>但是上面的代码在ARC有效时，就有了下面的错误：</p>
+
+<pre><code>error: implicit conversion of an Objective-C pointer
+    to ’void *’ is disallowed with ARC
+    void *p = obj;
+              ^
+
+error: implicit conversion of a non-Objective-C pointer
+    type ’void *’ to ’id’ is disallowed with ARC
+    id o = p;
+            ^
+</code></pre>
+
+<p><strong>bridge
+为了解决这一问题，我们使用 </strong>bridge 关键字来实现id类型与void*类型的相互转换。看下面的例子。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSObject</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">obj</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">id</span> <span class="n">o</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">p</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>将Objective-C的对象类型用 <strong>bridge 转换为 void* 类型和使用 </strong>unsafe_unretained 关键字修饰的变量是一样的。被代入对象的所有者需要明确对象生命周期的管理，不要出现异常访问的问题。
+除过 <strong>bridge 以外，还有两个 </strong>bridge 相关的类型转换关键字：  <br/>
+<strong>bridge_transfer  <br/>
+</strong>bridge_retained  <br/>
+接下来，我们将看看这两个关键字的区别。</p>
+
+<p><code>1.</code> <strong>bridge_retained  <br/>
+先来看使用 </strong>bridge_retained 关键字的例子程序：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSObject</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">__bridge_retained</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">obj</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从名字上我们应该能理解其意义：类型被转换时，其对象的所有权也将被变换后变量所持有。如果不是ARC代码，类似下面的实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSObject</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">obj</span><span class="p">;</span>
+</span><span class='line'><span class="p">[(</span><span class="kt">id</span><span class="p">)</span><span class="n">p</span> <span class="k">retain</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以用一个实际的例子验证，对象所有权是否被持有。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSObject</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="n">__bridge_retained</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">obj</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;class=%@&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">p</span> <span class="k">class</span><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>出了大括号的范围后，p 仍然指向一个有效的实体。说明他拥有该对象的所有权，该对象没有因为出其定义范围而被销毁。</p>
+
+<p><code>2.</code> __bridge_transfer</p>
+
+<p>相反，当想把本来拥有对象所有权的变量，在类型转换后，让其释放原先所有权的时候，需要使用__bridge_transfer 关键字。文字有点绕口，我们还是来看一段代码吧。
+如果ARC无效的时候，我们可能需要写下面的代码。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">// p 变量原先持有对象的所有权</span>
+</span><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="n">p</span><span class="p">;</span>
+</span><span class='line'><span class="p">[</span><span class="n">obj</span> <span class="k">retain</span><span class="p">];</span>
+</span><span class='line'><span class="p">[(</span><span class="kt">id</span><span class="p">)</span><span class="n">p</span> <span class="k">release</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那么ARC有效后，我们可以用下面的代码来替换：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">// p 变量原先持有对象的所有权</span>
+</span><span class='line'><span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge_transfer</span> <span class="kt">id</span><span class="p">)</span><span class="n">p</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以看出来，<strong>bridge_retained 是编译器替我们做了 retain 操作，而 </strong>bridge_transfer 是替我们做了 release。</p>
+
+<p>Toll-Free bridged
+在iOS世界，主要有两种对象：Objective-C 对象和 Core Foundation 对象0。Core Foundation 对象主要是有C语言实现的 Core Foundation Framework 的对象，其中也有对象引用计数的概念，只是不是 Cocoa Framework::Foundation Framework 的 retain/release，而是自身的 CFRetain/CFRelease 接口。
+这两种对象间可以互相转换和操作，不使用ARC的时候，单纯的用C原因的类型转换，不需要消耗CPU的资源，所以叫做 Toll-Free bridged。比如 NSArray和CFArrayRef, NSString和CFStringRef，他们虽然属于不同的 Framework，但是具有相同的对象结构，所以可以用标准C的类型转换。
+比如不使用ARC时，我们用下面的代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">NSString</span> <span class="o">*</span><span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:...];</span>
+</span><span class='line'><span class="n">CFStringRef</span> <span class="n">cfString</span> <span class="o">=</span> <span class="p">(</span><span class="n">CFStringRef</span><span class="p">)</span><span class="n">string</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同样，Core Foundation类型向Objective-C类型转换时，也是简单地用标准C的类型转换即可。
+但是在ARC有效的情况下，将出现类似下面的编译错误：</p>
+
+<pre><code>Cast of Objective-C pointer type ‘NSString *’ to C pointer type ‘CFStringRef’ (aka ‘const struct __CFString *’) requires a bridged cast
+Use __bridge to convert directly (no change in ownership)
+Use __bridge_retained to make an ARC object available as a +1 ‘CFStringRef’ (aka ‘const struct __CFString *’)
+</code></pre>
+
+<p>错误中已经提示了我们需要怎样做：用 <strong>bridge 或者 </strong>bridge_retained 来转型，其差别就是变更对象的所有权。</p>
+
+<p>正因为Objective-C是ARC管理的对象，而Core Foundation不是ARC管理的对象，所以才要特意这样转换，这与id类型向void*转换是一个概念。也就是说，当这两种类型（有ARC管理，没有ARC管理）在转换时，需要告诉编译器怎样处理对象的所有权。</p>
+
+<p>上面的例子，使用 <strong>bridge/</strong>bridge_retained 后的代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">NSString</span> <span class="o">*</span><span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:...];</span>
+</span><span class='line'><span class="n">CFStringRef</span> <span class="n">cfString</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge</span> <span class="n">CFStringRef</span><span class="p">)</span><span class="n">string</span><span class="p">;</span>
+</span><span class='line'><span class="err">只是单纯地执行了类型转换，没有进行所有权的转移，也就是说，当</span><span class="n">string</span><span class="err">对象被释放的时候，</span><span class="n">cfString</span><span class="err">也不能被使用了。</span>
+</span><span class='line'><span class="bp">NSString</span> <span class="o">*</span><span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:...];</span>
+</span><span class='line'><span class="n">CFStringRef</span> <span class="n">cfString</span> <span class="o">=</span> <span class="p">(</span><span class="n">__bridge_retained</span> <span class="n">CFStringRef</span><span class="p">)</span><span class="n">string</span><span class="p">;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="n">CFRelease</span><span class="p">(</span><span class="n">cfString</span><span class="p">);</span> <span class="c1">// 由于Core Foundation的对象不属于ARC的管理范畴，所以需要自己release</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用 __bridge_retained 可以通过转换目标处（cfString）的 retain 处理，来使所有权转移。即使 string 变量被释放，cfString 还是可以使用具体的对象。只是有一点，由于Core Foundation的对象不属于ARC的管理范畴，所以需要自己release。</p>
+
+<p>实际上，Core Foundation 内部，为了实现Core Foundation对象类型与Objective-C对象类型的相互转换，提供了下面的函数。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="n">CFTypeRef</span>  <span class="nf">CFBridgingRetain</span><span class="p">(</span><span class="kt">id</span>  <span class="n">X</span><span class="p">)</span>  <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span>  <span class="p">(</span><span class="n">__bridge_retained</span>  <span class="n">CFTypeRef</span><span class="p">)</span><span class="n">X</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">id</span>  <span class="nf">CFBridgingRelease</span><span class="p">(</span><span class="n">CFTypeRef</span>  <span class="n">X</span><span class="p">)</span>  <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span>  <span class="p">(</span><span class="k">__bridge_transfer</span>  <span class="kt">id</span><span class="p">)</span><span class="n">X</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>所以，可以用 CFBridgingRetain 替代 __bridge_retained 关键字：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">NSString</span> <span class="o">*</span><span class="n">string</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSString</span> <span class="nl">stringWithFormat</span><span class="p">:...];</span>
+</span><span class='line'><span class="n">CFStringRef</span> <span class="n">cfString</span> <span class="o">=</span> <span class="n">CFBridgingRetain</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="n">CFRelease</span><span class="p">(</span><span class="n">cfString</span><span class="p">);</span> <span class="c1">// 由于Core Foundation不在ARC管理范围内，所以需要主动release。</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code>__bridge_transfer
+</code></pre>
+
+<p>所有权被转移的同时，被转换变量将失去对象的所有权。当Core Foundation对象类型向Objective-C对象类型转换的时候，会经常用到 __bridge_transfer 关键字。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="n">CFStringRef</span> <span class="n">cfString</span> <span class="o">=</span> <span class="n">CFStringCreate</span><span class="p">...();</span>
+</span><span class='line'><span class="bp">NSString</span> <span class="o">*</span><span class="n">string</span> <span class="o">=</span> <span class="p">(</span><span class="k">__bridge_transfer</span> <span class="bp">NSString</span> <span class="o">*</span><span class="p">)</span><span class="n">cfString</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// CFRelease(cfString); 因为已经用 __bridge_transfer 转移了对象的所有权，所以不需要调用 release</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同样，我们可以使用 CFBridgingRelease() 来代替 __bridge_transfer 关键字。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="n">CFStringRef</span> <span class="n">cfString</span> <span class="o">=</span> <span class="n">CFStringCreate</span><span class="p">...();</span>
+</span><span class='line'><span class="bp">NSString</span> <span class="o">*</span><span class="n">string</span> <span class="o">=</span> <span class="n">CFBridgingRelease</span><span class="p">(</span><span class="n">cfString</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>总结
+由上面的学习我们了解到 ARC 中类型转换的用法，那么我们实际使用中按照怎样的原则或者方法来区分使用呢，下面我总结了几点关键要素。
+明确被转换类型是否是 ARC 管理的对象
+Core Foundation 对象类型不在 ARC 管理范畴内
+Cocoa Framework::Foundation 对象类型（即一般使用到的Objectie-C对象类型）在 ARC 的管理范畴内
+如果不在 ARC 管理范畴内的对象，那么要清楚 release 的责任应该是谁
+各种对象的生命周期是怎样的
+1. 声明 id obj 的时候，其实是缺省的申明了一个 <strong>strong 修饰的变量，所以编译器自动地加入了 retain 的处理，所以说 </strong>bridge_transfer 关键字只为我们做了 release 处理。</p>
+
+<p>根据苹果官方的文档（<a href="https://developer.apple.com/library/ios/#releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html%EF%BC%89%EF%BC%9A">https://developer.apple.com/library/ios/#releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html%EF%BC%89%EF%BC%9A</a></p>
+
+<p>__bridge只做类型转换，但是不修改对象（内存）管理权；</p>
+
+<p>__bridge_retained（也可以使用CFBridgingRetain）将Objective-C的对象转换为Core Foundation的对象，同时将对象（内存）的管理权交给我们，后续需要使用CFRelease或者相关方法来释放对象；</p>
+
+<p>__bridge_transfer（也可以使用CFBridgingRelease）将Core Foundation的对象转换为Objective-C的对象，同时将对象（内存）的管理权交给ARC。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[iOS开发一些零碎的小知识（四）]]></title>
@@ -2229,145 +2506,6 @@ if str1[i] != str2[j]  <br/>
 </span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>  
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[最长公共子序列]]></title>
-    <link href="http://caixindong.github.io/blog/2016/02/26/ios63/"/>
-    <updated>2016-02-26T15:39:41+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/02/26/ios63</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>给定两个字符串，求他们的最长公共子序列的长度。</p>
-
-<h4>何为最长公共子序列？</h4>
-
-<p>一个序列 S ，如果分别是两个或多个已知序列的子序列，且是所有符合此条件序列中最长的，则 S 称为已知序列的最长公共子序列，序列不要求连续，区别于最长公共子串。</p>
-
-<h4>例子</h4>
-
-<p>X = “a,b,c,f,b,c”  <br/>
-Y = “a,b,f,c,a,b”  <br/>
-X和Y的最长公共子序列为“a,b,c,b”  <br/>
-X和Y的最长公共子串为“a,b”</p>
-
-<h2>做法</h2>
-
-<h4>递归法（不推荐，但作为一种思路）</h4>
-
-<h5>代码如下</h5>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">int</span> <span class="nf">MAX</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="kt">int</span> <span class="n">b</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="o">?</span><span class="nl">a</span><span class="p">:</span><span class="n">b</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 递归解法，时间复杂度为np，非多项式时间复杂度</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">lcs_recursive</span><span class="p">(</span><span class="kt">char</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">a_length</span><span class="p">,</span><span class="kt">char</span> <span class="n">b</span><span class="p">[],</span><span class="kt">int</span> <span class="n">b_length</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">a_length</span><span class="o">==</span><span class="mi">0</span><span class="o">||</span><span class="n">b_length</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">a_length</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">b</span><span class="p">[</span><span class="n">b_length</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="mi">1</span><span class="o">+</span><span class="n">lcs_recursive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">a_length</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">b_length</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">a_next_length</span> <span class="o">=</span> <span class="n">lcs_recursive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a_length</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b_length</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">b_next_length</span> <span class="o">=</span> <span class="n">lcs_recursive</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a_length</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b_length</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">MAX</span><span class="p">(</span><span class="n">a_next_length</span><span class="p">,</span> <span class="n">b_next_length</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>动态规划法(填表法)</h4>
-
-<p>定义一个二维数组C[i][j],记录str1(0~i)和str2(0~j)的最长公共子序列。</p>
-
-<h5>动态方程</h5>
-
-<p>if str1[i] == str2[j]  <br/>
-    c[i][j] = c[i-1][j-1] + 1;  <br/>
-if str1[i] != str2[j]  <br/>
-    c[i][j] = MAX(c[i-1][j],c[i][j-1])</p>
-
-<h5>代码如下</h5>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">int</span> <span class="nf">MAX</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="kt">int</span> <span class="n">b</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="o">?</span><span class="nl">a</span><span class="p">:</span><span class="n">b</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 动态规划解法，时间复杂度为O(a_length*b_length)</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">lcs_dp</span><span class="p">(</span><span class="kt">char</span> <span class="n">a</span><span class="p">[],</span><span class="kt">int</span> <span class="n">a_length</span><span class="p">,</span><span class="kt">char</span> <span class="n">b</span><span class="p">[],</span><span class="kt">int</span> <span class="n">b_length</span><span class="p">){</span>
-</span><span class='line'>    <span class="c1">//字符串a到a_length位置的子字符串和字符串b到b_length位置的子字符串的最长公共子序列长度</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span><span class="p">[</span><span class="n">a_length</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">b_length</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">memset</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">count</span><span class="p">));</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">a_length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;=</span><span class="n">b_length</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">f_count1</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">f_count2</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">b</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">f_count1</span><span class="p">,</span> <span class="n">f_count2</span><span class="p">);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">[</span><span class="n">a_length</span><span class="p">][</span><span class="n">b_length</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
