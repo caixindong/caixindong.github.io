@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-03-30T23:33:40+08:00</updated>
+  <updated>2016-04-06T23:16:54+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,42 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[浅谈GCD的内部实现]]></title>
+    <link href="http://caixindong.github.io/blog/2016/04/06/ios84/"/>
+    <updated>2016-04-06T22:37:36+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/04/06/ios84</id>
+    <content type="html"><![CDATA[<h2>CGD</h2>
+
+<p>GCD是苹果开发的多线程编程的解决方案，通过简单的API就可以实现创建新线程去执行我们需要执行的任务，不需要我们手动地创建和管理线程。它的API包含在libdispatch库中。</p>
+
+<h2>Dispatch Queue</h2>
+
+<p>Dispatch Queue是GCD中很重要的一部分，它是负责执行处理的队列，它的内部主要由三部分构成：  <br/>
+1、一个管理追加block的C语言实现的FIFO的队列；   <br/>
+2、处理信号量的原子操作；  <br/>
+3、用于管理线程的C语言实现的一些容器。</p>
+
+<pre><code class="ObjC">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSLog(@"我的操作");
+    });
+</code></pre>
+
+<p>dispatch queue 通过 dispatch_async等函数将block追加到队列上，block不是直接追加到队列，而是先构成一个dispatch continuation构造体，构造体包含了这个block还有一些上下文信息，例如block所属的dispatch group等等。</p>
+
+<h2>Dispatch Queue执行过程是怎么的呢？</h2>
+
+<h2>workqueue</h2>
+
+<p>工作队列，是一个用于创建内核线程的接口，通过它创建的内核线程来执行内核其他模块排列到队列里的工作。不同优先级的dispatch queue对应着对应优先级的workqueue。GCD初始化的时候，使用pthread_workqueue_create_np创建pthread_workqueue</p>
+
+<h2>执行过程</h2>
+
+<p>dispatch queue执行block时，先从dispatch queue自身的FIFO队列中取出dispatch continuation，接着调用pthread_workqueue_additem_np函数，传入这些参数：dispatch queue自身、一个符合其优先级workqueue,dispatch continuation。  <br/>
+调用该函数后，会通知对应的workqueue增加执行项目，XNU内核生成线程，线程执行pthread_workqueue函数执行block。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Core Foundation(C对象)与 Foundation(OC对象)之间的转换的理解]]></title>
@@ -367,58 +403,6 @@ GET安全性没有POST好，因为GET提交的参数是可见</p>
     postRequest.HTTPBodyStream = inStream;
     postRequest.HTTPMethod = @"POST";
 </code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS9适配]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/06/ios77/"/>
-    <updated>2016-03-06T12:22:31+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/06/ios77</id>
-    <content type="html"><![CDATA[<h2>MARK</h2>
-
-<p>开发遇到适配iOS9的问题，这里mark一下</p>
-
-<p><code>1.</code> 默认使用HTTPS请求  <br/>
-如果在Xcode 9之前使用的时http请求，那么在XCode 9上编译的App是不能联网的，会提示如下错误:
-App Transport Security has blocked a cleartext HTTP (<a href="http://">http://</a>) resource load since it is insecure. Temporary exceptions can be configured via your app&rsquo;s Info.plist file.  <br/>
-修改方法是要么使服务器支持https访问，要么关闭https的使用。第一种方法对于个人开发者来说代价还是比较大的，因此推荐使用后面一种方法，具体的做法是:在工程的Info.plist文件里添加NSAppTransportSecurity字典类型的，添加一个元素：key为NSAllowsArbitraryLoads，值为YES。</p>
-
-<p><code>2.</code> iOS 9使用URL scheme必须将其加入白名单  <br/>
-否则会提示类似如下错误:  <br/>
-canOpenURL: failed for URL: &ldquo;mqqopensdkapiV2://qqapp&rdquo; - error: &ldquo;This app is not allowed to query for scheme mqqopensdkapiV2”  <br/>
-修正方法是，Info.plist文件中添加一个key为LSApplicationQueriesSchemes的数组值，里面包含需要添加白名单的string类型的scheme。特酷吧在项目中使用了qq，微信等分享登录功能，需要添加的值为：  <br/>
-mqqopensdkapiV2  <br/>
-mqqOpensdkSSoLogin  <br/>
-mqq  <br/>
-mqzoneopensdkapiV2  <br/>
-mqzoneopensdkapi19  <br/>
-mqzoneopensdkapi  <br/>
-mqzoneopensdk  <br/>
-mqzone  <br/>
-weixin  <br/>
-wechat  <br/>
-更多其他适配点后续不断跟进。</p>
-
-<p><code>3.</code> bitcode  <br/>
-使用Xcode7编译提示：XXX does not contain bitcode. You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. for architecture arm64  <br/>
-bitcode是被编译程序的一种中间形式的代码。包含bitcode配置的程序将会在App store上被编译和链接。    bitcode允许苹果在后期重新优化我们程序的二进制文件，而不需要我们重新提交一个新的版本到App store上。  <br/>
-Xcode7 默认开启了bitcode，如果App使用的第三方类库不支持bitcode会提示错误，只需要在”Build Settings”->”Enable Bitcode”选项中看关闭bitcode即可。  <br/>
-开启Bitcode编译后，编译产生的文件体积会变大 (因为是中间代码，不是用户下载的包)，且dSYM文件不能用来崩溃日志的符号化 (用户下载的包是Apple服务重新编译产生的，有产生新的符号文件)。通过Archive方式上传AppStore的包，可以在 Xcode的Organizer工具中下载对应安装包的新的符号文件。</p>
-
-<p><code>4.</code> 使用XCode7链接第三方库提示warning  <br/>
-Lots of warnings when building with Xcode 7 with 3rd party libraries  <br/>
-warning: Could not resolve external type c:objc(cs)NSString  <br/>
-warning: Could not resolve external type c:objc(cs)NSDictionary  <br/>
-warning: Could not resolve external type c:objc(cs)NSMutableString  <br/>
-warning: Could not resolve external type c:objc(cs)NSError  <br/>
-<a href="https://forums.developer.apple.com/thread/17921">https://forums.developer.apple.com/thread/17921</a>  <br/>
-目前没发现好的解决办法，可以尝试如下:  <br/>
-I had this problem too.  Here&rsquo;s how I fixed it.  <br/>
-1)  Go to Build Settings -> Build Options -> Debug Information Format  <br/>
-2)  Change the Debug setting from &ldquo;DWARF with dSYM File&rdquo; to &ldquo;DWARF&rdquo;  <br/>
-3)  Leave the Release setting at &ldquo;DWARF with dSYM File&rdquo;  <br/>
-The problem appears to be that Xcode was trying to create dSYM files for Debug     builds.  You don&rsquo;t need dSYM files for Debug builds &ndash; it&rsquo;s release builds where you need them.</p>
 ]]></content>
   </entry>
   
