@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-04-06T23:16:54+08:00</updated>
+  <updated>2016-05-03T16:58:27+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,236 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[iOS动画总结]]></title>
+    <link href="http://caixindong.github.io/blog/2016/04/19/ios85/"/>
+    <updated>2016-04-19T22:21:39+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/04/19/ios85</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>做个知识汇总，日常动画的动画实现，看这篇应该足够了</p>
+
+<h2>iOS图形分层</h2>
+
+<p><img src="/images/uikit.png"></p>
+
+<p>越顶层，动画的封装程度越高，动画api就越简洁，本文章主要讲动画在UIKit层和CoreAnimation层的实现</p>
+
+<h2>UIKit层</h2>
+
+<h4>UIViewAnimation</h4>
+
+<p>动画的实现过程：</p>
+
+<pre><code class="ObjC">[UIView beginAnimations:@"newAnimation" context:nil];
+//设置动画的持续时间
+[UIView setAnimationDuration:1.0];
+//如果设置为YES,代表动画每次重复执行的效果会跟上一次相反
+[UIView setAnimationRepeatAutoreverses:YES];
+//设置动画的运动曲线（线性、先快后慢、先慢后快）
+[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+//动画的重复次数
+[UIView setAnimationRepeatCount:10];
+
+//动画动作定义
+CGRect tmp = self.myView.frame;
+tmp.origin.x += 100;
+self.myView.frame = tmp;
+
+//提交动画
+[UIView commitAnimations];
+</code></pre>
+
+<h4>UIViewAnimationWithBlocks</h4>
+
+<p>动画的实现过程：</p>
+
+<pre><code class="ObjC">
+//动画持续时间、延迟时间、动画执行函数
+[UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseInOut  animations:^{
+//动画动作定义
+CGRect tmp = self.myView.frame;
+tmp.origin.x = 300;
+self.myView.frame = tmp;
+    } completion:nil];
+</code></pre>
+
+<h2>Core Animation</h2>
+
+<p>Core Animation是直接作用在CALayer上的(并非UIView上)非常强大的跨Mac OS X和iOS平台的动画处理API，Core Animation的动画执行过程都是在后台操作的，不会阻塞主线程。</p>
+
+<p>CAAnimation可分为四种：
+1.CABasicAnimation
+通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation
+2.CAKeyframeAnimation
+Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动
+3.CAAnimationGroup
+Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。
+4.CATransition
+这个就是苹果帮开发者封装好的一些动画</p>
+
+<p>停止动画</p>
+
+<pre><code class="ObjC">CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
+
+     // 让CALayer的时间停止走动
+     layer.speed = 0.0;
+     // 让CALayer的时间停留在pausedTime这个时刻
+     layer.timeOffset = pausedTime;
+</code></pre>
+
+<p>恢复动画</p>
+
+<pre><code class="ObjC">CFTimeInterval pausedTime = layer.timeOffset;
+      // 1. 让CALayer的时间继续行走
+        layer.speed = 1.0;
+      // 2. 取消上次记录的停留时刻
+        layer.timeOffset = 0.0;
+      // 3. 取消上次设置的时间
+        layer.beginTime = 0.0;    
+      // 4. 计算暂停的时间(这里也可以用CACurrentMediaTime()-pausedTime)
+      CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
+      // 5. 设置相对于父坐标系的开始时间(往后退timeSincePause)
+        layer.beginTime = timeSincePause;
+</code></pre>
+
+<h4>CABasicAnimation的实现</h4>
+
+<p>基础动画，是CAPropertyAnimation子类
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CALayer</span><span class="o">*</span> <span class="n">scaleLayer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CALayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">blueColor</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addSublayer</span><span class="p">:</span><span class="n">scaleLayer</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>  <span class="c1">//动画类型</span>
+</span><span class='line'><span class="bp">CABasicAnimation</span><span class="o">*</span> <span class="n">scaleAnimation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CABasicAnimation</span> <span class="nl">animationWithKeyPath</span><span class="p">:</span><span class="s">@&quot;transform.scale&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//动画的起始状态</span>
+</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">fromValue</span> <span class="o">=</span> <span class="mf">@1.0</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//动画的结束状态</span>
+</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">toValue</span> <span class="o">=</span> <span class="mf">@1.5</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//如果设置为YES,代表动画每次重复执行的效果会跟上一次相反</span>
+</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm">* fillMode决定当前对象在非active时间段的行为。（要想fillMode有效，最好设置removedOnCompletion = NO）</span>
+</span><span class='line'><span class="cm">**/</span>
+</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">fillMode</span> <span class="o">=</span> <span class="n">kCAFillModeForwards</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//动画重复次数</span>
+</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="n">MAXFLOAT</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//动画持续时间</span>
+</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//将动画添加到layer上面</span>
+</span><span class='line'><span class="p">[</span><span class="n">scaleLayer</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">scaleAnimation</span> <span class="nl">forKey</span><span class="p">:</span><span class="s">@&quot;scaleAnimation&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">####CAKeyframeAnimation的实现</span>
+</span><span class='line'><span class="err">关键帧动画，也是</span><span class="bp">CAPropertyAnimation</span><span class="err">的子类</span>
+</span><span class='line'><span class="err">与</span><span class="bp">CABasicAnimation</span><span class="err">的区别是：</span>
+</span><span class='line'><span class="bp">CABasicAnimation</span><span class="err">只能从一个数值（</span><span class="n">fromValue</span><span class="err">）变到另一个数值（</span><span class="n">toValue</span><span class="err">），而</span><span class="bp">CAKeyframeAnimation</span><span class="err">会使用一个</span><span class="bp">NSArray</span><span class="err">保存这些数值</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="bp">CALayer</span><span class="o">*</span> <span class="n">blackPoint</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CALayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">blackColor</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addSublayer</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">CGFloat</span> <span class="n">originY</span> <span class="o">=</span> <span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="bp">CAKeyframeAnimation</span><span class="o">*</span> <span class="n">keyAnimation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CAKeyframeAnimation</span> <span class="nl">animationWithKeyPath</span><span class="p">:</span><span class="s">@&quot;position&quot;</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//记录每一个关键帧</span>
+</span><span class='line'><span class="n">keyAnimation</span><span class="p">.</span><span class="n">values</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">],[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">CGPointMake</span><span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="n">originY</span><span class="p">)],[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//可以为对应的关键帧指定对应的时间点，其取值范围为0到1.0，keyTimes中的每一个时间值都对应values中的每一帧。如果没有设置keyTimes，各个关键帧的时间是平分的</span>
+</span><span class='line'><span class="n">keyAnimation</span><span class="p">.</span><span class="n">keyTimes</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mf">0.5</span><span class="p">],</span>
+</span><span class='line'>                          <span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>   <span class="c1">//指定时间函数</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">timingFunctions</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">CAMediaTimingFunction</span> <span class="nl">functionWithName</span><span class="p">:</span><span class="n">kCAMediaTimingFunctionLinear</span><span class="p">],</span>
+</span><span class='line'>                                                                               <span class="p">[</span><span class="bp">CAMediaTimingFunction</span> <span class="nl">functionWithName</span><span class="p">:</span><span class="n">kCAMediaTimingFunctionLinear</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">calculationMode</span> <span class="o">=</span> <span class="n">kCAAnimationLinear</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">blackPoint</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">keyAnimation</span> <span class="nl">forKey</span><span class="p">:@</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">rectRunAnimation</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;];</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h4>CAAnimationGroup的实现</h4>
+
+<p>组动画，是CAAnimation的子类  <br/>
+可以保存一组动画对象，将CAAnimationGroup对象加入层后，组中所有动画对象可以同时并发运行,可以通过设置动画对象的beginTime属性来更改动画的开始时间</p>
+
+<pre><code class="ObjC">CAAnimationGroup* group = [CAAnimationGroup animation];
+    //用来保存一组动画对象
+    group.animations = @[scaleAnimation];
+    group.duration = 0.8;
+    group.repeatCount = 3;
+    group.autoreverses = YES;
+    [scaleLayer addAnimation:group forKey:nil];
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[浅谈GCD的内部实现]]></title>
@@ -313,95 +543,6 @@ Cocoa Framework::Foundation 对象类型（即一般使用到的Objectie-C对象
     layer.colors = @[(__bridge id)opaqueBlackColor,(__bridge id)transparentBalckColor];
 
     [self.blackView.layer insertSublayer:layer atIndex:0];
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS 网络编程]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/07/ios80/"/>
-    <updated>2016-03-07T22:45:23+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/07/ios80</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>最近要给quanta的小朋友讲iOS网络编程的相关知识，所以提前在这里梳理。</p>
-
-<h2>何为HTTP</h2>
-
-<p>首先我们必须了解HTTP协议，何为HTTP?超文本传送协议，它是基于应用层的通信规范，是一个设计来使客户端和服务器顺利进行通讯的协议。
-HTTP做了以下几方面的规定：  <br/>
-<code>1.</code> request和response的格式；  <br/>
-<code>2.</code> 建立连接的方法，有持久连接和非持久连接。HTTP1.1默认是带流水的持久连接；  <br/>
-         非持久连接：服务器发出一个对象后，相应TCP连接关闭，每个TCP连接只用于传输一个请求消息和一个响应消息；  <br/>
-         持久连接：单个持久TCP连接，它分为不带流水线和流水线。不带流水线的只有收到上个请求响应再请求；
-<code>3.</code> 缓存机制（减少发送请求）；      <br/>
-<code>4.</code> 响应授权激发机制，用于服务器激发客户端请求并授权；</p>
-
-<p>过程：客户端先建立一个TCP连接，再发送一个请求，服务器收到请求处理后响应，传送数据，客户端可以继续发生请求或关闭TCP</p>
-
-<h2>GET与POST</h2>
-
-<p>GET与POST是两种请求方式，GET主要用于从指定的服务器中获取数据，POST主要用于提交数据给指定服务器
-区别：  <br/>
-GET请求能够被缓存，POST请求不能被缓存下来
-GET提交的数据放在url(以？分割url和传输数据，参数之间以&amp;相连)      <br/>
-GET请求会保存在浏览器的浏览记录中，POST请求不会保存在浏览器浏览记录中  <br/>
-以GET请求的URL能够保存为浏览器书签，以POST请求的URL无法保存为浏览器书签  <br/>
-GET请求有长度限制，POST请求无长度限制
-GET安全性没有POST好，因为GET提交的参数是可见</p>
-
-<h2>iOS网络编程</h2>
-
-<p>在iOS9之前，我们主要利用NSURLConnection来进行网络请求操作，在iOS9以后，苹果推荐使用NSURLSession。具体如何使用这些类来进行网络请求，我以代码加注释的形式呈现出来。</p>
-
-<pre><code class="ObjC">    /**
-     * 可变请求与不可变请求的区别：
-     * 1、不可变请求在初始化的时候需要指定url，而可变请求可以以后指定
-     * 2、cachePolicy缓存策略 timeoutInterval超时时间
-     **/
-
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60];
-
-
-
-    /**
-     * iOS 9以前 请求,默认是GET
-     **/
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse * _Nullable response, NSData * _Nullable data, NSError * _Nullable connectionError) {
-        //解析json数据
-        NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
-        NSLog(@"%@",dict);
-       dispatch_async(dispatch_get_main_queue(), ^{
-           _imageView.image = [UIImage imageWithData:data];
-       });
-    }];
-
-
-    /**
-     * iOS 9 请求
-    **/
-    NSMutableURLRequest* request2 = [[NSMutableURLRequest alloc]init];
-    request2.URL = [NSURL URLWithString:@"http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png"];
-    request2.HTTPMethod = @"GET";
-
-    NSURLSession* session = [NSURLSession sharedSession];
-
-    [[session dataTaskWithRequest:request2 completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"%@",data);
-            _imageView.image = [UIImage imageWithData:data];
-        });
-    }] resume];
-    //记得resume 唤醒 suspend 暂停
-
-    /**
-     * 上传 用POST，具体可以看这个链接 http://borissun.iteye.com/blog/1338991
-     **/
-    NSMutableURLRequest* postRequest = [[NSMutableURLRequest alloc]init];
-    postRequest.URL = [NSURL URLWithString:@""];
-    NSInputStream* inStream = [NSInputStream inputStreamWithFileAtPath:@""];
-    postRequest.HTTPBodyStream = inStream;
-    postRequest.HTTPMethod = @"POST";
 </code></pre>
 ]]></content>
   </entry>

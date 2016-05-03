@@ -7,14 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 为项目添加定位和导航功能 现在不少App都配备了定位和导航的功能，今天我教大家用iOS原生态的方法来实现这个两个功能。我们通过系统提供的CoreLocation和MapKit来实现。接下来用代码来演示。 1、添加MapView并且实例化它 1
-2
-3
-4
-5
-6
-7
-8 &hellip;">
+	<meta name="description" content="ios 强大的FastCoder FastCoder是一个Cocoa object和object graph的高性能二进制序列化格式,可以作为Property Lists和JSON的替代选择。通过两个简单的方法就可以实现任意对象和NSData之间的相互转化 1、对象转化为NSData &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,6 +85,51 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-11-08T21:31:42+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2015/11/08/ios15/" itemprop="url">强大的FastCoder</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<p>FastCoder是一个Cocoa object和object graph的高性能二进制序列化格式,可以作为Property Lists和JSON的替代选择。通过两个简单的方法就可以实现任意对象和NSData之间的相互转化</p>
+
+<p>1、对象转化为NSData</p>
+
+<pre><code>NSData *data = [FastCoder dataWithRootObject:obj];
+</code></pre>
+
+<p>2、从中NSData取回对象</p>
+
+<pre><code>id obj = [FastCoder objectWithData:data];
+</code></pre>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -916,67 +954,6 @@ NSOperationQueue* queue = manager.operationQueue;
 }];
 //开始监听
 [manager.reachabilityManager startMonitoring];
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-04T19:40:17+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>, <a class='category' href='/blog/categories/swift/'>swift</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/04/ios5/" itemprop="url">iOS多线程（NSThread）(swift)</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>NSThread
-如果你用到的子线程要长时间使用，就用它</p>
-
-<p>1、创建一个子线程</p>
-
-<pre><code>NSThread.detachNewThreadSelector("go:", toTarget:self, withObject: nil)
-
-func go(){
-    //操作
-
-}
-</code></pre>
-
-<p>2、自定义的nsthread</p>
-
-<pre><code>import UIKit
-
-class myThread: NSThread {
-//重写main方法，把子线程要做的操作放进去
-    overridefunc main() {
-    //操作
-    println("123")
-    }
-}
-let thread1 =myThread()
-thread1.start()
 </code></pre>
 
 		

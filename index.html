@@ -7,7 +7,11 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 浅谈GCD的内部实现 CGD GCD是苹果开发的多线程编程的解决方案，通过简单的API就可以实现创建新线程去执行我们需要执行的任务，不需要我们手动地创建和管理线程。它的API包含在libdispatch库中。 Dispatch Queue Dispatch &hellip;">
+	<meta name="description" content="ios iOS动画总结 前言 做个知识汇总，日常动画的动画实现，看这篇应该足够了 iOS图形分层 越顶层，动画的封装程度越高，动画api就越简洁，本文章主要讲动画在UIKit层和CoreAnimation层的实现 UIKit层 UIViewAnimation 动画的实现过程： 1
+2
+3
+4
+5 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +89,303 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-04-19T22:21:39+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/04/19/ios85/" itemprop="url">iOS动画总结</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>前言</h2>
+
+<p>做个知识汇总，日常动画的动画实现，看这篇应该足够了</p>
+
+<h2>iOS图形分层</h2>
+
+<p><img src="/images/uikit.png"></p>
+
+<p>越顶层，动画的封装程度越高，动画api就越简洁，本文章主要讲动画在UIKit层和CoreAnimation层的实现</p>
+
+<h2>UIKit层</h2>
+
+<h4>UIViewAnimation</h4>
+
+<p>动画的实现过程：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="nl">beginAnimations</span><span class="p">:</span><span class="s">@&quot;newAnimation&quot;</span> <span class="nl">context</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//设置动画的持续时间</span>
+</span><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationDuration</span><span class="p">:</span><span class="mf">1.0</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//如果设置为YES,代表动画每次重复执行的效果会跟上一次相反</span>
+</span><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationRepeatAutoreverses</span><span class="p">:</span><span class="nb">YES</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//设置动画的运动曲线（线性、先快后慢、先慢后快）</span>
+</span><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationCurve</span><span class="p">:</span><span class="n">UIViewAnimationCurveEaseInOut</span><span class="p">];</span>
+</span><span class='line'><span class="c1">//动画的重复次数</span>
+</span><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="nl">setAnimationRepeatCount</span><span class="p">:</span><span class="mi">10</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//动画动作定义</span>
+</span><span class='line'><span class="bp">CGRect</span> <span class="n">tmp</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">myView</span><span class="p">.</span><span class="n">frame</span><span class="p">;</span>
+</span><span class='line'><span class="n">tmp</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">x</span> <span class="o">+=</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'><span class="nb">self</span><span class="p">.</span><span class="n">myView</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//提交动画</span>
+</span><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="n">commitAnimations</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>UIViewAnimationWithBlocks</h4>
+
+<p>动画的实现过程：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">//动画持续时间、延迟时间、动画执行函数</span>
+</span><span class='line'><span class="p">[</span><span class="bp">UIView</span> <span class="nl">animateWithDuration</span><span class="p">:</span><span class="mf">0.5</span> <span class="nl">delay</span><span class="p">:</span><span class="mi">0</span> <span class="nl">options</span><span class="p">:</span><span class="n">UIViewAnimationOptionCurveEaseInOut</span>  <span class="nl">animations</span><span class="p">:</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'><span class="c1">//动画动作定义</span>
+</span><span class='line'><span class="bp">CGRect</span> <span class="n">tmp</span> <span class="o">=</span> <span class="nb">self</span><span class="p">.</span><span class="n">myView</span><span class="p">.</span><span class="n">frame</span><span class="p">;</span>
+</span><span class='line'><span class="n">tmp</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">300</span><span class="p">;</span>
+</span><span class='line'><span class="nb">self</span><span class="p">.</span><span class="n">myView</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Core Animation</h2>
+
+<p>Core Animation是直接作用在CALayer上的(并非UIView上)非常强大的跨Mac OS X和iOS平台的动画处理API，Core Animation的动画执行过程都是在后台操作的，不会阻塞主线程。</p>
+
+<p>CAAnimation可分为四种：
+1.CABasicAnimation
+通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation
+2.CAKeyframeAnimation
+Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动
+3.CAAnimationGroup
+Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。
+4.CATransition
+这个就是苹果帮开发者封装好的一些动画</p>
+
+<p>停止动画</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="n">CFTimeInterval</span> <span class="n">pausedTime</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer</span> <span class="nl">convertTime</span><span class="p">:</span><span class="n">CACurrentMediaTime</span><span class="p">()</span> <span class="nl">fromLayer</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="c1">// 让CALayer的时间停止走动</span>
+</span><span class='line'>     <span class="n">layer</span><span class="p">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+</span><span class='line'>     <span class="c1">// 让CALayer的时间停留在pausedTime这个时刻</span>
+</span><span class='line'>     <span class="n">layer</span><span class="p">.</span><span class="n">timeOffset</span> <span class="o">=</span> <span class="n">pausedTime</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>恢复动画</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="n">CFTimeInterval</span> <span class="n">pausedTime</span> <span class="o">=</span> <span class="n">layer</span><span class="p">.</span><span class="n">timeOffset</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">// 1. 让CALayer的时间继续行走</span>
+</span><span class='line'>        <span class="n">layer</span><span class="p">.</span><span class="n">speed</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">// 2. 取消上次记录的停留时刻</span>
+</span><span class='line'>        <span class="n">layer</span><span class="p">.</span><span class="n">timeOffset</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">// 3. 取消上次设置的时间</span>
+</span><span class='line'>        <span class="n">layer</span><span class="p">.</span><span class="n">beginTime</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">// 4. 计算暂停的时间(这里也可以用CACurrentMediaTime()-pausedTime)</span>
+</span><span class='line'>      <span class="n">CFTimeInterval</span> <span class="n">timeSincePause</span> <span class="o">=</span> <span class="p">[</span><span class="n">layer</span> <span class="nl">convertTime</span><span class="p">:</span><span class="n">CACurrentMediaTime</span><span class="p">()</span> <span class="nl">fromLayer</span><span class="p">:</span><span class="nb">nil</span><span class="p">]</span> <span class="o">-</span> <span class="n">pausedTime</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">// 5. 设置相对于父坐标系的开始时间(往后退timeSincePause)</span>
+</span><span class='line'>        <span class="n">layer</span><span class="p">.</span><span class="n">beginTime</span> <span class="o">=</span> <span class="n">timeSincePause</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>CABasicAnimation的实现</h4>
+
+<p>基础动画，是CAPropertyAnimation子类</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CALayer</span><span class="o">*</span> <span class="n">scaleLayer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CALayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">blueColor</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addSublayer</span><span class="p">:</span><span class="n">scaleLayer</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//动画类型</span>
+</span><span class='line'>    <span class="bp">CABasicAnimation</span><span class="o">*</span> <span class="n">scaleAnimation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CABasicAnimation</span> <span class="nl">animationWithKeyPath</span><span class="p">:</span><span class="s">@&quot;transform.scale&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="c1">//动画的起始状态</span>
+</span><span class='line'>    <span class="n">scaleAnimation</span><span class="p">.</span><span class="n">fromValue</span> <span class="o">=</span> <span class="mf">@1.0</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//动画的结束状态</span>
+</span><span class='line'>    <span class="n">scaleAnimation</span><span class="p">.</span><span class="n">toValue</span> <span class="o">=</span> <span class="mf">@1.5</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//如果设置为YES,代表动画每次重复执行的效果会跟上一次相反</span>
+</span><span class='line'>    <span class="n">scaleAnimation</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">    * fillMode决定当前对象在非active时间段的行为。（要想fillMode有效，最好设置removedOnCompletion = NO）</span>
+</span><span class='line'><span class="cm">    **/</span>
+</span><span class='line'>    <span class="n">scaleAnimation</span><span class="p">.</span><span class="n">fillMode</span> <span class="o">=</span> <span class="n">kCAFillModeForwards</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//动画重复次数</span>
+</span><span class='line'>    <span class="n">scaleAnimation</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="n">MAXFLOAT</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//动画持续时间</span>
+</span><span class='line'>    <span class="n">scaleAnimation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">;</span>
+</span><span class='line'>      <span class="c1">//将动画添加到layer上面</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">scaleLayer</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">scaleAnimation</span> <span class="nl">forKey</span><span class="p">:</span><span class="s">@&quot;scaleAnimation&quot;</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>CAKeyframeAnimation的实现</h4>
+
+<p>关键帧动画，也是CAPropertyAnimation的子类
+与CABasicAnimation的区别是：
+CABasicAnimation只能从一个数值（fromValue）变到另一个数值（toValue），而CAKeyframeAnimation会使用一个NSArray保存这些数值</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CALayer</span><span class="o">*</span> <span class="n">blackPoint</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CALayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">blackColor</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addSublayer</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">CGFloat</span> <span class="n">originY</span> <span class="o">=</span> <span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="bp">CAKeyframeAnimation</span><span class="o">*</span> <span class="n">keyAnimation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CAKeyframeAnimation</span> <span class="nl">animationWithKeyPath</span><span class="p">:</span><span class="s">@&quot;position&quot;</span><span class="p">];</span>
+</span><span class='line'>    <span class="c1">//记录每一个关键帧</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">values</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">],[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">CGPointMake</span><span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="n">originY</span><span class="p">)],[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//可以为对应的关键帧指定对应的时间点，其取值范围为0到1.0，keyTimes中的每一个时间值都对应values中的每一帧。如果没有设置keyTimes，各个关键帧的时间是平分的</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">keyTimes</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mf">0.5</span><span class="p">],</span>
+</span><span class='line'>                              <span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>   <span class="c1">//指定时间函数</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">timingFunctions</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">CAMediaTimingFunction</span> <span class="nl">functionWithName</span><span class="p">:</span><span class="n">kCAMediaTimingFunctionLinear</span><span class="p">],</span>
+</span><span class='line'>                                                                               <span class="p">[</span><span class="bp">CAMediaTimingFunction</span> <span class="nl">functionWithName</span><span class="p">:</span><span class="n">kCAMediaTimingFunctionLinear</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">calculationMode</span> <span class="o">=</span> <span class="n">kCAAnimationLinear</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">blackPoint</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">keyAnimation</span> <span class="nl">forKey</span><span class="p">:</span><span class="s">@&quot;rectRunAnimation&quot;</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>CAAnimationGroup的实现</h4>
+
+<p>组动画，是CAAnimation的子类  <br/>
+可以保存一组动画对象，将CAAnimationGroup对象加入层后，组中所有动画对象可以同时并发运行,可以通过设置动画对象的beginTime属性来更改动画的开始时间</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CAAnimationGroup</span><span class="o">*</span> <span class="n">group</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CAAnimationGroup</span> <span class="n">animation</span><span class="p">];</span>
+</span><span class='line'>  <span class="c1">//用来保存一组动画对象</span>
+</span><span class='line'>    <span class="n">group</span><span class="p">.</span><span class="n">animations</span> <span class="o">=</span> <span class="l">@[</span><span class="n">scaleAnimation</span><span class="l">]</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">group</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">group</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">group</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">scaleLayer</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">group</span> <span class="nl">forKey</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1342,118 +1643,6 @@ The problem appears to be that Xcode was trying to create dSYM files for Debug  
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
 </span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-05T21:09:32+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/lian-biao/'>链表</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/03/05/ios75/" itemprop="url">删除链表的重复元素(一)</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>要求</h2>
-
-<p>删除链表里的重复元素，例如1->2->2->3->3->4->5->5->6，返回1->2->3->4->5->6</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span><span class="o">::</span><span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//1,2,3,3,4,5 -&gt; 1,2,3,4,5</span>
-</span><span class='line'>  <span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">deleteDuplicates</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="o">||</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">pre</span><span class="o">-&gt;</span><span class="n">val</span><span class="o">==</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">val</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                    <span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// insert code here...</span>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello, World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
 </span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
