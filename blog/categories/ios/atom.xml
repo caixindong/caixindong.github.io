@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-03T16:58:27+08:00</updated>
+  <updated>2016-05-03T18:48:48+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -72,13 +72,13 @@ self.myView.frame = tmp;
 <p>Core Animation是直接作用在CALayer上的(并非UIView上)非常强大的跨Mac OS X和iOS平台的动画处理API，Core Animation的动画执行过程都是在后台操作的，不会阻塞主线程。</p>
 
 <p>CAAnimation可分为四种：
-1.CABasicAnimation
-通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation
-2.CAKeyframeAnimation
-Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动
-3.CAAnimationGroup
-Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。
-4.CATransition
+1.CABasicAnimation  <br/>
+通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation  <br/>
+2.CAKeyframeAnimation  <br/>
+Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动  <br/>
+3.CAAnimationGroup  <br/>
+Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。  <br/>
+4.CATransition  <br/>
 这个就是苹果帮开发者封装好的一些动画</p>
 
 <p>停止动画</p>
@@ -108,7 +108,9 @@ Group也就是组合的意思，就是把对这个Layer的所有动画都组合�
 
 <h4>CABasicAnimation的实现</h4>
 
-<p>基础动画，是CAPropertyAnimation子类
+<p>基础动画，是CAPropertyAnimation子类  <br/>
+keyPath附录表：  <br/>
+<img src="/images/keypath.png">
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -239,6 +241,35 @@ Group也就是组合的意思，就是把对这个Layer的所有动画都组合�
     group.repeatCount = 3;
     group.autoreverses = YES;
     [scaleLayer addAnimation:group forKey:nil];
+</code></pre>
+
+<h4>CATransition的实现</h4>
+
+<p>转场动画，是CAAnimation的子类，，能够为层提供移出屏幕和移入屏幕的动画效果。
+UINavigationController就是通过CATransition实现了将控制器的视图推入屏幕的动画效果
+有以下效果可以使用：  <br/>
+cube 方块  <br/>
+suckEffect 三角  <br/>
+rippleEffect 水波抖动  <br/>
+pageCurl 上翻页  <br/>
+pageUnCurl 下翻页  <br/>
+oglFlip 上下翻转  <br/>
+cameraIrisHollowOpen 镜头快门开  <br/>
+cameraIrisHollowClose 镜头快门开</p>
+
+<pre><code class="ObjC">CATransition* animation = [CATransition animation];
+    animation.duration = 1.0f;
+    animation.timingFunction = UIViewAnimationCurveEaseInOut;
+    //执行完是否移除
+    animation.removedOnCompletion = NO;
+    //过渡效果
+    animation.type = @"cube";
+    //过渡方向
+    animation.subtype = kCATransitionFromRight;
+    //设置之后endProgress才有效
+    animation.fillMode = kCAFillModeForwards;
+    animation.endProgress = 1;
+    [imageView.layer addAnimation:animation forKey:nil];
 </code></pre>
 ]]></content>
   </entry>

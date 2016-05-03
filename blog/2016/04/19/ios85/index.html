@@ -170,13 +170,13 @@
 <p>Core Animation是直接作用在CALayer上的(并非UIView上)非常强大的跨Mac OS X和iOS平台的动画处理API，Core Animation的动画执行过程都是在后台操作的，不会阻塞主线程。</p>
 
 <p>CAAnimation可分为四种：
-1.CABasicAnimation
-通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation
-2.CAKeyframeAnimation
-Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动
-3.CAAnimationGroup
-Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。
-4.CATransition
+1.CABasicAnimation  <br/>
+通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation  <br/>
+2.CAKeyframeAnimation  <br/>
+Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动  <br/>
+3.CAAnimationGroup  <br/>
+Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。  <br/>
+4.CATransition  <br/>
 这个就是苹果帮开发者封装好的一些动画</p>
 
 <p>停止动画</p>
@@ -225,7 +225,9 @@ Group也就是组合的意思，就是把对这个Layer的所有动画都组合�
 
 <h4>CABasicAnimation的实现</h4>
 
-<p>基础动画，是CAPropertyAnimation子类</p>
+<p>基础动画，是CAPropertyAnimation子类  <br/>
+keyPath附录表：  <br/>
+<img src="/images/keypath.png"></p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -350,6 +352,49 @@ CABasicAnimation只能从一个数值（fromValue）变到另一个数值（toVa
 </span><span class='line'>    <span class="n">group</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
 </span><span class='line'>    <span class="n">group</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
 </span><span class='line'>    <span class="p">[</span><span class="n">scaleLayer</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">group</span> <span class="nl">forKey</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>CATransition的实现</h4>
+
+<p>转场动画，是CAAnimation的子类，，能够为层提供移出屏幕和移入屏幕的动画效果。
+UINavigationController就是通过CATransition实现了将控制器的视图推入屏幕的动画效果
+有以下效果可以使用：  <br/>
+cube 方块  <br/>
+suckEffect 三角  <br/>
+rippleEffect 水波抖动  <br/>
+pageCurl 上翻页  <br/>
+pageUnCurl 下翻页  <br/>
+oglFlip 上下翻转  <br/>
+cameraIrisHollowOpen 镜头快门开  <br/>
+cameraIrisHollowClose 镜头快门开</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CATransition</span><span class="o">*</span> <span class="n">animation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CATransition</span> <span class="n">animation</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">1.0f</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">timingFunction</span> <span class="o">=</span> <span class="n">UIViewAnimationCurveEaseInOut</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//执行完是否移除</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">removedOnCompletion</span> <span class="o">=</span> <span class="nb">NO</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//过渡效果</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="s">@&quot;cube&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//过渡方向</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">subtype</span> <span class="o">=</span> <span class="n">kCATransitionFromRight</span><span class="p">;</span>
+</span><span class='line'>    <span class="c1">//设置之后endProgress才有效</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">fillMode</span> <span class="o">=</span> <span class="n">kCAFillModeForwards</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">animation</span><span class="p">.</span><span class="n">endProgress</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">[</span><span class="n">imageView</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">animation</span> <span class="nl">forKey</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
