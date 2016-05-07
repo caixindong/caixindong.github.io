@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-07T21:38:25+08:00</updated>
+  <updated>2016-05-07T21:40:08+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -204,6 +204,10 @@
 
 <p>用CAShapeLayer和UIBezierPath画图，以及结合CAAnimation实现一个绘图动画</p>
 
+<h2>动画效果：</h2>
+
+<p><img src="http://caixindong.github.io/images/gif1.gif"></p>
+
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -398,9 +402,6 @@
 </span><span class='line'><span class="k">@end</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>动画效果：
-<img src="http://caixindong.github.io/images/gif1.gif"></p>
 
 <p>Demo地址：</p>
 ]]></content>

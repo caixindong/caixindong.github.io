@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-07T21:38:25+08:00</updated>
+  <updated>2016-05-07T21:40:08+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -117,6 +117,10 @@
 
 <p>用CAShapeLayer和UIBezierPath画图，以及结合CAAnimation实现一个绘图动画</p>
 
+<h2>动画效果：</h2>
+
+<p><img src="/images/gif1.gif"></p>
+
 <pre><code class="ObjC">//
 //  ViewController.m
 //  CAShapeLayerAndUIBezierPath
@@ -214,9 +218,6 @@
 
 @end
 </code></pre>
-
-<p>动画效果：
-<img src="/images/gif1.gif"></p>
 
 <p>Demo地址：</p>
 ]]></content>
