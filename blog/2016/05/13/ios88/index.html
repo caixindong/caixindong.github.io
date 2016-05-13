@@ -104,10 +104,10 @@
 
 <h3>Runtime会根据类型自动转换为下列某个函数：</h3>
 
-<p><strong>==objc_msgSend==</strong>：普通的消息都会通过该函数发送；  <br/>
-<strong>==objc_msgSend_stret==</strong>：消息中有数据结构作为返回值（不是简单值）时，通过此函数发送和接收返回值；  <br/>
-<strong>==objc_msgSendSuper==</strong>：和objc_msgSend类似，这里把消息发送给父类的实例；  <br/>
-<strong>==objc_msgSendSuper_stret==</strong>：和objc_msgSend_stret类似，这里把消息发送给父类的实例并接收返回值；</p>
+<p><strong>objc_msgSend</strong>：普通的消息都会通过该函数发送；  <br/>
+<strong>objc_msgSend_stret</strong>：消息中有数据结构作为返回值（不是简单值）时，通过此函数发送和接收返回值；  <br/>
+<strong>objc_msgSendSuper</strong>：和objc_msgSend类似，这里把消息发送给父类的实例；  <br/>
+<strong>objc_msgSendSuper_stret</strong>：和objc_msgSend_stret类似，这里把消息发送给父类的实例并接收返回值；</p>
 
 <h3>objc_msgSend的调用过程</h3>
 
@@ -115,7 +115,7 @@
 <code>2.</code> 接着检查selector的target是否为nil，向nil对象发送任何消息都会被忽略掉；  <br/>
 <code>3.</code> 前面两步没问题，则先在isa指针指向的class的cache里面找有没有方法调用记录，如果有，则运行对应的函数，如果没有则在class的methodLists查找方法，没有则通过super_class指针找到父类的类对象结构体，然后从methodLists查找方法，如果仍找不到，则继续通过
 super_class向上一级父类结构体中查找，直到根类（NSObject）；  <br/>
-<code>4.</code> 如果还是找不到，则进入<strong>==消息动态解析==</strong>；</p>
+<code>4.</code> 如果还是找不到，则进入<strong>消息动态解析</strong>；</p>
 
 <h2>消息动态解析</h2>
 
@@ -223,7 +223,7 @@ super_class向上一级父类结构体中查找，直到根类（NSObject）； 
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><strong>==tip：==</strong>
+<p><strong>tip：</strong>
 默认会出现以下错误：  <br/>
 objc_msgSend()报错Too many arguments to function call ,expected 0,have3
 直接通过objc_msgSend(self, setter, value)是报错，说参数过多。  <br/>
