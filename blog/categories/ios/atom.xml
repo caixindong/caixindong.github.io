@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-11T23:32:22+08:00</updated>
+  <updated>2016-05-13T11:36:11+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,638 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Runtime小笔记（二）]]></title>
+    <link href="http://caixindong.github.io/blog/2016/05/13/ios88/"/>
+    <updated>2016-05-13T09:23:18+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/05/13/ios88</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>上篇主要讲Runtime的一些术语描述和定义，Runtime的主要应用是用于消息的传递，今天会结合一些实战例子来讲下OC的消息传递机制。</p>
+
+<h2>普通消息传递</h2>
+
+<p>在OC里，对象调用方法叫作发送消息，对象调用方法在Runtime里被转化为objc_msgSend函数来实现</p>
+
+<pre><code class="ObjC">
+[receiver oneMethod];
+//transfer to ：
+objc_msgSend(receiver, @selector(oneMethod));
+</code></pre>
+
+<h3>Runtime会根据类型自动转换为下列某个函数：</h3>
+
+<p><strong>==objc_msgSend==</strong>：普通的消息都会通过该函数发送；  <br/>
+<strong>==objc_msgSend_stret==</strong>：消息中有数据结构作为返回值（不是简单值）时，通过此函数发送和接收返回值；  <br/>
+<strong>==objc_msgSendSuper==</strong>：和objc_msgSend类似，这里把消息发送给父类的实例；  <br/>
+<strong>==objc_msgSendSuper_stret==</strong>：和objc_msgSend_stret类似，这里把消息发送给父类的实例并接收返回值；</p>
+
+<h3>objc_msgSend的调用过程</h3>
+
+<p><code>1.</code> 先检查这个selector是否存在，不存在则忽略；   <br/>
+<code>2.</code> 接着检查selector的target是否为nil，向nil对象发送任何消息都会被忽略掉；  <br/>
+<code>3.</code> 前面两步没问题，则先在isa指针指向的class的cache里面找有没有方法调用记录，如果有，则运行对应的函数，如果没有则在class的methodLists查找方法，没有则通过super_class指针找到父类的类对象结构体，然后从methodLists查找方法，如果仍找不到，则继续通过
+super_class向上一级父类结构体中查找，直到根类（NSObject）；  <br/>
+<code>4.</code> 如果还是找不到，则进入<strong>==消息动态解析==</strong>；</p>
+
+<h2>消息动态解析</h2>
+
+<p>动态解析流程图：
+<img src="/images/objective-runtime-6.png"></p>
+
+<p>具体解析：  <br/>
+<code>1.</code> 通过resolveInstanceMethod，该方法决定是否动态添加方法。如果返回YES，则通过class_addMethod动态添加方法，消息得到处理，结束；如果返回NO，则进入下一步；   <br/>
+<code>2.</code> 这一步会步入forwardingTargetForSelector方法，用于指定备选对象响应这个selector，不能指定为self，如果放回某个对象则会调用对象的方法，结束。如果放回nil，则进入第三步；  <br/>
+<code>3.</code> 这一步，我们通过methodSignatureForSelector进行方法签名，如果返回nil，则消息无法处理。如果返回methodSignature则进入下一步；  <br/>
+<code>4.</code> 这步调用forwardInvocation方法，我们通过anInvocation对象做很多处理，比如修改实现方法，修改响应对象，如果方法方法调用成功，则结束。如果失败，则进入doesNotRecognizeSelector，如果没有实现这个方法会crash</p>
+
+<h2>实战</h2>
+
+<h3>通过runtime动态创建类和对象</h3>
+
+<pre><code class="ObjC">
+#import &lt;Foundation/Foundation.h&gt;
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+void sayFunction(id self, SEL _cmd, id some){
+
+    NSLog(@"%@岁的%@说：%@",object_getIvar(self, class_getInstanceVariable([self class], "_age")),object_getIvar(self, class_getInstanceVariable([self class], "_name")),some);
+}
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        //动态创建类
+        Class MyPeople = objc_allocateClassPair([NSObject class], "Person", 0);
+
+        //为类添加成员变量
+        class_addIvar(MyPeople, "_name", sizeof(NSString*), log2(sizeof(NSString*)), @encode(NSString*));
+        class_addIvar(MyPeople, "_age", sizeof(int),sizeof(int),@encode(int));
+
+        //注册方法（"v@:@"代表返回值+参数列表）
+        SEL say = sel_registerName("say:");
+        class_addMethod(MyPeople, say, (IMP)sayFunction, "v@:@");
+
+        //注册类
+        objc_registerClassPair(MyPeople);
+
+        //创建实例对象
+        id peopleInstance = [[MyPeople alloc]init];
+
+        [peopleInstance setValue:@"李明" forKey:@"name"];
+
+        //获取成员变量
+        Ivar age = class_getInstanceVariable(MyPeople, "_age");
+        object_setIvar(peopleInstance, age, @18);
+
+        //发送消息
+        objc_msgSend(peopleInstance,say,@"你好呀");
+
+        //销毁实例对象
+        peopleInstance = nil;
+
+        //当类或子类的实例存在，则不能销毁类
+        objc_disposeClassPair(MyPeople);
+    }
+    return 0;
+}
+</code></pre>
+
+<p><strong>==tip：==</strong>
+默认会出现以下错误：  <br/>
+objc_msgSend()报错Too many arguments to function call ,expected 0,have3
+直接通过objc_msgSend(self, setter, value)是报错，说参数过多。  <br/>
+请这样解决：
+Build Setting–> Apple LLVM 7.0 – Preprocessing–> Enable Strict Checking of objc_msgSend Calls 改为 NO</p>
+
+<h3>通过runtime获取类的相关信息(属性、实例变量、方法)</h3>
+
+<pre><code class="ObjC">
+#import &lt;Foundation/Foundation.h&gt;
+
+@interface People : NSObject{
+
+    NSString* _nationality;
+
+}
+
+@property(nonatomic,copy)NSString* name;
+@property(nonatomic,strong)NSNumber* age;
+
+/**
+ * 获取所有属性
+ **/
+-(NSDictionary*)getAllProperties;
+
+/**
+ * 获取所有实例变量
+ **/
+-(NSDictionary*)getAllIvars;
+
+
+/**
+ * 获取所有方法
+ **/
+-(NSDictionary*)getAllMethods;
+
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import "People.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+@implementation People
+
+
+-(NSDictionary *)getAllProperties{
+    unsigned int count = 0;
+    NSMutableDictionary* result = [@{} mutableCopy];
+    objc_property_t* properties = class_copyPropertyList([self class], &amp;count);
+    for (NSUInteger i = 0; i&lt;count; i++) {
+        const char* propertyName = property_getName(properties[i]);
+        NSString* name = [NSString stringWithUTF8String:propertyName];
+        id propertyValue = [self valueForKey:name];
+        if (propertyValue) {
+            result[name] = propertyValue;
+        }else{
+            result[name] = @"value 不能为 nil";
+        }
+
+
+    }
+    free(properties);
+
+    return result;
+}
+
+-(NSDictionary *)getAllIvars{
+    unsigned int count = 0;
+    NSMutableDictionary* result = [@{} mutableCopy];
+    Ivar* ivars = class_copyIvarList([self class], &amp;count);
+    for (NSUInteger i = 0; i&lt;count; i++) {
+        const char* ivarName = ivar_getName(ivars[i]);
+        NSString* name = [NSString stringWithUTF8String:ivarName];
+        id value = [self valueForKey:name];
+        if (value) {
+            result[name] = value;
+        }else{
+            result[name] = @"value 不能为 nil";
+        }
+    }
+    free(ivars);
+    return  result;
+}
+
+-(NSDictionary*)getAllMethods{
+    unsigned int count = 0;
+    NSMutableDictionary* result = [@{} mutableCopy];
+    Method* methods = class_copyMethodList([self class], &amp;count);
+    for (NSUInteger i = 0; i&lt;count; i++) {
+        const char* methodName = sel_getName(method_getName(methods[i]));
+        NSString* name = [NSString stringWithUTF8String:methodName];
+        //获取参数列表
+        int args = method_getNumberOfArguments(methods[i]);
+        result[name] = [NSString stringWithFormat:@"args count is %d",args-2 ];
+    }
+    free(methods);
+    return result;
+}
+</code></pre>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+#import "People.h"
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        People* p = [[People alloc]init];
+        p.name = @"罗大锤";
+        p.age = @(30);
+        [p setValue:@"中国" forKey:@"nationality"];
+        NSDictionary* properties = [p getAllProperties];
+        NSDictionary* ivars = [p getAllIvars];
+        NSDictionary* methods = [p getAllMethods];
+        NSLog(@"属性为：%@",properties);
+        NSLog(@"实例变量：%@",ivars);
+        NSLog(@"方法：%@",methods);
+    }
+    return 0;
+}
+</code></pre>
+
+<p><strong>打印结果：</strong></p>
+
+<pre><code class="ObjC">2016-05-13 11:22:36.298 runtime 之 获取类的相关信息(属性、实例变量、方法)[2783:307932] 属性为：{
+    age = 30;
+    name = "\U7f57\U5927\U9524";
+}
+2016-05-13 11:22:36.299 runtime 之 获取类的相关信息(属性、实例变量、方法)[2783:307932] 实例变量：{
+    "_age" = 30;
+    "_name" = "\U7f57\U5927\U9524";
+    "_nationality" = "\U4e2d\U56fd";
+}
+2016-05-13 11:22:36.299 runtime 之 获取类的相关信息(属性、实例变量、方法)[2783:307932] 方法：{
+    ".cxx_destruct" = "args count is 0";
+    age = "args count is 0";
+    getAllIvars = "args count is 0";
+    getAllMethods = "args count is 0";
+    getAllProperties = "args count is 0";
+    name = "args count is 0";
+    "setAge:" = "args count is 1";
+    "setName:" = "args count is 1";
+}
+Program ended with exit code: 0
+</code></pre>
+
+<h3>通过Runtime给category添加属性</h3>
+
+<pre><code class="ObjC">
+#import "People.h"
+
+typedef void(^CallBackSomething)();
+
+@interface People (testCategory)
+
+@property(nonatomic,copy)NSString* address;
+@property(nonatomic,copy)CallBackSomething block;
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import "People+testCategory.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+
+@implementation People (testCategory)
+
+-(void)setAddress:(NSString *)address{
+    objc_setAssociatedObject(self, @selector(address), address, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+-(NSString *)address{
+    return objc_getAssociatedObject(self, @selector(address));
+}
+
+-(void)setBlock:(CallBackSomething)block{
+    objc_setAssociatedObject(self, @selector(block), block, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+-(CallBackSomething)block{
+    return objc_getAssociatedObject(self, @selector(block));
+}
+
+@end
+</code></pre>
+
+<h3>利用Runtime给对象归档和解档</h3>
+
+<pre><code class="ObjC">
+#import &lt;Foundation/Foundation.h&gt;
+
+@interface People : NSObject&lt;NSCoding&gt;{
+
+    NSString* _nationality;
+
+}
+
+@property(nonatomic,copy)NSString* name;
+@property(nonatomic,strong)NSNumber* age;
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import "People.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+@implementation People
+
+//归档
+-(void)encodeWithCoder:(NSCoder *)aCoder{
+    unsigned int count = 0;
+    Ivar* ivars = class_copyIvarList([self class],&amp;count);
+    for (NSUInteger i = 0; i&lt;count; i++) {
+        Ivar ivar = ivars[i];
+        const char* name = ivar_getName(ivar);
+        NSString* key = [NSString stringWithUTF8String:name];
+        id value = [self valueForKey:key];
+        [aCoder encodeObject:value forKey:key];
+    }
+    free(ivars);
+}
+
+//解档
+-(instancetype)initWithCoder:(NSCoder *)aDecoder{
+    if (self = [super init]) {
+        unsigned int count = 0;
+        Ivar* ivars = class_copyIvarList([self class],&amp;count);
+        for (NSUInteger i = 0; i&lt;count; i++) {
+            Ivar ivar = ivars[i];
+            const char* name = ivar_getName(ivar);
+            NSString* key = [NSString stringWithUTF8String:name];
+            id value = [aDecoder decodeObjectForKey:key];
+            [self setValue:value forKey:key];
+        }
+        free(ivars);
+    }
+    return self;
+}
+
+@end
+</code></pre>
+
+<h3>利用Runtime实现Model与字典互转</h3>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+
+@interface People : NSObject
+
+@property(nonatomic,copy)NSString* name;
+@property(nonatomic,strong)NSNumber* age;
+
+
+/**
+ * 字典 转 Model
+ **/
+-(instancetype)initWithDictionary:(NSDictionary*) dict;
+
+/**
+ * Model转换成字典
+ **/
+-(NSDictionary*)covertToDictionary;
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import "People.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+@implementation People
+
+
+
+
+-(instancetype)initWithDictionary:(NSDictionary *)dict{
+    if (self = [super init]) {
+        for (NSString* key in dict) {
+            id val = dict[key];
+            SEL setter = [self propertySetterByKey:key];
+            if (setter) {
+                objc_msgSend(self, setter,val);
+            }
+        }
+    }
+    return self;
+}
+
+-(NSDictionary *)covertToDictionary{
+    unsigned int count = 0;
+    objc_property_t* properties = class_copyPropertyList([self class], &amp;count);
+
+    if (count!=0) {
+        NSMutableDictionary* result = [@{} mutableCopy];
+        for (NSUInteger i = 0; i&lt;count; i++) {
+            const char * propertyName = property_getName(properties[i]);
+            NSString* name = [NSString stringWithUTF8String:propertyName];
+
+            SEL getter = [self propertyGetterByKey:name];
+            if (getter) {
+                id value = objc_msgSend(self, getter);
+                if (value) {
+                    result[name] = value;
+                }else{
+                    result[name] = @"value 为 nil";
+                }
+            }
+        }
+        free(properties);
+        return result;
+    }
+    free(properties);
+    return nil;
+}
+
+#pragma mark - 生成setter
+-(SEL)propertySetterByKey:(NSString*)key{
+    //key的首字母大写
+    NSString* propertySetterName = [NSString stringWithFormat:@"set%@:",key.capitalizedString];
+    SEL setter = NSSelectorFromString(propertySetterName);
+    if ([self respondsToSelector:setter]) {
+        return setter;
+    }
+    return nil;
+}
+
+-(SEL)propertyGetterByKey:(NSString*)key{
+    SEL getter = NSSelectorFromString(key);
+    if ([self respondsToSelector:getter]) {
+        return getter;
+    }
+    return nil;
+}
+
+@end
+</code></pre>
+
+<h3>消息动态解析（一）</h3>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+
+@interface People : NSObject
+
+@property(nonatomic,copy)NSString* name;
+
+/** m文件不实现方法，通过runtime动态添加方法
+ *  通过resolveInstanceMethod：方法决定是否动态添加方法。
+    如果返回Yes则通过class_addMethod动态添加方法，消息得到处理，结束；如果返回No
+ **/
+-(void)sing;
+
+@end
+</code></pre>
+
+<pre><code class="ObjC">
+#import "People.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+
+@implementation People
+
++(BOOL)resolveInstanceMethod:(SEL)sel{
+    if ([NSStringFromSelector(sel) isEqualToString:@"sing"]) {
+        class_addMethod([self class], sel, (IMP)otherIMP, "V@:");
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+
+void otherIMP(id self ,SEL cmd){
+    NSLog(@"%@正在唱歌",((People*)self).name);
+}
+
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+#import "People.h"
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        People* p = [[People alloc]init];
+        p.name = @"张全蛋";
+        [p sing];
+    }
+    return 0;
+}
+</code></pre>
+
+<p><strong>打印结果：</strong></p>
+
+<pre><code class="ObjC">2016-05-13 11:24:16.905 runtime 之 消息动态解析(一)[2819:311517] 张全蛋正在唱歌
+Program ended with exit code: 0
+</code></pre>
+
+<h3>消息动态解析（二）</h3>
+
+<p>修改Bird唱歌方法的调用对象</p>
+
+<pre><code class="ObjC">
+#import &lt;Foundation/Foundation.h&gt;
+
+@interface Bird : NSObject
+@property(nonatomic,copy)NSString* name;
+-(void)sing;
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import "Bird.h"
+#import "People.h"
+@implementation Bird
+
+
+//第一步，不动态添加方法
++(BOOL)resolveInstanceMethod:(SEL)sel{
+    return NO;
+}
+
+//第二步，不指定备选对象响应sselector
+-(id)forwardingTargetForSelector:(SEL)aSelector{
+
+    return nil;
+}
+
+//第三步，返回方法签名
+-(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector{
+    if ([NSStringFromSelector(aSelector) isEqualToString:@"sing"]) {
+        return [NSMethodSignature signatureWithObjCTypes:"v@:"];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+//第四部，修改调用对象
+-(void)forwardInvocation:(NSInvocation *)anInvocation{
+    People* p = [[People alloc]init];
+    p.name = @"张铁柱";
+    [anInvocation invokeWithTarget:p];
+}
+</code></pre>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+#import "Bird.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Bird* b = [[Bird alloc]init];
+        b.name = @"小鸟";
+        [b sing];
+    }
+    return 0;
+}
+</code></pre>
+
+<p><strong>打印结果：</strong></p>
+
+<pre><code class="ObjC">2016-05-13 11:29:58.335 runtime 之 消息动态解析(二)[2963:322829] 张铁柱正在唱歌
+Program ended with exit code: 0
+</code></pre>
+
+<h3>消息动态解析（三）</h3>
+
+<p>修改Person唱歌方法的实现</p>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+
+@interface People : NSObject
+-(void)sing;
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import "People.h"
+
+@implementation People
+
+//不动态添加方法
++(BOOL)resolveInstanceMethod:(SEL)sel{
+    return NO;
+}
+
+//不指定备选响应对象
+-(id)forwardingTargetForSelector:(SEL)aSelector{
+    return nil;
+}
+
+//返回方法签名
+-(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector{
+    if ([NSStringFromSelector(aSelector) isEqualToString:@"sing"]) {
+        return [NSMethodSignature signatureWithObjCTypes:"v@:"];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+//修改调用方法
+-(void)forwardInvocation:(NSInvocation *)anInvocation{
+    [anInvocation setSelector:@selector(dance)];
+    [anInvocation invokeWithTarget:self];
+}
+
+//若不实现forwardInvocation，则会调用此方法(可以注释掉forwardInvocation方法来做实验)
+-(void)doesNotRecognizeSelector:(SEL)aSelector{
+    NSLog(@"消息无法处理:%@",NSStringFromSelector(aSelector));
+}
+
+-(void)dance{
+    NSLog(@"跳舞中");
+}
+
+@end
+</code></pre>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+#import "People.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        People* p = [[People alloc]init];
+        [p sing];
+    }
+    return 0;
+}
+</code></pre>
+
+<p><strong>打印结果：</strong></p>
+
+<pre><code class="ObjC">2016-05-13 11:33:01.871 runtime 之 消息动态解析(三)[3073:329356] 跳舞中
+Program ended with exit code: 0
+</code></pre>
+
+<p><a href="https://github.com/caixindong/SomeDemoForYou/tree/master/RuntimeDemo">以上demo地址</a></p>
+
+<p>参考文章：  <br/>
+<a href="https://www.ianisme.com/ios/2019.html">Objective-C Runtime 1小时入门教程</a>  <br/>
+<a href="http://www.jianshu.com/p/1e06bfee99d0">详解Runtime运行时机制</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Runtime小笔记（一）]]></title>
@@ -690,213 +1322,6 @@ cameraIrisHollowClose 镜头快门开</p>
 
 <p>dispatch queue执行block时，先从dispatch queue自身的FIFO队列中取出dispatch continuation，接着调用pthread_workqueue_additem_np函数，传入这些参数：dispatch queue自身、一个符合其优先级workqueue,dispatch continuation。  <br/>
 调用该函数后，会通知对应的workqueue增加执行项目，XNU内核生成线程，线程执行pthread_workqueue函数执行block。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Core Foundation(C对象)与 Foundation(OC对象)之间的转换的理解]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/18/ios83/"/>
-    <updated>2016-03-18T21:43:11+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/18/ios83</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>最近在做一个UI效果的时候，用到__bridge这个关键字，查了资料发现它是Objective-C的对象类型转换为 void* 类型的一个关键字，于是继续查资料深入学习，发现了一遍好文章，在这里MARK一下。</p>
-
-<h2>转载自<a href="http://blog.sina.com.cn/s/blog_7c8dc2d50101ll9d.html">http://blog.sina.com.cn/s/blog_7c8dc2d50101ll9d.html</a></h2>
-
-<h4>Core Foundation 框架</h4>
-
-<p>Core Foundation框架 (CoreFoundation.framework) 是一组C语言接口，它们为iOS应用程序提供基本数据管理和服务功能。下面列举该框架支持进行管理的数据以及可提供的服务：  <br/>
-群体数据类型 (数组、集合等)  <br/>
-程序包  <br/>
-字符串管理  <br/>
-日期和时间管理  <br/>
-原始数据块管理  <br/>
-偏好管理  <br/>
-URL及数据流操作  <br/>
-线程和RunLoop  <br/>
-端口和soket通讯  <br/>
-Core Foundation框架和Foundation框架紧密相关，它们为相同功能提供接口，但Foundation框架提供Objective-C接口。如果您将Foundation对象和Core Foundation类型掺杂使用，则可利用两个框架之间的 “toll-free bridging”。所谓的Toll-free bridging是说您可以在某个框架的方法或函数同时使用Core Foundatio和Foundation 框架中的某些类型。很多数据类型支持这一特性，其中包括群体和字符串数据类型。每个框架的类和类型描述都会对某个对象是否为 toll-free bridged，应和什么对象桥接进行说明。  <br/>
-如需进一步信息，请阅读Core Foundation 框架参考。</p>
-
-<p>自 Xcode4.2 开始导入ARC机制后，为了支持对象间的转型，Apple又增加了许多转型用的关键字。这一讲我们就来了解其用法，以及产生的理由。  <br/>
-引子  <br/>
-我们先来看一下ARC无效的时候，我们写id类型转void*类型的写法：</p>
-
-<pre><code class="ObjC">id obj = [[NSObject alloc] init];
-void *p = obj;
-</code></pre>
-
-<p>反过来，当把void*对象变回id类型时，只是简单地如下来写，</p>
-
-<pre><code class="ObjC">id obj = p;
-[obj release];
-</code></pre>
-
-<p>但是上面的代码在ARC有效时，就有了下面的错误：</p>
-
-<pre><code>error: implicit conversion of an Objective-C pointer
-    to ’void *’ is disallowed with ARC
-    void *p = obj;
-              ^
-
-error: implicit conversion of a non-Objective-C pointer
-    type ’void *’ to ’id’ is disallowed with ARC
-    id o = p;
-            ^
-</code></pre>
-
-<p><strong>bridge
-为了解决这一问题，我们使用 </strong>bridge 关键字来实现id类型与void*类型的相互转换。看下面的例子。</p>
-
-<pre><code class="ObjC">id obj = [[NSObject alloc] init];
-
-void *p = (__bridge void *)obj;
-
-id o = (__bridge id)p;
-</code></pre>
-
-<p>将Objective-C的对象类型用 <strong>bridge 转换为 void* 类型和使用 </strong>unsafe_unretained 关键字修饰的变量是一样的。被代入对象的所有者需要明确对象生命周期的管理，不要出现异常访问的问题。
-除过 <strong>bridge 以外，还有两个 </strong>bridge 相关的类型转换关键字：  <br/>
-<strong>bridge_transfer  <br/>
-</strong>bridge_retained  <br/>
-接下来，我们将看看这两个关键字的区别。</p>
-
-<p><code>1.</code> <strong>bridge_retained  <br/>
-先来看使用 </strong>bridge_retained 关键字的例子程序：</p>
-
-<pre><code class="ObjC">id obj = [[NSObject alloc] init];
-
-void *p = (__bridge_retained void *)obj;
-</code></pre>
-
-<p>从名字上我们应该能理解其意义：类型被转换时，其对象的所有权也将被变换后变量所持有。如果不是ARC代码，类似下面的实现：</p>
-
-<pre><code class="ObjC">id obj = [[NSObject alloc] init];
-
-void *p = obj;
-[(id)p retain];
-</code></pre>
-
-<p>可以用一个实际的例子验证，对象所有权是否被持有。</p>
-
-<pre><code class="ObjC">void *p = 0;
-
-{
-    id obj = [[NSObject alloc] init];
-    p = (__bridge_retained void *)obj;
-}
-
-NSLog(@"class=%@", [(__bridge id)p class]);
-</code></pre>
-
-<p>出了大括号的范围后，p 仍然指向一个有效的实体。说明他拥有该对象的所有权，该对象没有因为出其定义范围而被销毁。</p>
-
-<p><code>2.</code> __bridge_transfer</p>
-
-<p>相反，当想把本来拥有对象所有权的变量，在类型转换后，让其释放原先所有权的时候，需要使用__bridge_transfer 关键字。文字有点绕口，我们还是来看一段代码吧。
-如果ARC无效的时候，我们可能需要写下面的代码。</p>
-
-<pre><code class="ObjC">// p 变量原先持有对象的所有权
-id obj = (id)p;
-[obj retain];
-[(id)p release];
-</code></pre>
-
-<p>那么ARC有效后，我们可以用下面的代码来替换：</p>
-
-<pre><code class="ObjC">// p 变量原先持有对象的所有权
-id obj = (__bridge_transfer id)p;
-</code></pre>
-
-<p>可以看出来，<strong>bridge_retained 是编译器替我们做了 retain 操作，而 </strong>bridge_transfer 是替我们做了 release。</p>
-
-<p>Toll-Free bridged
-在iOS世界，主要有两种对象：Objective-C 对象和 Core Foundation 对象0。Core Foundation 对象主要是有C语言实现的 Core Foundation Framework 的对象，其中也有对象引用计数的概念，只是不是 Cocoa Framework::Foundation Framework 的 retain/release，而是自身的 CFRetain/CFRelease 接口。
-这两种对象间可以互相转换和操作，不使用ARC的时候，单纯的用C原因的类型转换，不需要消耗CPU的资源，所以叫做 Toll-Free bridged。比如 NSArray和CFArrayRef, NSString和CFStringRef，他们虽然属于不同的 Framework，但是具有相同的对象结构，所以可以用标准C的类型转换。
-比如不使用ARC时，我们用下面的代码：</p>
-
-<pre><code class="ObjC">NSString *string = [NSString stringWithFormat:...];
-CFStringRef cfString = (CFStringRef)string;
-</code></pre>
-
-<p>同样，Core Foundation类型向Objective-C类型转换时，也是简单地用标准C的类型转换即可。
-但是在ARC有效的情况下，将出现类似下面的编译错误：</p>
-
-<pre><code>Cast of Objective-C pointer type ‘NSString *’ to C pointer type ‘CFStringRef’ (aka ‘const struct __CFString *’) requires a bridged cast
-Use __bridge to convert directly (no change in ownership)
-Use __bridge_retained to make an ARC object available as a +1 ‘CFStringRef’ (aka ‘const struct __CFString *’)
-</code></pre>
-
-<p>错误中已经提示了我们需要怎样做：用 <strong>bridge 或者 </strong>bridge_retained 来转型，其差别就是变更对象的所有权。</p>
-
-<p>正因为Objective-C是ARC管理的对象，而Core Foundation不是ARC管理的对象，所以才要特意这样转换，这与id类型向void*转换是一个概念。也就是说，当这两种类型（有ARC管理，没有ARC管理）在转换时，需要告诉编译器怎样处理对象的所有权。</p>
-
-<p>上面的例子，使用 <strong>bridge/</strong>bridge_retained 后的代码如下：</p>
-
-<pre><code class="ObjC">NSString *string = [NSString stringWithFormat:...];
-CFStringRef cfString = (__bridge CFStringRef)string;
-只是单纯地执行了类型转换，没有进行所有权的转移，也就是说，当string对象被释放的时候，cfString也不能被使用了。
-NSString *string = [NSString stringWithFormat:...];
-CFStringRef cfString = (__bridge_retained CFStringRef)string;
-...
-CFRelease(cfString); // 由于Core Foundation的对象不属于ARC的管理范畴，所以需要自己release
-</code></pre>
-
-<p>使用 __bridge_retained 可以通过转换目标处（cfString）的 retain 处理，来使所有权转移。即使 string 变量被释放，cfString 还是可以使用具体的对象。只是有一点，由于Core Foundation的对象不属于ARC的管理范畴，所以需要自己release。</p>
-
-<p>实际上，Core Foundation 内部，为了实现Core Foundation对象类型与Objective-C对象类型的相互转换，提供了下面的函数。</p>
-
-<pre><code class="ObjC">CFTypeRef  CFBridgingRetain(id  X)  {
-    return  (__bridge_retained  CFTypeRef)X;
-}
-
-id  CFBridgingRelease(CFTypeRef  X)  {
-    return  (__bridge_transfer  id)X;
-}
-</code></pre>
-
-<p>所以，可以用 CFBridgingRetain 替代 __bridge_retained 关键字：</p>
-
-<pre><code class="ObjC">NSString *string = [NSString stringWithFormat:...];
-CFStringRef cfString = CFBridgingRetain(string);
-...
-CFRelease(cfString); // 由于Core Foundation不在ARC管理范围内，所以需要主动release。
-</code></pre>
-
-<pre><code>__bridge_transfer
-</code></pre>
-
-<p>所有权被转移的同时，被转换变量将失去对象的所有权。当Core Foundation对象类型向Objective-C对象类型转换的时候，会经常用到 __bridge_transfer 关键字。</p>
-
-<pre><code class="ObjC">CFStringRef cfString = CFStringCreate...();
-NSString *string = (__bridge_transfer NSString *)cfString;
-
-// CFRelease(cfString); 因为已经用 __bridge_transfer 转移了对象的所有权，所以不需要调用 release
-</code></pre>
-
-<p>同样，我们可以使用 CFBridgingRelease() 来代替 __bridge_transfer 关键字。</p>
-
-<pre><code class="ObjC">CFStringRef cfString = CFStringCreate...();
-NSString *string = CFBridgingRelease(cfString);
-</code></pre>
-
-<p>总结
-由上面的学习我们了解到 ARC 中类型转换的用法，那么我们实际使用中按照怎样的原则或者方法来区分使用呢，下面我总结了几点关键要素。
-明确被转换类型是否是 ARC 管理的对象
-Core Foundation 对象类型不在 ARC 管理范畴内
-Cocoa Framework::Foundation 对象类型（即一般使用到的Objectie-C对象类型）在 ARC 的管理范畴内
-如果不在 ARC 管理范畴内的对象，那么要清楚 release 的责任应该是谁
-各种对象的生命周期是怎样的
-1. 声明 id obj 的时候，其实是缺省的申明了一个 <strong>strong 修饰的变量，所以编译器自动地加入了 retain 的处理，所以说 </strong>bridge_transfer 关键字只为我们做了 release 处理。</p>
-
-<p>根据苹果官方的文档（<a href="https://developer.apple.com/library/ios/#releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html%EF%BC%89%EF%BC%9A">https://developer.apple.com/library/ios/#releasenotes/ObjectiveC/RN-TransitioningToARC/Introduction/Introduction.html%EF%BC%89%EF%BC%9A</a></p>
-
-<p>__bridge只做类型转换，但是不修改对象（内存）管理权；</p>
-
-<p>__bridge_retained（也可以使用CFBridgingRetain）将Objective-C的对象转换为Core Foundation的对象，同时将对象（内存）的管理权交给我们，后续需要使用CFRelease或者相关方法来释放对象；</p>
-
-<p>__bridge_transfer（也可以使用CFBridgingRelease）将Core Foundation的对象转换为Objective-C的对象，同时将对象（内存）的管理权交给ARC。</p>
 ]]></content>
   </entry>
   
