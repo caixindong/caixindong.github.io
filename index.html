@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios Runtime小笔记（二） 前言 上篇主要讲Runtime的一些术语描述和定义，Runtime的主要应用是用于消息的传递，今天会结合一些实战例子来讲下OC的消息传递机制。 普通消息传递 在OC里，对象调用方法叫作发送消息， &hellip;">
+	<meta name="description" content="ios Block内存管理 ios Block 之 Block的底层实现 前言 最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个语法的入口，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。 block实例 1 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,222 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-15T11:25:38+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/05/15/ios90/" itemprop="url">Block内存管理</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-14T10:57:07+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/05/14/ios89/" itemprop="url">Block 之 Block的底层实现</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>前言</h2>
+
+<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。</p>
+
+<h2>block实例</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="cp">#import &lt;Foundation/Foundation.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">void</span> <span class="nf">hello_</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="p">(</span><span class="o">^</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="kt">long</span><span class="p">(){</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">*</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>定义hello方法是方便我们等下查看编译代码的时候准确定位myBlock的实现。用clang将objected-C 代码编译为C++代码。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="err">控制台命令：</span><span class="n">clang</span> <span class="o">-</span><span class="n">rewrite</span><span class="o">-</span><span class="n">objc</span> <span class="n">main</span><span class="p">.</span><span class="n">m</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们打开main.cpp文件，定位到以下代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">struct</span> <span class="n">__block_impl</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="o">*</span><span class="n">isa</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">Flags</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">Reserved</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="o">*</span><span class="n">FuncPtr</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这是block基类的定义，所有block都继承于它，拥有它以下那些属性：  <br/>
+isa是指向该block的类型的类，也就是我们理解的对象指针；  <br/>
+Flags包含了引用计数；  <br/>
+Reserved：保留变量,我的理解是表示block内部的变量数；      <br/>
+FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">struct</span> <span class="n">__hello__block_impl_0</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">__block_impl</span> <span class="n">impl</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">struct</span> <span class="n">__hello__block_desc_0</span><span class="o">*</span> <span class="n">Desc</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">j</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">__hello__block_impl_0</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="k">struct</span> <span class="n">__hello__block_desc_0</span> <span class="o">*</span><span class="n">desc</span><span class="p">,</span> <span class="kt">int</span> <span class="n">_i</span><span class="p">,</span> <span class="kt">int</span> <span class="n">_j</span><span class="p">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">:</span> <span class="n">i</span><span class="p">(</span><span class="n">_i</span><span class="p">),</span> <span class="n">j</span><span class="p">(</span><span class="n">_j</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">impl</span><span class="p">.</span><span class="n">isa</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">_NSConcreteStackBlock</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">impl</span><span class="p">.</span><span class="n">Flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">impl</span><span class="p">.</span><span class="n">FuncPtr</span> <span class="o">=</span> <span class="n">fp</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">Desc</span> <span class="o">=</span> <span class="n">desc</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这是myBlock的定义，它的结构体以hello打头，代表myBlock位于hello函数里，这是block的命名方式。<strong>hello</strong>block_desc_0指的是myBlock的描述。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="kt">long</span> <span class="nf">__hello__block_func_0</span><span class="p">(</span><span class="k">struct</span> <span class="n">__hello__block_impl_0</span> <span class="o">*</span><span class="n">__cself</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">i</span><span class="p">;</span> <span class="c1">// bound by copy</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">j</span><span class="p">;</span> <span class="c1">// bound by copy</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">*</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'> <span class="err">```</span>
+</span><span class='line'> <span class="n">myBlock</span><span class="err">内函数的具体实现，注意</span><span class="o">**</span><span class="n">bound</span> <span class="n">by</span> <span class="k">copy</span><span class="o">**</span><span class="err">，</span><span class="n">block</span><span class="err">对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于</span><span class="n">block</span><span class="err">的内存管理的时候会说。</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ObjC
+static struct <strong>hello</strong>block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+} <strong>hello</strong>block_desc_0_DATA = { 0, sizeof(struct <strong>hello</strong>block_impl_0)};</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="err">这是</span><span class="n">myBlock</span><span class="err">的具体描述</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ObjC
+void hello_(){
+    int i = 2;
+    int j = 3;
+    long (<em>myBlock)(void) = ((long (</em>)())&amp;<strong>hello</strong>block_impl_0((void *)<strong>hello</strong>block_func_0, &amp;<strong>hello</strong>block_desc_0_DATA, i, j));
+}
+```
+myBlock实例变量的定义</p>
+
+<h2>做下小小总结</h2>
+
+<p>编译器会根据block捕获的变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去。       <br/>
+block中包含了被引用的变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -2822,386 +3038,6 @@ Cocoa Framework::Foundation 对象类型（即一般使用到的Objectie-C对象
 </span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">colors</span> <span class="o">=</span> <span class="l">@[</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">opaqueBlackColor</span><span class="p">,(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">transparentBalckColor</span><span class="l">]</span><span class="p">;</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">layer</span> <span class="nl">insertSublayer</span><span class="p">:</span><span class="n">layer</span> <span class="nl">atIndex</span><span class="p">:</span><span class="mi">0</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-07T22:45:23+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/03/07/ios80/" itemprop="url">iOS 网络编程</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>前言</h2>
-
-<p>最近要给quanta的小朋友讲iOS网络编程的相关知识，所以提前在这里梳理。</p>
-
-<h2>何为HTTP</h2>
-
-<p>首先我们必须了解HTTP协议，何为HTTP?超文本传送协议，它是基于应用层的通信规范，是一个设计来使客户端和服务器顺利进行通讯的协议。
-HTTP做了以下几方面的规定：  <br/>
-<code>1.</code> request和response的格式；  <br/>
-<code>2.</code> 建立连接的方法，有持久连接和非持久连接。HTTP1.1默认是带流水的持久连接；  <br/>
-         非持久连接：服务器发出一个对象后，相应TCP连接关闭，每个TCP连接只用于传输一个请求消息和一个响应消息；  <br/>
-         持久连接：单个持久TCP连接，它分为不带流水线和流水线。不带流水线的只有收到上个请求响应再请求；
-<code>3.</code> 缓存机制（减少发送请求）；      <br/>
-<code>4.</code> 响应授权激发机制，用于服务器激发客户端请求并授权；</p>
-
-<p>过程：客户端先建立一个TCP连接，再发送一个请求，服务器收到请求处理后响应，传送数据，客户端可以继续发生请求或关闭TCP</p>
-
-<h2>GET与POST</h2>
-
-<p>GET与POST是两种请求方式，GET主要用于从指定的服务器中获取数据，POST主要用于提交数据给指定服务器
-区别：  <br/>
-GET请求能够被缓存，POST请求不能被缓存下来
-GET提交的数据放在url(以？分割url和传输数据，参数之间以&amp;相连)      <br/>
-GET请求会保存在浏览器的浏览记录中，POST请求不会保存在浏览器浏览记录中  <br/>
-以GET请求的URL能够保存为浏览器书签，以POST请求的URL无法保存为浏览器书签  <br/>
-GET请求有长度限制，POST请求无长度限制
-GET安全性没有POST好，因为GET提交的参数是可见</p>
-
-<h2>iOS网络编程</h2>
-
-<p>在iOS9之前，我们主要利用NSURLConnection来进行网络请求操作，在iOS9以后，苹果推荐使用NSURLSession。具体如何使用这些类来进行网络请求，我以代码加注释的形式呈现出来。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 可变请求与不可变请求的区别：</span>
-</span><span class='line'><span class="cm"> * 1、不可变请求在初始化的时候需要指定url，而可变请求可以以后指定</span>
-</span><span class='line'><span class="cm"> * 2、cachePolicy缓存策略 timeoutInterval超时时间</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'>
-</span><span class='line'><span class="bp">NSURLRequest</span><span class="o">*</span> <span class="n">request</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURLRequest</span> <span class="nl">requestWithURL</span><span class="p">:[</span><span class="bp">NSURL</span> <span class="nl">URLWithString</span><span class="p">:</span><span class="s">@&quot;http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png&quot;</span><span class="p">]</span> <span class="nl">cachePolicy</span><span class="p">:</span><span class="n">NSURLRequestReloadIgnoringLocalCacheData</span> <span class="nl">timeoutInterval</span><span class="p">:</span><span class="mi">60</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * iOS 9以前 请求,默认是GET</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="p">[</span><span class="bp">NSURLConnection</span> <span class="nl">sendAsynchronousRequest</span><span class="p">:</span><span class="n">request</span> <span class="nl">queue</span><span class="p">:[</span><span class="bp">NSOperationQueue</span> <span class="n">mainQueue</span><span class="p">]</span> <span class="nl">completionHandler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">NSURLResponse</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">response</span><span class="p">,</span> <span class="bp">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">data</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">//解析json数据</span>
-</span><span class='line'>    <span class="bp">NSDictionary</span><span class="o">*</span> <span class="n">dict</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSJSONSerialization</span> <span class="nl">JSONObjectWithData</span><span class="p">:</span><span class="n">data</span> <span class="nl">options</span><span class="p">:</span><span class="n">NSJSONReadingMutableLeaves</span> <span class="nl">error</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;%@&quot;</span><span class="p">,</span><span class="n">dict</span><span class="p">);</span>
-</span><span class='line'>   <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>       <span class="n">_imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIImage</span> <span class="nl">imageWithData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
-</span><span class='line'>   <span class="p">});</span>
-</span><span class='line'><span class="p">}];</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * iOS 9 请求</span>
-</span><span class='line'><span class="cm">**/</span>
-</span><span class='line'><span class="bp">NSMutableURLRequest</span><span class="o">*</span> <span class="n">request2</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
-</span><span class='line'><span class="n">request2</span><span class="p">.</span><span class="n">URL</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURL</span> <span class="nl">URLWithString</span><span class="p">:</span><span class="s">@&quot;http://a1.jikexueyuan.com/home/201601/25/1f7e/56a5887620a10.png&quot;</span><span class="p">];</span>
-</span><span class='line'><span class="n">request2</span><span class="p">.</span><span class="n">HTTPMethod</span> <span class="o">=</span> <span class="s">@&quot;GET&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="bp">NSURLSession</span><span class="o">*</span> <span class="n">session</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURLSession</span> <span class="n">sharedSession</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">[[</span><span class="n">session</span> <span class="nl">dataTaskWithRequest</span><span class="p">:</span><span class="n">request2</span> <span class="nl">completionHandler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">NSData</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">data</span><span class="p">,</span> <span class="bp">NSURLResponse</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">response</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span> <span class="n">_Nullable</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;%@&quot;</span><span class="p">,</span><span class="n">data</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">_imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIImage</span> <span class="nl">imageWithData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">}]</span> <span class="n">resume</span><span class="p">];</span>
-</span><span class='line'><span class="c1">//记得resume 唤醒 suspend 暂停</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 上传 用POST，具体可以看这个链接 http://borissun.iteye.com/blog/1338991</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="bp">NSMutableURLRequest</span><span class="o">*</span> <span class="n">postRequest</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">NSMutableURLRequest</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
-</span><span class='line'><span class="n">postRequest</span><span class="p">.</span><span class="n">URL</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSURL</span> <span class="nl">URLWithString</span><span class="p">:</span><span class="s">@&quot;&quot;</span><span class="p">];</span>
-</span><span class='line'><span class="bp">NSInputStream</span><span class="o">*</span> <span class="n">inStream</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSInputStream</span> <span class="nl">inputStreamWithFileAtPath</span><span class="p">:</span><span class="s">@&quot;&quot;</span><span class="p">];</span>
-</span><span class='line'><span class="n">postRequest</span><span class="p">.</span><span class="n">HTTPBodyStream</span> <span class="o">=</span> <span class="n">inStream</span><span class="p">;</span>
-</span><span class='line'><span class="n">postRequest</span><span class="p">.</span><span class="n">HTTPMethod</span> <span class="o">=</span> <span class="s">@&quot;POST&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-07T16:59:25+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/lian-biao/'>链表</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/03/07/ios79/" itemprop="url">重新整理链表</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>要求</h2>
-
-<p>例如原链表为 1->2->3->4->5 ,重新整理后为 1->4->2->5->3</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm">* 跟着算法走一遍就知道如何重新整理</span>
-</span><span class='line'><span class="cm">**/</span>
-</span><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span><span class="o">::</span><span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>      <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="c1">//1,2,4,5 -&gt; 1,4,2,5  1,2,3,4,5 -&gt; 1,4,2,5,3</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">lengthOfList</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">count</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/**</span>
-</span><span class='line'><span class="cm">    * 翻转链表</span>
-</span><span class='line'><span class="cm">    **/</span>
-</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">reverseList</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">pre</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">pre</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">p</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">pre</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kt">void</span> <span class="n">reorderList</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="o">||</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">lengthOfList</span><span class="p">(</span><span class="n">head</span><span class="p">);</span>
-</span><span class='line'>            <span class="kt">int</span> <span class="n">half</span> <span class="o">=</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">n</span><span class="o">%</span><span class="mi">2</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">half</span><span class="o">++</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">leftEnd</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">half</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">leftEnd</span> <span class="o">=</span> <span class="n">leftEnd</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">rightStart</span> <span class="o">=</span> <span class="n">leftEnd</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">rightStart</span> <span class="o">=</span> <span class="n">reverseList</span><span class="p">(</span><span class="n">rightStart</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="n">leftEnd</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">left</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">right</span> <span class="o">=</span> <span class="n">rightStart</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>            <span class="c1">//重新链接</span>
-</span><span class='line'>            <span class="kt">bool</span> <span class="n">flag</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">right</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">flag</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="n">next</span> <span class="o">=</span> <span class="n">left</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">left</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">right</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">left</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>                    <span class="n">next</span> <span class="o">=</span> <span class="n">right</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">right</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">left</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">right</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>                <span class="n">flag</span> <span class="o">=</span> <span class="o">!</span><span class="n">flag</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

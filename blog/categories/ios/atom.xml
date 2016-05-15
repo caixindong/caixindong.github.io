@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-13T11:38:10+08:00</updated>
+  <updated>2016-05-15T16:18:23+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,116 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Block内存管理]]></title>
+    <link href="http://caixindong.github.io/blog/2016/05/15/ios90/"/>
+    <updated>2016-05-15T11:25:38+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/05/15/ios90</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Block 之 Block的底层实现]]></title>
+    <link href="http://caixindong.github.io/blog/2016/05/14/ios89/"/>
+    <updated>2016-05-14T10:57:07+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/05/14/ios89</id>
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。</p>
+
+<h2>block实例</h2>
+
+<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
+
+void hello_(){
+    int i = 2;
+    int j = 3;
+    long (^myBlock)(void) = ^long(){
+        return i*j*10;
+    };
+}
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+
+
+    }
+    return 0;
+}
+</code></pre>
+
+<p>定义hello方法是方便我们等下查看编译代码的时候准确定位myBlock的实现。用clang将objected-C 代码编译为C++代码。</p>
+
+<pre><code>控制台命令：clang -rewrite-objc main.m 
+</code></pre>
+
+<p>我们打开main.cpp文件，定位到以下代码：</p>
+
+<pre><code class="ObjC">struct __block_impl {
+  void *isa;
+  int Flags;
+  int Reserved;
+  void *FuncPtr;
+};
+</code></pre>
+
+<p>这是block基类的定义，所有block都继承于它，拥有它以下那些属性：  <br/>
+isa是指向该block的类型的类，也就是我们理解的对象指针；  <br/>
+Flags包含了引用计数；  <br/>
+Reserved：保留变量,我的理解是表示block内部的变量数；      <br/>
+FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
+
+<pre><code class="ObjC">struct __hello__block_impl_0 {
+  struct __block_impl impl;
+  struct __hello__block_desc_0* Desc;
+  int i;
+  int j;
+  __hello__block_impl_0(void *fp, struct __hello__block_desc_0 *desc, int _i, int _j, int flags=0) : i(_i), j(_j) {
+    impl.isa = &amp;_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+</code></pre>
+
+<p>这是myBlock的定义，它的结构体以hello打头，代表myBlock位于hello函数里，这是block的命名方式。<strong>hello</strong>block_desc_0指的是myBlock的描述。</p>
+
+<pre><code class="ObjC">static long __hello__block_func_0(struct __hello__block_impl_0 *__cself) {
+  int i = __cself-&gt;i; // bound by copy
+  int j = __cself-&gt;j; // bound by copy
+
+        return i*j*10;
+    }
+</code></pre>
+
+<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block的内存管理的时候会说。</p>
+
+<pre><code class="ObjC">static struct __hello__block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+} __hello__block_desc_0_DATA = { 0, sizeof(struct __hello__block_impl_0)};
+</code></pre>
+
+<p>这是myBlock的具体描述</p>
+
+<pre><code class="ObjC">void hello_(){
+    int i = 2;
+    int j = 3;
+    long (*myBlock)(void) = ((long (*)())&amp;__hello__block_impl_0((void *)__hello__block_func_0, &amp;__hello__block_desc_0_DATA, i, j));
+}
+</code></pre>
+
+<p>myBlock实例变量的定义</p>
+
+<h2>做下小小总结</h2>
+
+<p>编译器会根据block捕获的变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去。       <br/>
+block中包含了被引用的变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Runtime小笔记（二）]]></title>
@@ -1025,303 +1135,6 @@ struct objc_category {
 </code></pre>
 
 <p>Demo地址：<a href="https://github.com/caixindong/SomeDemoForYou">https://github.com/caixindong/SomeDemoForYou</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[iOS动画总结]]></title>
-    <link href="http://caixindong.github.io/blog/2016/04/19/ios85/"/>
-    <updated>2016-04-19T22:21:39+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/04/19/ios85</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>做个知识汇总，日常动画的动画实现，看这篇应该足够了</p>
-
-<h2>iOS图形分层</h2>
-
-<p><img src="/images/uikit.png"></p>
-
-<p>越顶层，动画的封装程度越高，动画api就越简洁，本文章主要讲动画在UIKit层和CoreAnimation层的实现</p>
-
-<h2>UIKit层</h2>
-
-<h4>UIViewAnimation</h4>
-
-<p>动画的实现过程：</p>
-
-<pre><code class="ObjC">[UIView beginAnimations:@"newAnimation" context:nil];
-//设置动画的持续时间
-[UIView setAnimationDuration:1.0];
-//如果设置为YES,代表动画每次重复执行的效果会跟上一次相反
-[UIView setAnimationRepeatAutoreverses:YES];
-//设置动画的运动曲线（线性、先快后慢、先慢后快）
-[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-//动画的重复次数
-[UIView setAnimationRepeatCount:10];
-
-//动画动作定义
-CGRect tmp = self.myView.frame;
-tmp.origin.x += 100;
-self.myView.frame = tmp;
-
-//提交动画
-[UIView commitAnimations];
-</code></pre>
-
-<h4>UIViewAnimationWithBlocks</h4>
-
-<p>动画的实现过程：</p>
-
-<pre><code class="ObjC">
-//动画持续时间、延迟时间、动画执行函数
-[UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseInOut  animations:^{
-//动画动作定义
-CGRect tmp = self.myView.frame;
-tmp.origin.x = 300;
-self.myView.frame = tmp;
-    } completion:nil];
-</code></pre>
-
-<h2>Core Animation</h2>
-
-<p>Core Animation是直接作用在CALayer上的(并非UIView上)非常强大的跨Mac OS X和iOS平台的动画处理API，Core Animation的动画执行过程都是在后台操作的，不会阻塞主线程。</p>
-
-<p>CAAnimation可分为四种：
-1.CABasicAnimation  <br/>
-通过设定起始点，终点，时间，动画会沿着你这设定点进行移动。可以看做特殊的CAKeyFrameAnimation  <br/>
-2.CAKeyframeAnimation  <br/>
-Keyframe顾名思义就是关键点的frame，你可以通过设定CALayer的始点、中间关键点、终点的frame，时间，动画会沿你设定的轨迹进行移动  <br/>
-3.CAAnimationGroup  <br/>
-Group也就是组合的意思，就是把对这个Layer的所有动画都组合起来。PS：一个layer设定了很多动画，他们都会同时执行，如何按顺序执行我到时候再讲。  <br/>
-4.CATransition  <br/>
-这个就是苹果帮开发者封装好的一些动画</p>
-
-<p>停止动画</p>
-
-<pre><code class="ObjC">CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
-
-     // 让CALayer的时间停止走动
-     layer.speed = 0.0;
-     // 让CALayer的时间停留在pausedTime这个时刻
-     layer.timeOffset = pausedTime;
-</code></pre>
-
-<p>恢复动画</p>
-
-<pre><code class="ObjC">CFTimeInterval pausedTime = layer.timeOffset;
-      // 1. 让CALayer的时间继续行走
-        layer.speed = 1.0;
-      // 2. 取消上次记录的停留时刻
-        layer.timeOffset = 0.0;
-      // 3. 取消上次设置的时间
-        layer.beginTime = 0.0;    
-      // 4. 计算暂停的时间(这里也可以用CACurrentMediaTime()-pausedTime)
-      CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
-      // 5. 设置相对于父坐标系的开始时间(往后退timeSincePause)
-        layer.beginTime = timeSincePause;
-</code></pre>
-
-<h4>CABasicAnimation的实现</h4>
-
-<p>基础动画，是CAPropertyAnimation子类  <br/>
-keyPath附录表：  <br/>
-<img src="/images/keypath.png">
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="bp">CALayer</span><span class="o">*</span> <span class="n">scaleLayer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CALayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">blueColor</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">scaleLayer</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addSublayer</span><span class="p">:</span><span class="n">scaleLayer</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>  <span class="c1">//动画类型</span>
-</span><span class='line'><span class="bp">CABasicAnimation</span><span class="o">*</span> <span class="n">scaleAnimation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CABasicAnimation</span> <span class="nl">animationWithKeyPath</span><span class="p">:</span><span class="s">@&quot;transform.scale&quot;</span><span class="p">];</span>
-</span><span class='line'><span class="c1">//动画的起始状态</span>
-</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">fromValue</span> <span class="o">=</span> <span class="mf">@1.0</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//动画的结束状态</span>
-</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">toValue</span> <span class="o">=</span> <span class="mf">@1.5</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//如果设置为YES,代表动画每次重复执行的效果会跟上一次相反</span>
-</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm">* fillMode决定当前对象在非active时间段的行为。（要想fillMode有效，最好设置removedOnCompletion = NO）</span>
-</span><span class='line'><span class="cm">**/</span>
-</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">fillMode</span> <span class="o">=</span> <span class="n">kCAFillModeForwards</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//动画重复次数</span>
-</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="n">MAXFLOAT</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//动画持续时间</span>
-</span><span class='line'><span class="n">scaleAnimation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">//将动画添加到layer上面</span>
-</span><span class='line'><span class="p">[</span><span class="n">scaleLayer</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">scaleAnimation</span> <span class="nl">forKey</span><span class="p">:</span><span class="s">@&quot;scaleAnimation&quot;</span><span class="p">];</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">####CAKeyframeAnimation的实现</span>
-</span><span class='line'><span class="err">关键帧动画，也是</span><span class="bp">CAPropertyAnimation</span><span class="err">的子类</span>
-</span><span class='line'><span class="err">与</span><span class="bp">CABasicAnimation</span><span class="err">的区别是：</span>
-</span><span class='line'><span class="bp">CABasicAnimation</span><span class="err">只能从一个数值（</span><span class="n">fromValue</span><span class="err">）变到另一个数值（</span><span class="n">toValue</span><span class="err">），而</span><span class="bp">CAKeyframeAnimation</span><span class="err">会使用一个</span><span class="bp">NSArray</span><span class="err">保存这些数值</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="bp">CALayer</span><span class="o">*</span> <span class="n">blackPoint</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CALayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">backgroundColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="n">blackColor</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">blackPoint</span><span class="p">.</span><span class="n">cornerRadius</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">view</span><span class="p">.</span><span class="n">layer</span> <span class="nl">addSublayer</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">];</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">CGFloat</span> <span class="n">originY</span> <span class="o">=</span> <span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="bp">CAKeyframeAnimation</span><span class="o">*</span> <span class="n">keyAnimation</span> <span class="o">=</span> <span class="p">[</span><span class="bp">CAKeyframeAnimation</span> <span class="nl">animationWithKeyPath</span><span class="p">:</span><span class="s">@&quot;position&quot;</span><span class="p">];</span>
-</span><span class='line'><span class="c1">//记录每一个关键帧</span>
-</span><span class='line'><span class="n">keyAnimation</span><span class="p">.</span><span class="n">values</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">],[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">CGPointMake</span><span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="n">originY</span><span class="p">)],[</span><span class="bp">NSValue</span> <span class="nl">valueWithCGPoint</span><span class="p">:</span><span class="n">blackPoint</span><span class="p">.</span><span class="n">frame</span><span class="p">.</span><span class="n">origin</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
-</span><span class='line'><span class="c1">//可以为对应的关键帧指定对应的时间点，其取值范围为0到1.0，keyTimes中的每一个时间值都对应values中的每一帧。如果没有设置keyTimes，各个关键帧的时间是平分的</span>
-</span><span class='line'><span class="n">keyAnimation</span><span class="p">.</span><span class="n">keyTimes</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mf">0.5</span><span class="p">],</span>
-</span><span class='line'>                          <span class="p">[</span><span class="bp">NSNumber</span> <span class="nl">numberWithFloat</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>   <span class="c1">//指定时间函数</span>
-</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">timingFunctions</span> <span class="o">=</span> <span class="l">@[</span><span class="p">[</span><span class="bp">CAMediaTimingFunction</span> <span class="nl">functionWithName</span><span class="p">:</span><span class="n">kCAMediaTimingFunctionLinear</span><span class="p">],</span>
-</span><span class='line'>                                                                               <span class="p">[</span><span class="bp">CAMediaTimingFunction</span> <span class="nl">functionWithName</span><span class="p">:</span><span class="n">kCAMediaTimingFunctionLinear</span><span class="p">]</span><span class="l">]</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">repeatCount</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">autoreverses</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">calculationMode</span> <span class="o">=</span> <span class="n">kCAAnimationLinear</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">keyAnimation</span><span class="p">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">[</span><span class="n">blackPoint</span> <span class="nl">addAnimation</span><span class="p">:</span><span class="n">keyAnimation</span> <span class="nl">forKey</span><span class="p">:@</span><span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">rectRunAnimation</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;];</span>
-</span></code></pre></td></tr></table></div></figure></p>
-
-<h4>CAAnimationGroup的实现</h4>
-
-<p>组动画，是CAAnimation的子类  <br/>
-可以保存一组动画对象，将CAAnimationGroup对象加入层后，组中所有动画对象可以同时并发运行,可以通过设置动画对象的beginTime属性来更改动画的开始时间</p>
-
-<pre><code class="ObjC">CAAnimationGroup* group = [CAAnimationGroup animation];
-    //用来保存一组动画对象
-    group.animations = @[scaleAnimation];
-    group.duration = 0.8;
-    group.repeatCount = 3;
-    group.autoreverses = YES;
-    [scaleLayer addAnimation:group forKey:nil];
-</code></pre>
-
-<h4>CATransition的实现</h4>
-
-<p>转场动画，是CAAnimation的子类，，能够为层提供移出屏幕和移入屏幕的动画效果。
-UINavigationController就是通过CATransition实现了将控制器的视图推入屏幕的动画效果
-有以下效果可以使用：  <br/>
-cube 方块  <br/>
-suckEffect 三角  <br/>
-rippleEffect 水波抖动  <br/>
-pageCurl 上翻页  <br/>
-pageUnCurl 下翻页  <br/>
-oglFlip 上下翻转  <br/>
-cameraIrisHollowOpen 镜头快门开  <br/>
-cameraIrisHollowClose 镜头快门开</p>
-
-<pre><code class="ObjC">CATransition* animation = [CATransition animation];
-    animation.duration = 1.0f;
-    animation.timingFunction = UIViewAnimationCurveEaseInOut;
-    //执行完是否移除
-    animation.removedOnCompletion = NO;
-    //过渡效果
-    animation.type = @"cube";
-    //过渡方向
-    animation.subtype = kCATransitionFromRight;
-    //设置之后endProgress才有效
-    animation.fillMode = kCAFillModeForwards;
-    animation.endProgress = 1;
-    [imageView.layer addAnimation:animation forKey:nil];
-</code></pre>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[浅谈GCD的内部实现]]></title>
-    <link href="http://caixindong.github.io/blog/2016/04/06/ios84/"/>
-    <updated>2016-04-06T22:37:36+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/04/06/ios84</id>
-    <content type="html"><![CDATA[<h2>CGD</h2>
-
-<p>GCD是苹果开发的多线程编程的解决方案，通过简单的API就可以实现创建新线程去执行我们需要执行的任务，不需要我们手动地创建和管理线程。它的API包含在libdispatch库中。</p>
-
-<h2>Dispatch Queue</h2>
-
-<p>Dispatch Queue是GCD中很重要的一部分，它是负责执行处理的队列，它的内部主要由三部分构成：  <br/>
-1、一个管理追加block的C语言实现的FIFO的队列；   <br/>
-2、处理信号量的原子操作；  <br/>
-3、用于管理线程的C语言实现的一些容器。</p>
-
-<pre><code class="ObjC">dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSLog(@"我的操作");
-    });
-</code></pre>
-
-<p>dispatch queue 通过 dispatch_async等函数将block追加到队列上，block不是直接追加到队列，而是先构成一个dispatch continuation构造体，构造体包含了这个block还有一些上下文信息，例如block所属的dispatch group等等。</p>
-
-<h2>Dispatch Queue执行过程是怎么的呢？</h2>
-
-<h2>workqueue</h2>
-
-<p>工作队列，是一个用于创建内核线程的接口，通过它创建的内核线程来执行内核其他模块排列到队列里的工作。不同优先级的dispatch queue对应着对应优先级的workqueue。GCD初始化的时候，使用pthread_workqueue_create_np创建pthread_workqueue</p>
-
-<h2>执行过程</h2>
-
-<p>dispatch queue执行block时，先从dispatch queue自身的FIFO队列中取出dispatch continuation，接着调用pthread_workqueue_additem_np函数，传入这些参数：dispatch queue自身、一个符合其优先级workqueue,dispatch continuation。  <br/>
-调用该函数后，会通知对应的workqueue增加执行项目，XNU内核生成线程，线程执行pthread_workqueue函数执行block。</p>
 ]]></content>
   </entry>
   

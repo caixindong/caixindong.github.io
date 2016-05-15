@@ -7,7 +7,33 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="动态规划 Word Break 问题 要求 给一串字符串和一个字典，判断这个字符串是否能够拆分成字典里面的词 例子 s = &ldquo;wordbreakproblem&rdquo; dict = [&ldquo;word&rdquo;,&ldquo;break&rdquo;,&ldquo; &hellip;">
+	<meta name="description" content="数据结构, 链表 旋转链表 要求 给定一个链表1->2->3->4->5->NULL和一个k=2，返回4->5->1->2->3->NULL 代码实现 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +111,286 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-04T21:18:17+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/lian-biao/'>链表</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/03/04/ios70/" itemprop="url">旋转链表</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4->5->NULL和一个k=2，返回4->5->1->2->3->NULL</p>
+
+<h2>代码实现</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>         <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">length</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">){</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">rotateRight</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">,</span> <span class="kt">int</span> <span class="n">k</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="o">||</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">k</span><span class="o">==</span><span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">head</span><span class="p">);</span>
+</span><span class='line'>            <span class="c1">//如果k大于链表长度则取余</span>
+</span><span class='line'>            <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">%</span><span class="n">n</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">k</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//关键步骤</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">//取得新链表的头和尾</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newEnd</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">touch</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">touch</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">newEnd</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">newHead</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-03-04T20:58:34+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/lian-biao/'>链表</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/03/04/ios69/" itemprop="url">链表成对交换问题</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>要求</h2>
+
+<p>给定一个链表1->2->3->4,你会返回2->1->4->3</p>
+
+<h2>代码实现</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
+</span><span class='line'>         <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>         <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">swapPairs</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="o">||</span><span class="n">head</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">nh</span> <span class="o">=</span> <span class="n">newHead</span><span class="p">;</span>
+</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">pre</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">nh</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">nh</span> <span class="o">=</span> <span class="n">pre</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">next</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="n">pre</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span><span class='line'>                <span class="n">p</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// insert code here...</span>
+</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello, World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1390,459 +1696,6 @@ if str1[i] != str2[j]  <br/>
 </span><span class='line'>        <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-24T16:54:00+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/dong-tai-gui-hua/'>动态规划</a>, <a class='category' href='/blog/categories/suan-fa/'>算法</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/02/24/ios60/" itemprop="url">01背包问题</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>问题描述</h2>
-
-<p>已知:有一个容量为W的背包和N件物品，第i件物品的重量是weight[i]，收益是cost[i]。  <br/>
-限制:每种物品只有一件，可以选择放或者不放  <br/>
-问题:在不超过背包容量的情况下，最多能获得多少价值或收益</p>
-
-<h2>算法思路</h2>
-
-<p>我们定义一个数据结构f[i][j],它代表前i个物品在j容量下的最大价值。  <br/>
-问题可以转化为解决这样的一个子问题，前i-1件物品已放入背包中，我们只考虑第i件物品的放入情况，如果不放则f[i][j] = f[i-1][j]；如果放入则f[i][j] = f[i-1][j-weight[i]]+cost[i],我们通过比较这两种情况f值得大小，来决定这件物品该不该放入</p>
-
-<h2>代码如下</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;climits&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">MAX</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span><span class="kt">int</span> <span class="n">b</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="o">?</span><span class="nl">a</span><span class="p">:</span><span class="n">b</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 时间复杂度为O(N*W)</span>
-</span><span class='line'><span class="cm"> * 空间复杂度为O(N*W)</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">_01Package</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">weight</span><span class="p">,</span><span class="kt">int</span><span class="o">*</span> <span class="n">cost</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int</span> <span class="n">W</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">f</span><span class="p">[</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">W</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">memset</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">f</span><span class="p">));</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span><span class="n">W</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">+</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">W</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">const</span> <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="c1">//物品个数</span>
-</span><span class='line'>    <span class="k">const</span> <span class="kt">int</span> <span class="n">V</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span><span class="c1">//背包最大容量</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">weight</span><span class="p">[</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">};</span><span class="c1">//物品重量</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">value</span><span class="p">[</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">};</span><span class="c1">//物品价值</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">_01FillPackage02</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>优化空间复杂度</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 优化空间复杂度</span>
-</span><span class='line'><span class="cm"> * 空间复杂度为O(W)</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">_01Package02</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">weight</span><span class="p">,</span><span class="kt">int</span><span class="o">*</span> <span class="n">cost</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">,</span><span class="kt">int</span> <span class="n">W</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">f</span><span class="p">[</span><span class="n">W</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">memset</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">f</span><span class="p">));</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">W</span><span class="p">;</span> <span class="n">j</span><span class="o">&gt;=</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">j</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">+</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">W</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>逆序枚举容量的原因：
-上面那种做法实际上是根据方程f[i][j] = MAX(f[i-1][j], f[i-1][j-weight[i]]演化而来，当到达第i次循环时，在计算f[j]之间，f[j]已经保存上次循环求得的f值，即实际上在计算f[j]之前，f[j] = f[i-1][j],如果是顺序枚举容量，则此时f[j-weight[i]]+cost[i]实际上是f[i][j-weight[i]]+cost[i],则不符合题意，其实相当于重复装入某件物品，如果是解决完全背包问题，顺序枚举容量是最简洁的解决方案。</p>
-
-<h2>问题延伸</h2>
-
-<p>当前问题不要求把背包装满，如果把背包装满，那怎么解决呢？  <br/>
-其实解法跟上面问题的解法一样，只是在f数组的初始化上面有所不同。要求把背包装满，只有容量为0的背包时有合法解，价值为0，其他的容量均没有合法解，属于未定义状态，应该被复制为负无穷。</p>
-
-<h4>代码实现</h4>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="kt">int</span> <span class="nf">_01FillPackage</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">weight</span><span class="p">,</span><span class="kt">int</span><span class="o">*</span> <span class="n">cost</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">,</span> <span class="kt">int</span> <span class="n">W</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">f</span><span class="p">[</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="n">W</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>    <span class="c1">//注意初始化</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;=</span><span class="n">W</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;=</span><span class="n">W</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">];</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">j</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">j</span><span class="o">-</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">+</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">N</span><span class="p">][</span><span class="n">W</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">_01FillPackage02</span><span class="p">(</span><span class="kt">int</span><span class="o">*</span> <span class="n">weight</span><span class="p">,</span><span class="kt">int</span><span class="o">*</span> <span class="n">cost</span><span class="p">,</span> <span class="kt">int</span> <span class="n">N</span><span class="p">,</span><span class="kt">int</span> <span class="n">W</span><span class="p">){</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">f</span><span class="p">[</span><span class="n">W</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
-</span><span class='line'>    <span class="c1">//注意初始化</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">W</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">f</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">INT_MIN</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;=</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">W</span><span class="p">;</span> <span class="n">j</span><span class="o">&gt;=</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">];</span> <span class="n">j</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAX</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="n">weight</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">+</span><span class="n">cost</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="n">W</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-23T17:06:59+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ha-xi-biao/'>哈希表</a>, <a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/02/23/ios59/" itemprop="url">Word Ladder</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>要求</h2>
-
-<p>给定两个字符串，一个为起始字符串，一个为终点字符串，以及一个字典，求起始字符串转化为终点字符串的最短路径,返回转化路径的长度。</p>
-
-<h4>具体要求：</h4>
-
-<p>1、一次只能变换一个单词；  <br/>
-2、转化过程出现的单词必须是字典里的。</p>
-
-<h4>例子：</h4>
-
-<p>beginWord = “hit”  <br/>
-endWord = “cog”  <br/>
-dictionary = [&ldquo;hot&rdquo;,&ldquo;dot&rdquo;,&ldquo;dog&rdquo;,&ldquo;lot&rdquo;,&ldquo;log&rdquo;]  <br/>
-transformation："hit"->&ldquo;hot&rdquo;->&ldquo;dot&rdquo;->&ldquo;dog&rdquo;->&ldquo;cog&rdquo;  <br/>
-return its length 5</p>
-
-<h2>做法</h2>
-
-<p>既然要求最短，我们可以借助图BFS的思想来解决这个问题，这个问题可以转化为图的源最短路径问题，虽然解题过程中没有用到图，但用到图的思想。
-从源字符串出发，先遍历完当前字符串可能变化的情况，如果还没变成终点字符串，则继续下一层遍历，直到可以变成终点字符串，返回转化步数。如果所有情况都遍历完了还不能变成终点字符串，则返回0。</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;queue&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;unordered_set&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;unordered_map&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 记录源字符串转化当前字符串的路径</span>
-</span><span class='line'><span class="cm"> * word 当前字符串</span>
-</span><span class='line'><span class="cm"> * pre 前驱字符串</span>
-</span><span class='line'><span class="cm"> * isVisited 当前字符串是否被访问</span>
-</span><span class='line'><span class="cm"> * size 源字符串转化为当前字符串的过程经过的字符串的个数，即转化步数</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">Node</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">string</span> <span class="n">word</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">string</span> <span class="n">pre</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">bool</span> <span class="n">isVisited</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="n">string</span> <span class="n">word</span><span class="p">)</span>
-</span><span class='line'>    <span class="o">:</span><span class="n">word</span><span class="p">(</span><span class="n">word</span><span class="p">),</span><span class="n">isVisited</span><span class="p">(</span><span class="nb">false</span><span class="p">),</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">ladderLength</span><span class="p">(</span><span class="n">string</span> <span class="n">beginWord</span><span class="p">,</span> <span class="n">string</span> <span class="n">endWord</span><span class="p">,</span> <span class="n">unordered_set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;&amp;</span> <span class="n">wordList</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">string</span><span class="p">,</span> <span class="n">Node</span><span class="o">*&gt;</span> <span class="n">word_map</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">wordList</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">wordList</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">Node</span><span class="o">*</span> <span class="n">node</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">word_map</span><span class="p">[</span><span class="o">*</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">node</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="n">Node</span><span class="o">*</span> <span class="n">begin</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">beginWord</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">begin</span><span class="o">-&gt;</span><span class="n">isVisited</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">begin</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">word_map</span><span class="p">[</span><span class="n">beginWord</span><span class="p">]</span> <span class="o">=</span> <span class="n">begin</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">Node</span><span class="o">*</span> <span class="n">end</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="p">(</span><span class="n">endWord</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">word_map</span><span class="p">[</span><span class="n">endWord</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">queue</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">*&gt;</span> <span class="n">queue</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">queue</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">word_map</span><span class="p">[</span><span class="n">beginWord</span><span class="p">]);</span>
-</span><span class='line'>        <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">queue</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>            <span class="n">Node</span><span class="o">*</span> <span class="n">current_node</span> <span class="o">=</span> <span class="n">queue</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
-</span><span class='line'>            <span class="n">queue</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>            <span class="c1">//遍历字符串每一个位置</span>
-</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">current_node</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">.</span><span class="n">length</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">for</span> <span class="p">(</span><span class="kt">char</span> <span class="n">j</span> <span class="o">=</span> <span class="sc">&#39;a&#39;</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;=</span><span class="sc">&#39;z&#39;</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="n">string</span> <span class="n">word</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
-</span><span class='line'>                    <span class="c1">//替换字符，word变成一个新字符串</span>
-</span><span class='line'>                    <span class="n">word</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span><span class="p">;</span>
-</span><span class='line'>                    <span class="k">if</span> <span class="p">(</span><span class="n">word</span><span class="o">==</span><span class="n">endWord</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">size</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>                        <span class="k">return</span> <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">;</span>
-</span><span class='line'>                    <span class="p">}</span>
-</span><span class='line'>                    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">word_map</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">word</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">isVisited</span><span class="o">==</span><span class="nb">false</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">isVisited</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">pre</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">word</span><span class="p">;</span>
-</span><span class='line'>                        <span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="n">current_node</span><span class="o">-&gt;</span><span class="n">size</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>                        <span class="n">queue</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">word_map</span><span class="p">[</span><span class="n">word</span><span class="p">]);</span>
-</span><span class='line'>                    <span class="p">}</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">unordered_set</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">wordList</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;hot&quot;</span><span class="p">,</span><span class="s">&quot;dot&quot;</span><span class="p">,</span><span class="s">&quot;dog&quot;</span><span class="p">,</span><span class="s">&quot;lot&quot;</span><span class="p">,</span><span class="s">&quot;log&quot;</span><span class="p">};</span>
-</span><span class='line'>    <span class="n">Solution</span> <span class="n">s</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">s</span><span class="p">.</span><span class="n">ladderLength</span><span class="p">(</span><span class="s">&quot;hit&quot;</span><span class="p">,</span> <span class="s">&quot;cog&quot;</span><span class="p">,</span> <span class="n">wordList</span><span class="p">)</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
