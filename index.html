@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios Block 之 Block内存管理 ios Block 之 Block的底层实现 前言 最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个语法的入口，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。 &hellip;">
+	<meta name="description" content="ios Block 之 Block内存管理 ios Block 之 Block的底层实现 前言 最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个语法的入口，我们主要探究block的底层实现、block引用局部变量与对象、block的内存管理， &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -150,7 +150,7 @@
 	<div class="entry-content" itemprop="articleBody">
 		<h2>前言</h2>
 
-<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。</p>
+<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现、block引用局部变量与对象、block的内存管理，今天先讲下block的底层实现。</p>
 
 <h2>block实例</h2>
 
@@ -266,7 +266,7 @@ FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
 </span><span class='line'>        <span class="k">return</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">*</span><span class="mi">10</span><span class="p">;</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'> <span class="err">```</span>
-</span><span class='line'> <span class="n">myBlock</span><span class="err">内函数的具体实现，注意</span><span class="o">**</span><span class="n">bound</span> <span class="n">by</span> <span class="k">copy</span><span class="o">**</span><span class="err">，</span><span class="n">block</span><span class="err">对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于</span><span class="n">block</span><span class="err">的内存管理的时候会说。</span>
+</span><span class='line'> <span class="n">myBlock</span><span class="err">内函数的具体实现，注意</span><span class="o">**</span><span class="n">bound</span> <span class="n">by</span> <span class="k">copy</span><span class="o">**</span><span class="err">，</span><span class="n">block</span><span class="err">对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于</span><span class="n">block</span><span class="err">引用局部变量与对象的时候会说。</span>
 </span><span class='line'>
 </span></code></pre></td></tr></table></div></figure>
 

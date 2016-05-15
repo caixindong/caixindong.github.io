@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-15T16:25:56+08:00</updated>
+  <updated>2016-05-15T16:28:37+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -29,7 +29,7 @@
     <id>http://caixindong.github.io/blog/2016/05/14/ios89</id>
     <content type="html"><![CDATA[<h2>前言</h2>
 
-<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。</p>
+<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现、block引用局部变量与对象、block的内存管理，今天先讲下block的底层实现。</p>
 
 <h2>block实例</h2>
 
@@ -97,7 +97,7 @@ FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
     }
 </code></pre>
 
-<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block的内存管理的时候会说。</p>
+<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block引用局部变量与对象的时候会说。</p>
 
 <pre><code class="ObjC">static struct __hello__block_desc_0 {
   size_t reserved;
