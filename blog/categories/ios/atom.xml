@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-15T16:18:23+08:00</updated>
+  <updated>2016-05-15T16:25:56+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Block内存管理]]></title>
+    <title type="html"><![CDATA[Block 之 Block内存管理]]></title>
     <link href="http://caixindong.github.io/blog/2016/05/15/ios90/"/>
     <updated>2016-05-15T11:25:38+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/05/15/ios90</id>
@@ -118,8 +118,9 @@ FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
 
 <h2>做下小小总结</h2>
 
-<p>编译器会根据block捕获的变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去。       <br/>
-block中包含了被引用的变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
+<p>block是对象；  <br/>
+编译器会根据block捕获的局部变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去；          <br/>
+block中包含了被引用的局部变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
 ]]></content>
   </entry>
   

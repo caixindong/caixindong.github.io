@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios Block内存管理 ios Block 之 Block的底层实现 前言 最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个语法的入口，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。 block实例 1 &hellip;">
+	<meta name="description" content="ios Block 之 Block内存管理 ios Block 之 Block的底层实现 前言 最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个语法的入口，我们主要探究block的底层实现与block的内存管理，今天先讲下block的底层实现。 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -111,7 +111,7 @@
 </div>
 		
 	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/05/15/ios90/" itemprop="url">Block内存管理</a></h1>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/05/15/ios90/" itemprop="url">Block 之 Block内存管理</a></h1>
 	<div class="entry-content" itemprop="articleBody">
 		
 
@@ -293,8 +293,9 @@ myBlock实例变量的定义</p>
 
 <h2>做下小小总结</h2>
 
-<p>编译器会根据block捕获的变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去。       <br/>
-block中包含了被引用的变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
+<p>block是对象；  <br/>
+编译器会根据block捕获的局部变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去；          <br/>
+block中包含了被引用的局部变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
 
 		
 		
