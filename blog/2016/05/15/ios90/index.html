@@ -3,11 +3,23 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>block 之 block内存管理 - Cool Guy</title>
+	<title>block 之 block引用局部变量 - Cool Guy</title>
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content=" Block 之 Block内存管理 Comments ">
+	<meta name="description" content="Block 之 Block引用局部变量 前言 这一篇主要着重对__block关键字的理解 例子 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+int main(int argc, const char * argv[]) { @autoreleasepool { int a = 10; &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,8 +96,123 @@
 			
 			<div class="mid-col-container">
 				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-	<h1 class="title" itemprop="name">Block 之 Block内存管理</h1>
-	<div class="entry-content" itemprop="articleBody">
+	<h1 class="title" itemprop="name">Block 之 Block引用局部变量</h1>
+	<div class="entry-content" itemprop="articleBody"><h2>前言</h2>
+
+<p>这一篇主要着重对__block关键字的理解</p>
+
+<h2>例子</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">helloBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">a</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>        <span class="n">a</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">helloBlock</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面那个例子运行后的结果是10。我们可以编译看一下block里面匿名函数的实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">__main_block_func_0</span><span class="p">(</span><span class="k">struct</span> <span class="n">__main_block_impl_0</span> <span class="o">*</span><span class="n">__cself</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">a</span><span class="p">;</span> <span class="c1">// bound by copy</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">a</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>bound by copy</strong>这里的注释表示，block对它引用的局部变量做了只读拷贝，也就是说block引用的是局部变量的副本。所以在执行block语法后，即使改写block中使用的局部变量的值也不会影响block执行时局部变量的值。      <br/>
+那怎么样才能修改a的值呢？答案就是__block</p>
+
+<h2>__block</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">__block</span> <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">helloBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">a</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>        <span class="n">a</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">helloBlock</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>引入__block关键字后，运行结果是11，我们再编译看看block里面匿名函数的实现</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">__main_block_func_0</span><span class="p">(</span><span class="k">struct</span> <span class="n">__main_block_impl_0</span> <span class="o">*</span><span class="n">__cself</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">__Block_byref_a_0</span> <span class="o">*</span><span class="n">a</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">a</span><span class="p">;</span> <span class="c1">// bound by ref</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,(</span><span class="n">a</span><span class="o">-&gt;</span><span class="n">__forwarding</span><span class="o">-&gt;</span><span class="n">a</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">struct</span> <span class="n">__Block_byref_a_0</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="o">*</span><span class="n">__isa</span><span class="p">;</span>
+</span><span class='line'><span class="n">__Block_byref_a_0</span> <span class="o">*</span><span class="n">__forwarding</span><span class="p">;</span>
+</span><span class='line'> <span class="kt">int</span> <span class="n">__flags</span><span class="p">;</span>
+</span><span class='line'> <span class="kt">int</span> <span class="n">__size</span><span class="p">;</span>
+</span><span class='line'> <span class="kt">int</span> <span class="n">a</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们看到局部变量a变成一个构造体对象，而不再是一个整形变量，结构体里包含它原来的整形变量。<strong>bound by ref</strong>这个注释也表明此时已变成引用传递</p>
+
+<h2>小小总结</h2>
+
+<p>block可以引用局部变量，但是不能修改它，不然就是编译错误，如果想修改它，可以加上__block关键字。但是可以改变全局变量、静态变量、全局静态变量。</p>
 </div>
 
 </article>
@@ -113,7 +240,7 @@
 <section id="comment">
     <h1 class="title">Comments</h1>
     <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
-	<div class="ds-thread" data-thread-key="/blog/2016/05/15/ios90" data-title="block 之 block内存管理" data-url="http://caixindong.github.io/blog/2016/05/15/ios90/"></div>
+	<div class="ds-thread" data-thread-key="/blog/2016/05/15/ios90" data-title="block 之 block引用局部变量" data-url="http://caixindong.github.io/blog/2016/05/15/ios90/"></div>
 <!-- 多说评论框 end -->
 <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">

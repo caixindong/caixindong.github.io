@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-15T16:28:37+08:00</updated>
+  <updated>2016-05-15T17:08:06+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -14,11 +14,81 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Block 之 Block内存管理]]></title>
+    <title type="html"><![CDATA[Block 之 Block引用局部变量]]></title>
     <link href="http://caixindong.github.io/blog/2016/05/15/ios90/"/>
     <updated>2016-05-15T11:25:38+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/05/15/ios90</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<h2>前言</h2>
+
+<p>这一篇主要着重对__block关键字的理解</p>
+
+<h2>例子</h2>
+
+<pre><code class="ObjC">int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        int a = 10;
+        void (^helloBlock)(void) = ^(){
+            printf("%d\n",a);
+        };
+        a = 11;
+        helloBlock();
+
+    }
+    return 0;
+}
+</code></pre>
+
+<p>上面那个例子运行后的结果是10。我们可以编译看一下block里面匿名函数的实现：</p>
+
+<pre><code class="ObjC">static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+  int a = __cself-&gt;a; // bound by copy
+
+            printf("%d\n",a);
+}
+</code></pre>
+
+<p><strong>bound by copy</strong>这里的注释表示，block对它引用的局部变量做了只读拷贝，也就是说block引用的是局部变量的副本。所以在执行block语法后，即使改写block中使用的局部变量的值也不会影响block执行时局部变量的值。      <br/>
+那怎么样才能修改a的值呢？答案就是__block</p>
+
+<h2>__block</h2>
+
+<pre><code class="ObjC">int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        __block int a = 10;
+        void (^helloBlock)(void) = ^(){
+            printf("%d\n",a);
+        };
+        a = 11;
+        helloBlock();
+
+    }
+    return 0;
+}
+</code></pre>
+
+<p>引入__block关键字后，运行结果是11，我们再编译看看block里面匿名函数的实现</p>
+
+<pre><code class="ObjC">
+static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+  __Block_byref_a_0 *a = __cself-&gt;a; // bound by ref
+
+            printf("%d\n",(a-&gt;__forwarding-&gt;a));
+}
+
+struct __Block_byref_a_0 {
+  void *__isa;
+__Block_byref_a_0 *__forwarding;
+ int __flags;
+ int __size;
+ int a;
+};
+</code></pre>
+
+<p>我们看到局部变量a变成一个构造体对象，而不再是一个整形变量，结构体里包含它原来的整形变量。<strong>bound by ref</strong>这个注释也表明此时已变成引用传递</p>
+
+<h2>小小总结</h2>
+
+<p>block可以引用局部变量，但是不能修改它，不然就是编译错误，如果想修改它，可以加上__block关键字。但是可以改变全局变量、静态变量、全局静态变量。</p>
 ]]></content>
   </entry>
   
@@ -29,7 +99,7 @@
     <id>http://caixindong.github.io/blog/2016/05/14/ios89</id>
     <content type="html"><![CDATA[<h2>前言</h2>
 
-<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现、block引用局部变量与对象、block的内存管理，今天先讲下block的底层实现。</p>
+<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现、block引用局部变量、block的内存管理，今天先讲下block的底层实现。</p>
 
 <h2>block实例</h2>
 
@@ -97,7 +167,7 @@ FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
     }
 </code></pre>
 
-<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block引用局部变量与对象的时候会说。</p>
+<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block引用局部变量的时候会说。</p>
 
 <pre><code class="ObjC">static struct __hello__block_desc_0 {
   size_t reserved;
