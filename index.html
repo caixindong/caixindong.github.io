@@ -7,19 +7,8 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios Block 之 Block引用局部变量 前言 这一篇主要着重对__block关键字的理解 例子 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-int main(int argc, const char * argv[]) { @autoreleasepool { int a = &hellip;">
+	<meta name="description" content="ios Block 之 Block内存管理 前言 block的内存管理相对比较复杂，分ARC和MRC两种情况考虑，虽然现在开发基本是用ARC，编译器已经帮我们做了很多内存管理的优化，但我们不仅要知其然，也要知其所以然。 Block的类型 根据Block的存储方式，分为以下三种：
+. &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -97,6 +86,163 @@ int main(int argc, const char * argv[]) { @autoreleasepool { int a = &hellip;">
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-05-16T20:20:25+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/05/16/ios91/" itemprop="url">Block 之 Block内存管理</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>前言</h2>
+
+<p>block的内存管理相对比较复杂，分ARC和MRC两种情况考虑，虽然现在开发基本是用ARC，编译器已经帮我们做了很多内存管理的优化，但我们不仅要知其然，也要知其所以然。</p>
+
+<h2>Block的类型</h2>
+
+<p>根据Block的存储方式，分为以下三种：
+<code>.</code> <em>NSConcretStackBlock  <br/>
+<code>.</code> </em>NSConcretGlobalBlock  <br/>
+<code>.</code> _NSConcretMallocBlock  <br/>
+这三种类型表明了Block的三种存储方式：栈、全局、堆。   <br/>
+<strong>注意：</strong> 在ARC模式下，Block只存在全局和堆之中，对于栈上的Block，编译器帮我们拷贝到堆上，这也是为什么我们声明Block的时候即使不声明为copy，Block也是拷贝到堆上。显示地声明不会与编译器相冲突，是为了我们更好地理解是编译器做了copy这一步使得Block拷贝到堆上。</p>
+
+<h3>全局Block</h3>
+
+<p>位于全局存储区的Block有两种情况：  <br/>
+<code>.</code> 定义在函数外面的Block；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;hello&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>.</code> 不引用局部变量的Block；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>            <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;hello&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>        <span class="n">myBlock</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>栈Block</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">^</span><span class="n">stackBlock</span><span class="p">)()</span> <span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">stackBlock</span> <span class="nf">returnBlock</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">^</span><span class="p">{</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;a=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">a</span><span class="p">);};</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的例子在MRC下无法编译，而在ARC下可以编译  <br/>
+这是因为返回block的时候是返回局部变量的指针,而这一点恰是编译器已经断定了。在ARC下可以编译过，是因为ARC使用autorelease了</p>
+
+<h3>堆Block</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="nf">getBlockArray</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span> <span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">[</span><span class="bp">NSArray</span> <span class="nl">arrayWithObjects</span><span class="p">:</span>
+</span><span class='line'>            <span class="o">^</span><span class="p">{</span><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;blk0:%d&quot;</span><span class="p">,</span><span class="n">val</span><span class="p">);},</span>
+</span><span class='line'>            <span class="o">^</span><span class="p">{</span><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;blk1:%d&quot;</span><span class="p">,</span><span class="n">val</span><span class="p">);},</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">getBlockArray</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="kt">blk_t</span><span class="p">)(</span><span class="kt">void</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">blk_t</span> <span class="n">blk</span> <span class="o">=</span> <span class="p">(</span><span class="kt">blk_t</span><span class="p">)[</span><span class="n">obj</span> <span class="nl">objectAtIndex</span><span class="p">:</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">blk</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在MRC模式下，会发生异常，因为数组中的block是在栈上的，到blk指向的block已经释放内存了，访问blk就会造成崩溃，解决方法就是在block后面加上copy，使它变成堆上的block。</p>
+
+<h2>copy的使用</h2>
+
+<p>不管block配置在何处，用copy方法复制都不会引起任何问题。  <br/>
+在ARC环境下，如果不确定是否要copy block尽管copy即可。ARC会自动处理的。  <br/>
+【注意】：  <br/>
+● 在栈上调用copy那么复制到堆上  <br/>
+● 在全局block调用copy什么也不做  <br/>
+● 在堆上调用block 引用计数增加</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -383,40 +529,44 @@ FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="kt">long</span> <span class="nf">__hello__block_func_0</span><span class="p">(</span><span class="k">struct</span> <span class="n">__hello__block_impl_0</span> <span class="o">*</span><span class="n">__cself</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">i</span><span class="p">;</span> <span class="c1">// bound by copy</span>
 </span><span class='line'>  <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">j</span><span class="p">;</span> <span class="c1">// bound by copy</span>
 </span><span class='line'>
 </span><span class='line'>        <span class="k">return</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">*</span><span class="mi">10</span><span class="p">;</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'> <span class="err">```</span>
-</span><span class='line'> <span class="n">myBlock</span><span class="err">内函数的具体实现，注意</span><span class="o">**</span><span class="n">bound</span> <span class="n">by</span> <span class="k">copy</span><span class="o">**</span><span class="err">，</span><span class="n">block</span><span class="err">对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于</span><span class="n">block</span><span class="err">引用局部变量的时候会说。</span>
-</span><span class='line'>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>ObjC
-static struct <strong>hello</strong>block_desc_0 {
-  size_t reserved;
-  size_t Block_size;
-} <strong>hello</strong>block_desc_0_DATA = { 0, sizeof(struct <strong>hello</strong>block_impl_0)};</p>
+<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block引用局部变量的时候会说。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="err">这是</span><span class="n">myBlock</span><span class="err">的具体描述</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="k">struct</span> <span class="n">__hello__block_desc_0</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">size_t</span> <span class="n">reserved</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">size_t</span> <span class="n">Block_size</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="n">__hello__block_desc_0_DATA</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">__hello__block_impl_0</span><span class="p">)};</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>ObjC
-void hello_(){
-    int i = 2;
-    int j = 3;
-    long (<em>myBlock)(void) = ((long (</em>)())&amp;<strong>hello</strong>block_impl_0((void *)<strong>hello</strong>block_func_0, &amp;<strong>hello</strong>block_desc_0_DATA, i, j));
-}
-```
-myBlock实例变量的定义</p>
+<p>这是myBlock的描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">void</span> <span class="nf">hello_</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="p">(</span><span class="o">*</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="p">((</span><span class="kt">long</span> <span class="p">(</span><span class="o">*</span><span class="p">)())</span><span class="o">&amp;</span><span class="n">__hello__block_impl_0</span><span class="p">((</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">__hello__block_func_0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">__hello__block_desc_0_DATA</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>myBlock实例变量的定义</p>
 
 <h2>做下小小总结</h2>
 
@@ -3086,86 +3236,6 @@ Cocoa Framework::Foundation 对象类型（即一般使用到的Objectie-C对象
 </span><span class='line'>    <span class="nb">self</span><span class="p">.</span><span class="n">navigationController</span><span class="p">.</span><span class="n">interactivePopGestureRecognizer</span><span class="p">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="nb">YES</span><span class="p">;</span>
 </span><span class='line'>    <span class="nb">self</span><span class="p">.</span><span class="n">navigationController</span><span class="p">.</span><span class="n">interactivePopGestureRecognizer</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nb">self</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-03-17T20:17:14+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/03/17/ios81/" itemprop="url">为app实现渐变的遮罩效果</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>效果图如下</h2>
-
-<p><img src="/images/exampleImg1.png"></p>
-
-<h2>实现代码如下</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="c1">//blackView为你想加上遮罩的视图</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>   <span class="n">CGColorRef</span> <span class="n">opaqueBlackColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="nl">colorWithRed</span><span class="p">:</span><span class="mi">0</span> <span class="nl">green</span><span class="p">:</span><span class="mi">0</span> <span class="nl">blue</span><span class="p">:</span><span class="mi">0</span> <span class="nl">alpha</span><span class="p">:</span><span class="mi">1</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">CGColorRef</span> <span class="n">transparentBalckColor</span> <span class="o">=</span> <span class="p">[</span><span class="bp">UIColor</span> <span class="nl">colorWithRed</span><span class="p">:</span><span class="mi">0</span> <span class="nl">green</span><span class="p">:</span><span class="mi">0</span> <span class="nl">blue</span><span class="p">:</span><span class="mi">0</span> <span class="nl">alpha</span><span class="p">:</span><span class="mf">0.4</span><span class="p">].</span><span class="bp">CGColor</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>       <span class="c1">//遮罩效果由CAGradientLayer实现</span>
-</span><span class='line'>    <span class="bp">CAGradientLayer</span> <span class="o">*</span> <span class="n">layer</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">CAGradientLayer</span> <span class="n">alloc</span><span class="p">]</span><span class="n">init</span><span class="p">];</span>
-</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">CGRectMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">WIDTH</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">bounds</span><span class="p">.</span><span class="n">size</span><span class="p">.</span><span class="n">height</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">//设置渐变的方向</span>
-</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">startPoint</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">endPoint</span> <span class="o">=</span> <span class="n">CGPointMake</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">//设置渐变得颜色范围</span>
-</span><span class='line'>    <span class="n">layer</span><span class="p">.</span><span class="n">colors</span> <span class="o">=</span> <span class="l">@[</span><span class="p">(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">opaqueBlackColor</span><span class="p">,(</span><span class="k">__bridge</span> <span class="kt">id</span><span class="p">)</span><span class="n">transparentBalckColor</span><span class="l">]</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">blackView</span><span class="p">.</span><span class="n">layer</span> <span class="nl">insertSublayer</span><span class="p">:</span><span class="n">layer</span> <span class="nl">atIndex</span><span class="p">:</span><span class="mi">0</span><span class="p">];</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

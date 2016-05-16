@@ -196,40 +196,44 @@ FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="kt">long</span> <span class="nf">__hello__block_func_0</span><span class="p">(</span><span class="k">struct</span> <span class="n">__hello__block_impl_0</span> <span class="o">*</span><span class="n">__cself</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">i</span><span class="p">;</span> <span class="c1">// bound by copy</span>
 </span><span class='line'>  <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">__cself</span><span class="o">-&gt;</span><span class="n">j</span><span class="p">;</span> <span class="c1">// bound by copy</span>
 </span><span class='line'>
 </span><span class='line'>        <span class="k">return</span> <span class="n">i</span><span class="o">*</span><span class="n">j</span><span class="o">*</span><span class="mi">10</span><span class="p">;</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'> <span class="err">```</span>
-</span><span class='line'> <span class="n">myBlock</span><span class="err">内函数的具体实现，注意</span><span class="o">**</span><span class="n">bound</span> <span class="n">by</span> <span class="k">copy</span><span class="o">**</span><span class="err">，</span><span class="n">block</span><span class="err">对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于</span><span class="n">block</span><span class="err">引用局部变量的时候会说。</span>
-</span><span class='line'>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>ObjC
-static struct <strong>hello</strong>block_desc_0 {
-  size_t reserved;
-  size_t Block_size;
-} <strong>hello</strong>block_desc_0_DATA = { 0, sizeof(struct <strong>hello</strong>block_impl_0)};</p>
+<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block引用局部变量的时候会说。</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="err">这是</span><span class="n">myBlock</span><span class="err">的具体描述</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">static</span> <span class="k">struct</span> <span class="n">__hello__block_desc_0</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">size_t</span> <span class="n">reserved</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">size_t</span> <span class="n">Block_size</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="n">__hello__block_desc_0_DATA</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">__hello__block_impl_0</span><span class="p">)};</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>ObjC
-void hello_(){
-    int i = 2;
-    int j = 3;
-    long (<em>myBlock)(void) = ((long (</em>)())&amp;<strong>hello</strong>block_impl_0((void *)<strong>hello</strong>block_func_0, &amp;<strong>hello</strong>block_desc_0_DATA, i, j));
-}
-```
-myBlock实例变量的定义</p>
+<p>这是myBlock的描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">void</span> <span class="nf">hello_</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">long</span> <span class="p">(</span><span class="o">*</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="p">((</span><span class="kt">long</span> <span class="p">(</span><span class="o">*</span><span class="p">)())</span><span class="o">&amp;</span><span class="n">__hello__block_impl_0</span><span class="p">((</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">__hello__block_func_0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">__hello__block_desc_0_DATA</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>myBlock实例变量的定义</p>
 
 <h2>做下小小总结</h2>
 

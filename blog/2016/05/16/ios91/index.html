@@ -1,0 +1,281 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Block 之 Block内存管理 - Cool Guy</title>
+	<meta name="author" content="Xindong">
+
+	
+	<meta name="description" content="Block 之 Block内存管理 前言 block的内存管理相对比较复杂，分ARC和MRC两种情况考虑，虽然现在开发基本是用ARC，编译器已经帮我们做了很多内存管理的优化，但我们不仅要知其然，也要知其所以然。 Block的类型 根据Block的存储方式，分为以下三种：
+. &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://caixindong.github.io/blog/2016/05/16/ios91/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img alt='Profile Picture' src='/images/touxiang.jpeg' style='width: 160px;'>");
+	</script>
+</div>
+<h1><a href="/">Cool Guy</a></h1>
+<p class="subtitle">Blog like a hacker.</p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/aboutme">AboutMe</a></li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/3872004666/profile?topnav=1&wvr=6" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="https://github.com/caixindong" title="GitHub">GitHub</a>
+		
+		
+		<a class="dribbble" href="http://www.dribbble.com/allenhsu" title="Dribbble">Dribbble</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+<hgroup>
+
+</hgroup>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">Block 之 Block内存管理</h1>
+	<div class="entry-content" itemprop="articleBody"><h2>前言</h2>
+
+<p>block的内存管理相对比较复杂，分ARC和MRC两种情况考虑，虽然现在开发基本是用ARC，编译器已经帮我们做了很多内存管理的优化，但我们不仅要知其然，也要知其所以然。</p>
+
+<h2>Block的类型</h2>
+
+<p>根据Block的存储方式，分为以下三种：
+<code>.</code> <em>NSConcretStackBlock  <br/>
+<code>.</code> </em>NSConcretGlobalBlock  <br/>
+<code>.</code> _NSConcretMallocBlock  <br/>
+这三种类型表明了Block的三种存储方式：栈、全局、堆。   <br/>
+<strong>注意：</strong> 在ARC模式下，Block只存在全局和堆之中，对于栈上的Block，编译器帮我们拷贝到堆上，这也是为什么我们声明Block的时候即使不声明为copy，Block也是拷贝到堆上。显示地声明不会与编译器相冲突，是为了我们更好地理解是编译器做了copy这一步使得Block拷贝到堆上。</p>
+
+<h3>全局Block</h3>
+
+<p>位于全局存储区的Block有两种情况：  <br/>
+<code>.</code> 定义在函数外面的Block；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;hello&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>.</code> 不引用局部变量的Block；</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">myBlock</span><span class="p">)(</span><span class="kt">void</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(){</span>
+</span><span class='line'>            <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;hello&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>        <span class="n">myBlock</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>栈Block</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">^</span><span class="n">stackBlock</span><span class="p">)()</span> <span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">stackBlock</span> <span class="nf">returnBlock</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">^</span><span class="p">{</span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;a=%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">a</span><span class="p">);};</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的例子在MRC下无法编译，而在ARC下可以编译  <br/>
+这是因为返回block的时候是返回局部变量的指针,而这一点恰是编译器已经断定了。在ARC下可以编译过，是因为ARC使用autorelease了</p>
+
+<h3>堆Block</h3>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="kt">id</span> <span class="nf">getBlockArray</span><span class="p">(){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span> <span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="p">[</span><span class="bp">NSArray</span> <span class="nl">arrayWithObjects</span><span class="p">:</span>
+</span><span class='line'>            <span class="o">^</span><span class="p">{</span><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;blk0:%d&quot;</span><span class="p">,</span><span class="n">val</span><span class="p">);},</span>
+</span><span class='line'>            <span class="o">^</span><span class="p">{</span><span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;blk1:%d&quot;</span><span class="p">,</span><span class="n">val</span><span class="p">);},</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">@autoreleasepool</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kt">id</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">getBlockArray</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="kt">blk_t</span><span class="p">)(</span><span class="kt">void</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">blk_t</span> <span class="n">blk</span> <span class="o">=</span> <span class="p">(</span><span class="kt">blk_t</span><span class="p">)[</span><span class="n">obj</span> <span class="nl">objectAtIndex</span><span class="p">:</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">blk</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在MRC模式下，会发生异常，因为数组中的block是在栈上的，到blk指向的block已经释放内存了，访问blk就会造成崩溃，解决方法就是在block后面加上copy，使它变成堆上的block。</p>
+
+<h2>copy的使用</h2>
+
+<p>不管block配置在何处，用copy方法复制都不会引起任何问题。  <br/>
+在ARC环境下，如果不确定是否要copy block尽管copy即可。ARC会自动处理的。  <br/>
+【注意】：  <br/>
+● 在栈上调用copy那么复制到堆上  <br/>
+● 在全局block调用copy什么也不做  <br/>
+● 在堆上调用block 引用计数增加</p>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+ 
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2016/05/16/ios91" data-title="Block 之 Block内存管理" data-url="http://caixindong.github.io/blog/2016/05/16/ios91/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Xindong -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>
