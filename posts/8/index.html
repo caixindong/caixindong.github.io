@@ -7,7 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="栈内存与堆内存 内存栈与内存堆的区别 内存栈 又称为栈内存，它有以下特点： 1. 函数压栈和弹栈符合后进先出的原则； 2. 无论是变量还是函数，栈内存都是由高地址向低地址拓展，它是一块连续的内存区域； 3. 栈内存的分配在运行前（编译）完成，运行时回收，且回收的素速度很快； 4. &hellip;">
+	<meta name="description" content="数据结构, 栈与队列 栈的实现(C++版) 栈 我利用数组来实现栈，实现方法： 1. 创建MAXSIZE大小的数组用于存放数据，MAXSIZE也为栈的最大容量； 2. 当压栈时，判断栈是否满了，如果不满，就往数组里添加数据，如果满了，就提示栈溢出； 3. 当弹栈时，判断栈是否为空，如果不为空， &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +85,193 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-06T11:34:25+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>, <a class='category' href='/blog/categories/zhan-yu-dui-lie/'>栈与队列</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/06/ios22/" itemprop="url">栈的实现(C++版)</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>栈</h2>
+
+<p>我利用数组来实现栈，实现方法：  <br/>
+<code>1.</code> 创建MAXSIZE大小的数组用于存放数据，MAXSIZE也为栈的最大容量；  <br/>
+<code>2.</code> 当压栈时，判断栈是否满了，如果不满，就往数组里添加数据，如果满了，就提示栈溢出；  <br/>
+<code>3.</code>  当弹栈时，判断栈是否为空，如果不为空，就取出数组末尾的元素，取出后将该位置的值置为NULL，数组指针向前移动一位；如果为
+空，就提示栈为空；  <br/>
+代码实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#define MAXSIZE 4</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">MyStack</span><span class="p">{</span>
+</span><span class='line'><span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="n">T</span><span class="o">*</span> <span class="n">arr</span><span class="p">;</span>
+</span><span class='line'><span class="k">public</span><span class="o">:</span>
+</span><span class='line'><span class="n">MyStack</span><span class="p">(){</span>
+</span><span class='line'>    <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">T</span><span class="p">[</span><span class="n">MAXSIZE</span><span class="p">];</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">~</span><span class="n">MyStack</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">delete</span> <span class="p">[]</span> <span class="n">arr</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="n">sizeOfStack</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">size</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//压栈</span>
+</span><span class='line'><span class="kt">void</span> <span class="n">push</span><span class="p">(</span><span class="k">const</span> <span class="n">T</span> <span class="o">&amp;</span><span class="n">t</span><span class="p">){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isFull</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;栈溢出&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">size</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//弹栈</span>
+</span><span class='line'><span class="n">T</span> <span class="n">pop</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;栈为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="n">T</span> <span class="n">t</span> <span class="o">=</span> <span class="n">peek</span><span class="p">();</span>
+</span><span class='line'>        <span class="n">arr</span><span class="p">[</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">size</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">t</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//查看栈顶元素</span>
+</span><span class='line'><span class="n">T</span> <span class="n">peek</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;栈为空&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">arr</span><span class="p">[</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//判断栈是否为空</span>
+</span><span class='line'><span class="kt">bool</span> <span class="n">isEmpty</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//判断栈是否溢出</span>
+</span><span class='line'><span class="kt">bool</span> <span class="n">isFull</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="o">&gt;=</span><span class="n">MAXSIZE</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1020,101 +1207,6 @@ MKLocalSearch localSearch = [[MKLocalSearch alloc]initWithRequest:request];
         NSLog(@"error : %@",error);
     }else{
         //取得搜索后的结果 response.mapItems
-    }
-}];
-</code></pre>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-15T16:26:52+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2015/10/15/ios12/" itemprop="url">利用Parse为我们的app构建后台服务</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<p>一、什么是Parse?</p>
-
-<p>Parse是一群美国人开发的专为移动APP服务的云计算平台，与现有的其他云计算平台相比，Parse除了提供Restful的service 之外，也提供了官方的iOS和Android SDK。</p>
-
-<p>二、如何导入Parse的iOS SDK?</p>
-
-<p>可以参考<a href="https://www.parse.com/docs">https://www.parse.com/docs</a></p>
-
-<p>三、如何使用Parse为我们app实现登录注册功能</p>
-
-<p>1、先在 <a href="https://www.parse.com">https://www.parse.com</a> 创建一个app，得到它的ApplicationId和clientKey，然后在AppDelegate注册，这是必要的配置工作</p>
-
-<pre><code>#import &lt;Parse/Parse.h&gt;
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:
-- (NSDictionary *)launchOptions {
-// Initialize Parse.
-[Parse setApplicationId:@"omV1NT7fu3QX91ph5lIBj5LANoaMhSvlxXC5Awdt"
-              clientKey:@"hMXPZhDtZ14lNKpZuuuodtxo0RCramJHDN0go4Uy"];
-return YES;
-} 
-</code></pre>
-
-<p>2、在你的app的注册界面实例化一个PFUser对象，用用户的注册信息对它属性进行赋值，并提交它</p>
-
-<pre><code>PFUser* myuser = [[PFUser alloc]init];
-myuser.username = userPhoneNum;//用户名
-myuser.password = userPassword;//密码
-myuser.email = userEmail;//邮箱
-
-[myuser signUpInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-    if (!succeeded) {
-        //注册失败
-    }else{
-        //注册成功
-   }
-}];
-</code></pre>
-
-<p>3、在你的app的登录界面，将登录信息提交给Parse后台进行验证</p>
-
-<pre><code>[PFUser logInWithUsernameInBackground:username password:password 
-    block:^(PFUser * _Nullable user, NSError * _Nullable error) {
-    //username和password是你提交的登录信息
-    if (user!=nil) {
-        //登录成功
-    }else{
-        //登录失败
-    }
-}];
-</code></pre>
-
-<p>4、退出当前账号</p>
-
-<pre><code>[PFUser logOutInBackgroundWithBlock:^(NSError * _Nullable error) {
-    if (error) {
-      //退出失败  
-    }else{
-       //退出成功 
     }
 }];
 </code></pre>

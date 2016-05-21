@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-05-16T21:33:46+08:00</updated>
+  <updated>2016-05-21T14:14:12+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,338 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Runloop小笔记]]></title>
+    <link href="http://caixindong.github.io/blog/2016/05/20/ios92/"/>
+    <updated>2016-05-20T20:44:54+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/05/20/ios92</id>
+    <content type="html"><![CDATA[<h2>何为RunLoop</h2>
+
+<p>RunLoop就是一直运行的循环。程序的持续运行和即时反应依赖于RunLoop。我们知道，一个线程一次只能执行一个任务，执行完后线程就会退出，而RunLoop就是一个机制使我们的线程能够随时处理事件而不退出。其实它实现逻辑很简单，就是在内部开启一个死循环。</p>
+
+<pre><code class="ObjC">-(void)loop{
+    do{
+        bool isRunning = SomeToDo();
+    }while(isRunning);
+}
+</code></pre>
+
+<p>这种模型有个术语叫作Event Loop，实现这种模型的关键在于：   <br/>
+1、 如何管理事件；   <br/>
+2、 如何让线程在没有消息处理的时候休眠，在有事件响应的时候及时被唤醒；</p>
+
+<h2>RunLoop是一个对象</h2>
+
+<p>RunLoop管理着需要处理的事件和消息，并提供一个入口函数来执行上面Event Loop的逻辑。线程执行这个函数后就会处于“<strong>接受消息->等待->处理</strong>”的循环中,直到循环结束，函数返回。</p>
+
+<h2>Cocoa 中的 RunLoop</h2>
+
+<p>苹果为我们提供这样的两个对象：NSRunLoop 和 CFRunLoopRef 来实现RunLoop。  <br/>
+NSRunLoop是基于CFRunLoopRef封装的，提供面向对象API，但是它不是线程安全的。  <br/>
+CFRunLoopRef是CoreFoundation框架内的，它提供纯C的API，而且它是线程安全的。此外它是<a href="http://opensource.apple.com/tarballs/CF/">开源</a>的。      <br/>
+我们这篇博客讲解也是主要基于CFRunLoopRef。</p>
+
+<h2>RunLoop与线程</h2>
+
+<p>pthread_t和NSThread都可以用于创建新线程，他们都是基于底层的mach thread封装的。且pthread_t与NSThread是一一对应的。CFRunLoop是基于pthread来管理的。  <br/>
+苹果不允许直接创建RunLoop，它提供两个自动获取函数：CFRunLoopGetMain()和CFRunLoopGetCurrent()。实现逻辑如下：</p>
+
+<pre><code class="ObjC">// 全局的Dictionary，key 是 pthread_t， value 是 CFRunLoopRef
+static CFMutableDictionaryRef loopsDic;
+// 访问 loopsDic 时的锁
+static CFSpinLock_t loopsLock;
+
+// 获取一个 pthread 对应的 RunLoop。
+CFRunLoopRef _CFRunLoopGet(pthread_t thread) {
+    OSSpinLockLock(&amp;loopsLock);
+
+    if (!loopsDic) {
+        // 第一次进入时，初始化全局Dic，并先为主线程创建一个 RunLoop。
+        loopsDic = CFDictionaryCreateMutable();
+        CFRunLoopRef mainLoop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, pthread_main_thread_np(), mainLoop);
+    }
+
+    // 直接从 Dictionary 里获取。
+    CFRunLoopRef loop = CFDictionaryGetValue(loopsDic, thread));
+
+    if (!loop) {
+        // 取不到时，创建一个
+        loop = _CFRunLoopCreate();
+        CFDictionarySetValue(loopsDic, thread, loop);
+        // 注册一个回调，当线程销毁时，顺便也销毁其对应的 RunLoop。
+        _CFSetTSD(..., thread, loop, __CFFinalizeRunLoop);
+    }
+
+    OSSpinLockUnLock(&amp;loopsLock);
+    return loop;
+}
+
+CFRunLoopRef CFRunLoopGetMain() {
+    return _CFRunLoopGet(pthread_main_thread_np());
+}
+
+CFRunLoopRef CFRunLoopGetCurrent() {
+    return _CFRunLoopGet(pthread_self());
+}
+</code></pre>
+
+<p>由上面的代码，可看出，线程与RunLoop是一一对应，而且他们以键值对的关系保存在一个全局的字典里面。线程刚创建时是没有RunLoop，如果你不主动获取，那它一直都不会有。RunLoop的创建发生在第一次获取时，RunLoop的销毁发生在线程结束时。</p>
+
+<h2>RunLoop对外提供的API</h2>
+
+<p>CoreFoundation的RunLoop提供以下5个类：
+CFRunLoopRef  <br/>
+CFRunLoopModeRef  <br/>
+CFRunLoopSourceRef  <br/>
+CFRunLoopTimerRef  <br/>
+CFRUNLoopObserverRef  <br/>
+他们的关系如下图：</p>
+
+<p><img src="/images/RunLoop_0.png"></p>
+
+<p>一个RunLoop包含若干个Mode，每个Mode又包含若干个Source/Timer/Observer。每次调用RunLoop的主函数，只能指定其中一个Mode，这个Mode被称为Current Mode。如果要切换Mode，只能退出Loop，再重新指定一个Mode进入，这样做是为了分隔不同组的Source/Timer/Observer，让其互不影响。</p>
+
+<h3>CFRunLoopSourceRef</h3>
+
+<p>是事件产生的地方，它有两个版本：Source0 和 Source 1。        <br/>
+<strong>Source0</strong> 只包含一个回调（函数指针），它并不能主动触发事件，使用时，你需要先调用CFRunLoopSourceSignal(source)，将这个source标记为待处理，然后手动调用CFRunLoopWakeUp(source)来唤醒RunLoop，让其处理这个事件。  <br/>
+<strong>Source1</strong> 包含一个mach_port和一个回调，被用于通过内核和其他线程相互发送消息。这种Source能主动唤醒RunLoop线程。</p>
+
+<h3>CFRunLoopTimerRef</h3>
+
+<p>是基于时间的触发器，它与NSTimer是toll-free-bridged的，可以混用。它包含一个时间长度和一个回调。当其加入RunLoop时，RunLoop会注册对应的时间点，当时间点到时，RunLoop会被唤醒去执行那个回调。</p>
+
+<h3>CFRunLoopObserverRef</h3>
+
+<p>是观察者，每个Observer包含一个回调，当RunLoop的状态发生变化时，观察者能通过回调接收到这个变化。以下是观察者观察的时间点：</p>
+
+<pre><code class="ObjC">typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
+    kCFRunLoopEntry         = (1UL &lt;&lt; 0), // 即将进入Loop
+    kCFRunLoopBeforeTimers  = (1UL &lt;&lt; 1), // 即将处理 Timer
+    kCFRunLoopBeforeSources = (1UL &lt;&lt; 2), // 即将处理 Source
+    kCFRunLoopBeforeWaiting = (1UL &lt;&lt; 5), // 即将进入休眠
+    kCFRunLoopAfterWaiting  = (1UL &lt;&lt; 6), // 刚从休眠中唤醒
+    kCFRunLoopExit          = (1UL &lt;&lt; 7), // 即将退出Loop
+};
+</code></pre>
+
+<p>上面的 Source/Timer/Observer 被统称为 mode item，一个 item 可以被同时加入多个 mode。但一个 item 被重复加入同一个 mode 时是不会有效果的。如果一个 mode 中一个 item 都没有，则 RunLoop 会直接退出，不进入循环。</p>
+
+<h3>CFRunLoopMode</h3>
+
+<p>有了以上的基础，来谈Mode比较容易理解。  <br/>
+我们看下CFRunLoop和CFRunLoopMode的结构：</p>
+
+<pre><code class="ObjC">struct __CFRunLoopMode {
+    CFStringRef _name;            // Mode Name, 例如 @"kCFRunLoopDefaultMode"
+    CFMutableSetRef _sources0;    // Set
+    CFMutableSetRef _sources1;    // Set
+    CFMutableArrayRef _observers; // Array
+    CFMutableArrayRef _timers;    // Array
+    ...
+};
+
+struct __CFRunLoop {
+    CFMutableSetRef _commonModes;     // Set
+    CFMutableSetRef _commonModeItems; // Set&lt;Source/Observer/Timer&gt;
+    CFRunLoopModeRef _currentMode;    // Current Runloop Mode
+    CFMutableSetRef _modes;           // Set
+    ...
+};
+</code></pre>
+
+<p>这里解释下commonModes和comminModeItems：  <br/>
+一个Mode可以将自己标识为Common属性（通过将其ModeName添加到RunLoop的commonModes中）。每当RunLoop的内容发生变化时，RunLoop都会自动将commonModeItems里的Source/Observer/Timer同步到具有“Common”标识的所有Mode里。   <br/>
+<strong>举例说明下</strong>：主线程的RunLoop里有两个预设的Mode：kCFRunLoopDefaultMode 和 UITrackingRunLoopMode。这两个Mode都已经被标志为“Common”属性。DefaultMode是App平时所处的状态，TrackingRunLoopMode是追踪ScrollView滑动时的状态。当你创建一个Timer并添加到DefaultMode时，Timer会得到重复回调，但当你滑动scrollView时，RunLoop会将Mode切换为TrackingRunLoopMode来保证滑动顺畅，这时Timer会停止回调。  <br/>
+如果你想Timer在滑动的时候也有回调的话，有两种做法：  <br/>
+一：将这个Timer分别加入这两个Mode；  <br/>
+二：这个做法用得比较多，就是将Timer加入到顶层的RunLoop的“commonModeItems”中。“commonModeItems”被RunLoop自动更新到所有具有“Common”属性的Mode里去。</p>
+
+<p>我们只能通过 mode name 来操作内部的 mode，当你传入一个新的 mode name 但 RunLoop 内部没有对应 mode 时，RunLoop会自动帮你创建对应的 CFRunLoopModeRef。对于一个 RunLoop 来说，其内部的 mode 只能增加不能删除。
+苹果公开提供Mode有两个：kCFRunLoopDefaultMode 和 UITrackingRunLoopMode，我们可以通过这两个Mode Name来操作相应的Mode。  <br/>
+同时苹果还提供了一个操作Common标记的字符串：kCFRunLoopCommonModes (NSRunLoopCommonModes)，我们可以用这个字符串来操作Common Items 或标志一个Mode为“Common”。</p>
+
+<h2>RunLoop的内部逻辑</h2>
+
+<p>RunLoop内部实现逻辑大致如下图：</p>
+
+<p><img src="/images/RunLoop_1.png"></p>
+
+<p>代码实现逻辑如下：</p>
+
+<pre><code class="ObjC">/// 用DefaultMode启动
+void CFRunLoopRun(void) {
+    CFRunLoopRunSpecific(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 1.0e10, false);
+}
+
+/// 用指定的Mode启动，允许设置RunLoop超时时间
+int CFRunLoopRunInMode(CFStringRef modeName, CFTimeInterval seconds, Boolean stopAfterHandle) {
+    return CFRunLoopRunSpecific(CFRunLoopGetCurrent(), modeName, seconds, returnAfterSourceHandled);
+}
+
+/// RunLoop的实现
+int CFRunLoopRunSpecific(runloop, modeName, seconds, stopAfterHandle) {
+
+    /// 首先根据modeName找到对应mode
+    CFRunLoopModeRef currentMode = __CFRunLoopFindMode(runloop, modeName, false);
+    /// 如果mode里没有source/timer/observer, 直接返回。
+    if (__CFRunLoopModeIsEmpty(currentMode)) return;
+
+    /// 1. 通知 Observers: RunLoop 即将进入 loop。
+    __CFRunLoopDoObservers(runloop, currentMode, kCFRunLoopEntry);
+
+    /// 内部函数，进入loop
+    __CFRunLoopRun(runloop, currentMode, seconds, returnAfterSourceHandled) {
+
+        Boolean sourceHandledThisLoop = NO;
+        int retVal = 0;
+        do {
+
+            /// 2. 通知 Observers: RunLoop 即将触发 Timer 回调。
+            __CFRunLoopDoObservers(runloop, currentMode, kCFRunLoopBeforeTimers);
+            /// 3. 通知 Observers: RunLoop 即将触发 Source0 (非port) 回调。
+            __CFRunLoopDoObservers(runloop, currentMode, kCFRunLoopBeforeSources);
+            /// 执行被加入的block
+            __CFRunLoopDoBlocks(runloop, currentMode);
+
+            /// 4. RunLoop 触发 Source0 (非port) 回调。
+            sourceHandledThisLoop = __CFRunLoopDoSources0(runloop, currentMode, stopAfterHandle);
+            /// 执行被加入的block
+            __CFRunLoopDoBlocks(runloop, currentMode);
+
+            /// 5. 如果有 Source1 (基于port) 处于 ready 状态，直接处理这个 Source1 然后跳转去处理消息。
+            if (__Source0DidDispatchPortLastTime) {
+                Boolean hasMsg = __CFRunLoopServiceMachPort(dispatchPort, &amp;msg)
+                if (hasMsg) goto handle_msg;
+            }
+
+            /// 通知 Observers: RunLoop 的线程即将进入休眠(sleep)。
+            if (!sourceHandledThisLoop) {
+                __CFRunLoopDoObservers(runloop, currentMode, kCFRunLoopBeforeWaiting);
+            }
+
+            /// 7. 调用 mach_msg 等待接受 mach_port 的消息。线程将进入休眠, 直到被下面某一个事件唤醒。
+            /// • 一个基于 port 的Source 的事件。
+            /// • 一个 Timer 到时间了
+            /// • RunLoop 自身的超时时间到了
+            /// • 被其他什么调用者手动唤醒
+            __CFRunLoopServiceMachPort(waitSet, &amp;msg, sizeof(msg_buffer), &amp;livePort) {
+                mach_msg(msg, MACH_RCV_MSG, port); // thread wait for receive msg
+            }
+
+            /// 8. 通知 Observers: RunLoop 的线程刚刚被唤醒了。
+            __CFRunLoopDoObservers(runloop, currentMode, kCFRunLoopAfterWaiting);
+
+            /// 收到消息，处理消息。
+            handle_msg:
+
+            /// 9.1 如果一个 Timer 到时间了，触发这个Timer的回调。
+            if (msg_is_timer) {
+                __CFRunLoopDoTimers(runloop, currentMode, mach_absolute_time())
+            } 
+
+            /// 9.2 如果有dispatch到main_queue的block，执行block。
+            else if (msg_is_dispatch) {
+                __CFRUNLOOP_IS_SERVICING_THE_MAIN_DISPATCH_QUEUE__(msg);
+            } 
+
+            /// 9.3 如果一个 Source1 (基于port) 发出事件了，处理这个事件
+            else {
+                CFRunLoopSourceRef source1 = __CFRunLoopModeFindSourceForMachPort(runloop, currentMode, livePort);
+                sourceHandledThisLoop = __CFRunLoopDoSource1(runloop, currentMode, source1, msg);
+                if (sourceHandledThisLoop) {
+                    mach_msg(reply, MACH_SEND_MSG, reply);
+                }
+            }
+
+            /// 执行加入到Loop的block
+            __CFRunLoopDoBlocks(runloop, currentMode);
+
+
+            if (sourceHandledThisLoop &amp;&amp; stopAfterHandle) {
+                /// 进入loop时参数说处理完事件就返回。
+                retVal = kCFRunLoopRunHandledSource;
+            } else if (timeout) {
+                /// 超出传入参数标记的超时时间了
+                retVal = kCFRunLoopRunTimedOut;
+            } else if (__CFRunLoopIsStopped(runloop)) {
+                /// 被外部调用者强制停止了
+                retVal = kCFRunLoopRunStopped;
+            } else if (__CFRunLoopModeIsEmpty(runloop, currentMode)) {
+                /// source/timer/observer一个都没有了
+                retVal = kCFRunLoopRunFinished;
+            }
+
+            /// 如果没超时，mode里没空，loop也没被停止，那继续loop。
+        } while (retVal == 0);
+    }
+
+    /// 10. 通知 Observers: RunLoop 即将退出。
+    __CFRunLoopDoObservers(rl, currentMode, kCFRunLoopExit);
+}
+</code></pre>
+
+<p>实际上RunLoop内部就是一个do-while循环，当你调用CFRunLoopRun（）时，线程就会一直停留在这个循环里，处于<strong>接受消息->等待->处理</strong>的循环中，直到超时或者手动停止，函数返回。</p>
+
+<h2>RunLoop底层实现</h2>
+
+<p>RunLoop的核心是基于mach port，在RunLoop进入休眠时，它调用mach_msg()等待mach port传消息过来，如果没有消息过来，内核会将线程置于等待状态。为了更好的了解mach port，我们先了解OSX/iOS的系统架构。</p>
+
+<p><img src="/images/RunLoop_3.png"></p>
+
+<p>苹果官方将整个系统大致划分为上述4个层次：  <br/>
+<strong>应用层</strong>：包括用户能接触到的图形应用，例如 Spotlight、Aqua、SpringBoard 等。  <br/>
+<strong>应用框架层</strong>：即开发人员接触到的 Cocoa 等框架。  <br/>
+<strong>核心框架层</strong>：包括各种核心框架、OpenGL 等内容。  <br/>
+<strong>Darwin</strong>： 即操作系统的核心，包括系统内核、驱动、Shell 等内容，这一层是开源的，其所有源码都可以在 <a href="http://opensource.apple.com">opensource.apple.com</a> 里找到。</p>
+
+<p>我们再深入看下Darwin：</p>
+
+<p><img src="/images/RunLoop_4.png"></p>
+
+<p>其中，在硬件层上面由三部分组成：Mach、BSD、IOKit（还包括一些没标注的内容），共同组成XNU内核。  <br/>
+XNU内核的内环被称为Mach，它作为一个微内核，仅提供诸如处理器调度、IPC（进程间通信）等非常少量的基础服务。  <br/>
+BSD层可以看作围绕Mach层的一个外环，其提供了诸如进程管理、文件系统和网络等功能。
+IOKit层为设备驱动提供一个面向对象的框架（C++）。</p>
+
+<p>Mach 本身提供的 API 非常有限，而且苹果也不鼓励使用 Mach 的 API，但是这些API非常基础，如果没有这些API的话，其他任何工作都无法实施。在 Mach 中，所有的东西都是通过自己的对象实现的，进程、线程和虚拟内存都被称为"对象"。和其他架构不同， Mach 的对象间不能直接调用，只能通过消息传递的方式实现对象间的通信。"消息"是 Mach 中最基础的概念，消息在两个端口 (port) 之间传递，这就是 Mach 的 IPC (进程间通信) 的核心。</p>
+
+<p>Mach 的消息定义是在 &lt;mach/message.h> 头文件的，很简单：</p>
+
+<pre><code class="ObjC">typedef struct {
+  mach_msg_header_t header;
+  mach_msg_body_t body;
+} mach_msg_base_t;
+
+typedef struct {
+  mach_msg_bits_t msgh_bits;
+  mach_msg_size_t msgh_size;
+  mach_port_t msgh_remote_port;
+  mach_port_t msgh_local_port;
+  mach_port_name_t msgh_voucher_port;
+  mach_msg_id_t msgh_id;
+} mach_msg_header_t;
+</code></pre>
+
+<p>一条Mach消息实际上就是一个二进制数据包（BLOB），其头部定义了当前端口local_port和目标端口remote_port。</p>
+
+<pre><code class="ObjC">mach_msg_return_t mach_msg(
+            mach_msg_header_t *msg,
+            mach_msg_option_t option,
+            mach_msg_size_t send_size,
+            mach_msg_size_t rcv_size,
+            mach_port_name_t rcv_name,
+            mach_msg_timeout_t timeout,
+            mach_port_name_t notify);
+</code></pre>
+
+<p>发送消息和接收消息是通过同个API进行的，其option标记了消息传递的方向。</p>
+
+<p>为了实现消息的发送和接收，mach_msg()实际上是调用了一个Mach陷阱，即mach_msg_trap()，陷阱这个概念在Mach中等同于系统调用，当你在用户态调用mach_msg_trap()时会触发陷阱机制，切换到内核态，内核态中的内核实现的mach_msg()会完成实际的工作。例如你在在模拟器里跑起一个 iOS 的 App，然后在 App 静止时点击暂停，你会看到主线程调用栈是停留在 mach_msg_trap() 这个地方。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Block 之 Block内存管理]]></title>
@@ -910,179 +1242,6 @@ Program ended with exit code: 0
 </code></pre>
 
 <p><a href="https://github.com/caixindong/SomeDemoForYou/tree/master/RuntimeDemo">以上demo地址</a></p>
-
-<p>参考文章：  <br/>
-<a href="https://www.ianisme.com/ios/2019.html">Objective-C Runtime 1小时入门教程</a>  <br/>
-<a href="http://www.jianshu.com/p/1e06bfee99d0">详解Runtime运行时机制</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Runtime小笔记（一）]]></title>
-    <link href="http://caixindong.github.io/blog/2016/05/11/ios87/"/>
-    <updated>2016-05-11T21:52:03+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/05/11/ios87</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>之前看过关于runtime的几篇文章，水平各有千秋，现在先汇集各个大牛的总结，以后找个时间将Runtime的<a href="http://opensource.apple.com//source/objc4/">源码</a>啃一遍，再完善自己的笔记</p>
-
-<h2>什么是Runtime</h2>
-
-<p>Objective-C Runtime是一个将C语言转化为面向对象语言的扩展。  <br/>
-C++和Objective进行对比：  <br/>
-<code>同 ：</code> C++和Objective-C都是在C的基础上加入面向对象的特性扩充而成的程序设计语言；  <br/>
-<code>异 ：</code> 实现的机制差异不同。C++是基于静态类型，而Objective-C是基于动态运行时类型。也就是说用C++编写的程序编译时就直接编译成了可令机器读懂的机器语言；用Objective-C编写的程序不能直接编译成可令机器读懂的机器语言，而是在程序运行的时候，通过Runtime把程序转为可令机器读懂的机器语言。Runtime是Objective不可缺少的重要一部分；</p>
-
-<h2>一些 Runtime 的术语</h2>
-
-<h3>id 和 Class</h3>
-
-<pre><code class="ObjC">#if !OBJC_TYPES_DEFINED
-/// An opaque type that represents an Objective-C class.
-typedef struct objc_class *Class;
-
-/// Represents an instance of a class.
-struct objc_object {
-    Class isa  OBJC_ISA_AVAILABILITY;
-};
-
-/// A pointer to an instance of a class.
-typedef struct objc_object *id;
-#endif
-</code></pre>
-
-<p>Class是一个指向<strong>==objc_class==</strong>结构体的指针；  <br/>
-id是一个指向<strong>==objc_object==</strong>结构体的指针，其中的<strong>==isa==</strong>是一个指<strong>==objc_class==</strong>结构体的指针。  <br/>
-换句话说，id就是我们所说的对象，Class就是我们所说的类。</p>
-
-<h4>objc_class的定义</h4>
-
-<pre><code class="ObjC">typedef struct objc_class *Class;
-struct objc_class { 
- Class isa                                 OBJC_ISA_AVAILABILITY;
-#if !__OBJC2__
- Class super_class                         OBJC2_UNAVAILABLE; 
- const char *name                          OBJC2_UNAVAILABLE; 
- long version                              OBJC2_UNAVAILABLE; 
- long info                                 OBJC2_UNAVAILABLE; 
- long instance_size                        OBJC2_UNAVAILABLE; 
- struct objc_ivar_list *ivars              OBJC2_UNAVAILABLE;
- struct objc_method_list **methodLists     OBJC2_UNAVAILABLE; 
- struct objc_cache *cache                  OBJC2_UNAVAILABLE; 
- struct objc_protocol_list *protocols      OBJC2_UNAVAILABLE; 
-#endif
-}
-/* Use `Class` instead of `struct objc_class *` */
-</code></pre>
-
-<p>isa指针：指向的类结构称为metaclass(元类)，其中存放着static类型的成员变量与类方法（“+”开头的方法）；  <br/>
-super_class：指向该类的父类的指针，如果该类是根类（如NSObject或NSProxy），那么super_class就为nil；  <br/>
-name：类名；  <br/>
-version：类的版本信息，默认为0，可以通过runtime函数class_setVersion或者class_getVersion进行修改、读取；  <br/>
-info：类信息，供运行时期使用的一些位标识，如CLS_CLASS (0x1L) 表示该类为普通 class，其中包含实例方法和变量;CLS_META (0x2L) 表示该类为 metaclass，其中包含类方法；  <br/>
-instance_size：该类的实例变量大小（包括从父类继承下来的实例变量）；   <br/>
-ivars：该类的成员变量地址列表；    <br/>
-methodLists：方法地址列表，与 info 的一些标志位有关，如CLS_CLASS (0x1L)，则存储实例方法，如CLS_META (0x2L)，则存储类方法；  <br/>
-cache：缓存最近使用的方法地址，用于提升效率；  <br/>
-protocols：存储该类声明遵守的协议的列表；</p>
-
-<p>类与对象的继承层次关系如图：  <br/>
-<img src="/images/objective-runtime.png"></p>
-
-<p>所有的metaclass中isa指针都是指向根metaclass，而根metaclass则指向自身。根metaclass是通过继承根类产生的，与根class结构体成员一致，不同的是根metaclass的isa指针指向自身。</p>
-
-<h3>SEL</h3>
-
-<p>SEL是方法选择器，作用就和名字一样，日常生活中，我们通过人名辨别谁是谁，注意 Objc 在相同的类中不会有命名相同的两个方法。selector 对方法名进行包装，以便找到对应的方法实现</p>
-
-<pre><code class="ObjC">typedef struct objc_selector *SEL;
-
-struct objc_selector {
-    char *name;                       OBJC2_UNAVAILABLE;// 方法名
-    char *types;                      OBJC2_UNAVAILABLE;// 方法类型
-};
-</code></pre>
-
-<h3>IMP</h3>
-
-<p>IMP是由编译器生成的一个函数指针，指向方法的实现。当你发起一个消息后，这个函数指针决定了最终执行哪段代码。</p>
-
-<pre><code class="ObjC">typedef id (*IMP)(id, SEL, ...);
-</code></pre>
-
-<h3>Method</h3>
-
-<p>Method代表类中的某个方法的类型。</p>
-
-<pre><code class="ObjC">typedef struct objc_method *Method;
-
-struct objc_method {
-    SEL method_name                   OBJC2_UNAVAILABLE; // 方法名
-    char *method_types                OBJC2_UNAVAILABLE; // 方法类型,存储着方法的参数类型和返回值类型
-    IMP method_imp                    OBJC2_UNAVAILABLE; // 方法实现
-}
-</code></pre>
-
-<h3>Ivar</h3>
-
-<p>Ivar代表类中实例变量的类型</p>
-
-<pre><code class="ObjC">typedef struct objc_ivar *Ivar;
-
-struct objc_ivar {
-    char *ivar_name                   OBJC2_UNAVAILABLE; // 变量名
-    char *ivar_type                   OBJC2_UNAVAILABLE; // 变量类型
-    int ivar_offset                   OBJC2_UNAVAILABLE; // 基地址偏移字节
-#ifdef __LP64__
-    int space                         OBJC2_UNAVAILABLE; // 占用空间
-#endif
-}
-</code></pre>
-
-<h3>objc_property_t</h3>
-
-<p>objc_property_t是属性,是内置的类型，与之关联的还有一个objc_property_attribute_t，它是属性的attribute，也就是其实是对属性的详细描述，包括属性名称、属性编码类型、原子类型/非原子类型等。它的定义如下</p>
-
-<pre><code class="ObjC">typedef struct objc_property *objc_property_t;
-
-typedef struct {
-    const char *name; // 名称
-    const char *value;  // 值（通常是空的）
-} objc_property_attribute_t;
-</code></pre>
-
-<h3>Cache</h3>
-
-<p>方法地址缓存</p>
-
-<pre><code class="ObjC">typedef struct objc_cache *Cache
-
-struct objc_cache {
-    unsigned int mask                   OBJC2_UNAVAILABLE;
-    unsigned int occupied               OBJC2_UNAVAILABLE;
-    Method buckets[1]                   OBJC2_UNAVAILABLE;
-};
-</code></pre>
-
-<p><code>mask</code>： 指定分配cache buckets的总数。在方法查找中，Runtime使用这个字段确定数组的索引位置。  <br/>
-<code>occupied</code>： 实际占用cache buckets的总数。  <br/>
-<code>buckets</code>： 指定Method数据结构指针的数组。这个数组可能包含不超过mask+1个元素。需要注意的是，指针可能是NULL，表示这个缓存bucket没有被占用，另外被占用的bucket可能是不连续的。这个数组可能会随着时间而增长。  <br/>
-objc_msgSend每调用一次方法后，就会把该方法缓存到cache列表中，下次调用的时候，就直接优先从cache列表中寻找，如果cache没有，才从methodLists中查找方法。</p>
-
-<h3>Catagory</h3>
-
-<p>这个就是我们平时所说的类别了,它可以动态的为已存在的类添加新的方法。</p>
-
-<pre><code class="ObjC">typedef struct objc_category *Category;
-
-struct objc_category {
-    char *category_name                           OBJC2_UNAVAILABLE; // 类别名称
-    char *class_name                              OBJC2_UNAVAILABLE; // 类名
-    struct objc_method_list *instance_methods     OBJC2_UNAVAILABLE; // 实例方法列表
-    struct objc_method_list *class_methods        OBJC2_UNAVAILABLE; // 类方法列表
-    struct objc_protocol_list *protocols          OBJC2_UNAVAILABLE; // 协议列表
-}
-</code></pre>
 
 <p>参考文章：  <br/>
 <a href="https://www.ianisme.com/ios/2019.html">Objective-C Runtime 1小时入门教程</a>  <br/>
