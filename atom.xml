@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-07-27T22:44:50+08:00</updated>
+  <updated>2016-07-27T22:49:46+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -163,7 +163,7 @@
 
 <h1>目录结构</h1>
 
-<p><img src="http://upload-images.jianshu.io/upload_images/1714221-fddd358a6d7ef353.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照 2016-07-25 下午9.23.51.png" /></p>
+<p><img src="http://caixindong.github.io/images/XDNetworking.png"></p>
 
 <p>将cache相关的东西抽离为了方便日后拓展</p>
 
