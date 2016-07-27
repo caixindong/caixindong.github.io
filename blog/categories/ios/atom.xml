@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-07-27T22:39:06+08:00</updated>
+  <updated>2016-07-27T22:40:35+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -12,6 +12,88 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[实现简易版的上下拉刷新控件XDRefresh]]></title>
+    <link href="http://caixindong.github.io/blog/2016/07/27/ios96/"/>
+    <updated>2016-07-27T22:39:42+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/07/27/ios96</id>
+    <content type="html"><![CDATA[<h1>XDRefresh</h1>
+
+<p>开发的时候经常用到上下拉刷新控件，因为项目只是需要实现简单的菊花样式的刷新动画，所以自己封装了一个简易版上下拉刷新控件，到时未来再拓展出可以自定义的刷新控件。</p>
+
+<h1>效果图</h1>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/1714221-2c319400680c88f2.gif?imageMogr2/auto-orient/strip" alt="XDRefreshDemo.gif" /></p>
+
+<h1>使用</h1>
+
+<pre><code class="ObjC">#import "KitRefresh.h"
+...
+KitRefreshHeader *_header;
+KitRefreshFooter *_footer;
+
+_header =  [KitRefreshHeader headerOfScrollView:tableView withRefreshingBlock:^{
+     //下拉刷新回调
+    }];
+    
+_footer = [KitRefreshFooter footerOfScrollView:tableView withRefreshingBlock:^{
+        //上拉刷新回调
+    }];
+</code></pre>
+
+<h1>实现原理</h1>
+
+<p>通过观察scrollview的contentOffset属性的变化来进行处理。  <br/>
+给出一段KVO处理，具体实现大家可以看源码</p>
+
+<pre><code class="ObjC">- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary&lt;NSString *,id&gt; *)change
+                       context:(void *)context {
+    if ([keyPath isEqualToString:@"contentOffset"]) {
+        _contentHeight = _scrollView.contentSize.height;
+        //拉伸状态
+        if (_scrollView.isDragging) {
+            CGFloat currentPosition = _scrollView.contentOffset.y;
+            
+            if (!_isRefreshing) {
+                [UIView animateWithDuration:0.3f animations:^{
+                    //下拉过程超过_headerHeight*1.5
+                    if (currentPosition &lt; -_headerHeight* 1.5 ) {
+                        _statusLabel.text       = _releaseText;
+                        _arrowView.transform    = CGAffineTransformMakeRotation(M_PI);
+                    }else {
+                        //上拉
+                        if (currentPosition - _lastPosition &gt; 5) {
+                            _lastPosition = currentPosition;
+                            _statusLabel.text = _pulldownText;
+                            _arrowView.transform = CGAffineTransformMakeRotation(M_PI*2);
+                            //下拉不超过_headerHeight*1.5
+                        }else if(_lastPosition - currentPosition &gt; 5) {
+                            _lastPosition = currentPosition;
+                        }
+                    }
+                }];
+            }
+            
+        }else {
+            //松开手时
+            if ([_statusLabel.text isEqualToString:_releaseText]) {
+                [self beginRefreshing];
+            }
+        }
+
+    }
+}
+</code></pre>
+
+<h1>源码地址</h1>
+
+<p><a href="https://github.com/caixindong/XDRefresh/tree/master/XDRefresh">https://github.com/caixindong/XDRefresh/tree/master/XDRefresh</a>
+大家觉得喜欢就赏个star，有什么问题可以issue我或者在评论指出，相互学习</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[XDNetworking（拓展出缓存功能的网络框架）]]></title>
@@ -717,97 +799,6 @@ typedef struct {
 <p>发送消息和接收消息是通过同个API进行的，其option标记了消息传递的方向。</p>
 
 <p>为了实现消息的发送和接收，mach_msg()实际上是调用了一个Mach陷阱，即mach_msg_trap()，陷阱这个概念在Mach中等同于系统调用，当你在用户态调用mach_msg_trap()时会触发陷阱机制，切换到内核态，内核态中的内核实现的mach_msg()会完成实际的工作。例如你在在模拟器里跑起一个 iOS 的 App，然后在 App 静止时点击暂停，你会看到主线程调用栈是停留在 mach_msg_trap() 这个地方。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Block 之 Block内存管理]]></title>
-    <link href="http://caixindong.github.io/blog/2016/05/16/ios91/"/>
-    <updated>2016-05-16T20:20:25+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/05/16/ios91</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>block的内存管理相对比较复杂，分ARC和MRC两种情况考虑，虽然现在开发基本是用ARC，编译器已经帮我们做了很多内存管理的优化，但我们不仅要知其然，也要知其所以然。</p>
-
-<h2>Block的类型</h2>
-
-<p>根据Block的存储方式，分为以下三种：
-<code>.</code> <em>NSConcretStackBlock  <br/>
-<code>.</code> </em>NSConcretGlobalBlock  <br/>
-<code>.</code> _NSConcretMallocBlock  <br/>
-这三种类型表明了Block的三种存储方式：栈、全局、堆。   <br/>
-<strong>注意：</strong> 在ARC模式下，Block只存在全局和堆之中，对于栈上的Block，编译器帮我们拷贝到堆上，这也是为什么我们声明Block的时候即使不声明为copy，Block也是拷贝到堆上。显示地声明不会与编译器相冲突，是为了我们更好地理解是编译器做了copy这一步使得Block拷贝到堆上。</p>
-
-<h3>全局Block</h3>
-
-<p>位于全局存储区的Block有两种情况：  <br/>
-<code>.</code> 定义在函数外面的Block；</p>
-
-<pre><code class="ObjC">void (^myBlock)(void) = ^(){
-    NSLog(@"hello");
-};
-</code></pre>
-
-<p><code>.</code> 不引用局部变量的Block；</p>
-
-<pre><code class="ObjC">
-int main(int argc, const char * argv[]) {
-    @autoreleasepool {
-        void (^myBlock)(void) = ^(){
-            NSLog(@"hello");
-        };
-        myBlock();
-
-    }
-    return 0;
-}
-</code></pre>
-
-<h3>栈Block</h3>
-
-<pre><code>typedef void (^stackBlock)() ;
-
-stackBlock returnBlock(){
-    int a =10;
-    return ^{printf("a=%d\n",a);};
-}
-</code></pre>
-
-<p>上面的例子在MRC下无法编译，而在ARC下可以编译  <br/>
-这是因为返回block的时候是返回局部变量的指针,而这一点恰是编译器已经断定了。在ARC下可以编译过，是因为ARC使用autorelease了</p>
-
-<h3>堆Block</h3>
-
-<pre><code class="ObjC">id getBlockArray(){
-    int val =10;
-    return [NSArray arrayWithObjects:
-            ^{NSLog(@"blk0:%d",val);},
-            ^{NSLog(@"blk1:%d",val);},nil];
-}
-
-int main(int argc, const char * argv[]) {
-    @autoreleasepool {
-
-        id obj = getBlockArray();
-        typedef void (^blk_t)(void);
-        blk_t blk = (blk_t)[obj objectAtIndex:0];
-        blk();
-
-    }
-    return 0;
-}
-</code></pre>
-
-<p>在MRC模式下，会发生异常，因为数组中的block是在栈上的，到blk指向的block已经释放内存了，访问blk就会造成崩溃，解决方法就是在block后面加上copy，使它变成堆上的block。</p>
-
-<h2>copy的使用</h2>
-
-<p>不管block配置在何处，用copy方法复制都不会引起任何问题。  <br/>
-在ARC环境下，如果不确定是否要copy block尽管copy即可。ARC会自动处理的。  <br/>
-【注意】：  <br/>
-● 在栈上调用copy那么复制到堆上  <br/>
-● 在全局block调用copy什么也不做  <br/>
-● 在堆上调用block 引用计数增加</p>
 ]]></content>
   </entry>
   
