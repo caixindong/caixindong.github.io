@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-07-27T22:40:35+08:00</updated>
+  <updated>2016-07-27T22:44:50+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -241,7 +241,7 @@ _footer = [KitRefreshFooter footerOfScrollView:tableView withRefreshingBlock:^{
 
 <p>取消所有网络请求</p>
 
-<pre><code class="OjbC">+ (void)cancleAllRequest;
+<pre><code class="ObjC">+ (void)cancleAllRequest;
 </code></pre>
 
 <p>取消单个请求</p>
@@ -348,7 +348,7 @@ XDAlertController *alert = [XDAlertController alertControllerWithTitle:@"我是a
 
 <h2>效果图</h2>
 
-<p>{% img /images/multTableView.gif %}</p>
+<p><img src="/images/multTableView.gif"></p>
 
 <h2>用法（类似UITableView）</h2>
 
@@ -558,7 +558,7 @@ CFRunLoopTimerRef  <br/>
 CFRUNLoopObserverRef  <br/>
 他们的关系如下图：</p>
 
-<p>{% img /images/RunLoop_0.png %}</p>
+<p><img src="/images/RunLoop_0.png"></p>
 
 <p>一个RunLoop包含若干个Mode，每个Mode又包含若干个Source/Timer/Observer。每次调用RunLoop的主函数，只能指定其中一个Mode，这个Mode被称为Current Mode。如果要切换Mode，只能退出Loop，再重新指定一个Mode进入，这样做是为了分隔不同组的Source/Timer/Observer，让其互不影响。</p>
 
@@ -626,7 +626,7 @@ struct __CFRunLoop {
 
 <p>RunLoop内部实现逻辑大致如下图：</p>
 
-<p>{% img /images/RunLoop_1.png %}</p>
+<p><img src="/images/RunLoop_1.png"></p>
 
 <p>代码实现逻辑如下：</p>
 
@@ -748,7 +748,7 @@ int CFRunLoopRunSpecific(runloop, modeName, seconds, stopAfterHandle) {
 
 <p>RunLoop的核心是基于mach port，在RunLoop进入休眠时，它调用mach_msg()等待mach port传消息过来，如果没有消息过来，内核会将线程置于等待状态。为了更好的了解mach port，我们先了解OSX/iOS的系统架构。</p>
 
-<p>{% img /images/RunLoop_3.png %}</p>
+<p><img src="/images/RunLoop_3.png"></p>
 
 <p>苹果官方将整个系统大致划分为上述4个层次：  <br/>
 <strong>应用层</strong>：包括用户能接触到的图形应用，例如 Spotlight、Aqua、SpringBoard 等。  <br/>
@@ -758,7 +758,7 @@ int CFRunLoopRunSpecific(runloop, modeName, seconds, stopAfterHandle) {
 
 <p>我们再深入看下Darwin：</p>
 
-<p>{% img /images/RunLoop_4.png %}</p>
+<p><img src="/images/RunLoop_4.png"></p>
 
 <p>其中，在硬件层上面由三部分组成：Mach、BSD、IOKit（还包括一些没标注的内容），共同组成XNU内核。  <br/>
 XNU内核的内环被称为Mach，它作为一个微内核，仅提供诸如处理器调度、IPC（进程间通信）等非常少量的基础服务。  <br/>

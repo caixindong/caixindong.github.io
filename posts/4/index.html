@@ -7,7 +7,8 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="动态规划, 数据结构 最长公共子串 前言 它比最长公共子序列多了一个要求，就是要求子串是连续的，做法跟最长公共子序列的做法大致相同，只是在一处判断的处理改变了。 做法 定义一个二维数组C[i][j],记录str1(0~i)和str2(0~j)的最长公共子串。 定义一个max， &hellip;">
+	<meta name="description" content="ios 简析SDWebImage 前言 SDWebImage是一个强大的第三方图片异步加载库，从事iOS开发的人或多或少用过它。今天我点开源码一看，里面一些实现细节确实令人玩味，同时也让我了解到缓存机制是如何实现。 简析 1
+- (void)sd_setImageWithURL:(NSURL &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,6 +86,470 @@
 			<div class="mid-col-container">
 				<div id="content" class="inner">
 <div itemscope itemtype="http://schema.org/Blog">
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-26T22:31:56+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/26/ios66/" itemprop="url">简析SDWebImage</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h1>前言</h1>
+
+<p>SDWebImage是一个强大的第三方图片异步加载库，从事iOS开发的人或多或少用过它。今天我点开源码一看，里面一些实现细节确实令人玩味，同时也让我了解到缓存机制是如何实现。</p>
+
+<h1>简析</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>作者利用category为一些UIKit类拓展出相应的缓存功能，其中UIImageView和UIButton使用频率比较高，因为日常开发中，我们需要这两个控件加载图片。上面那个方法是UIImageView+WebCache最常用的方法，传一个url，UIImageView就会将网络图片加载出来，这个方法看起来简单，可是背后的实现没那么容易，不禁感慨大神之牛，巧妙的设计和背后复杂的实现竟然浓缩成这样的一个接口函数。</p>
+
+<h2>点进去看源码</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">sd_setImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">placeholderImage</span><span class="p">:</span><span class="n">placeholder</span> <span class="nl">options</span><span class="p">:</span><span class="mi">0</span> <span class="nl">progress</span><span class="p">:</span><span class="nb">nil</span> <span class="nl">completed</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个是原始接口</p>
+
+<h2>点进去这个原始接口</h2>
+
+<p>我可以看到这个函数体</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objc'><span class='line'><span class="p">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">sd_setImageWithURL:</span><span class="p">(</span><span class="bp">NSURL</span> <span class="o">*</span><span class="p">)</span><span class="nv">url</span> <span class="nf">placeholderImage:</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">placeholder</span> <span class="nf">options:</span><span class="p">(</span><span class="n">SDWebImageOptions</span><span class="p">)</span><span class="nv">options</span> <span class="nf">progress:</span><span class="p">(</span><span class="n">SDWebImageDownloaderProgressBlock</span><span class="p">)</span><span class="nv">progressBlock</span> <span class="nf">completed:</span><span class="p">(</span><span class="n">SDWebImageCompletionBlock</span><span class="p">)</span><span class="nv">completedBlock</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个函数体就是就是sd_setImage的实现逻辑，利用block回调，有加载过程的回调和加载完成的回调</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="n">sd_cancelCurrentImageLoad</span><span class="p">];</span>
+</span><span class='line'><span class="n">objc_setAssociatedObject</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">imageURLKey</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">OBJC_ASSOCIATION_RETAIN_NONATOMIC</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDelayPlaceholder</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">dispatch_main_async_safe</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'>            <span class="nb">self</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">placeholder</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先，它先取消下载队列里正在进行的任务，将图片的url和UIImageView关联起来作为UIImageView的一部分；如果有placeholder，就先将它显示出来；</p>
+
+<p>接着就是网络加载图片实现逻辑的主要部分</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="kt">id</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageManager</span><span class="p">.</span><span class="n">sharedManager</span> <span class="nl">downloadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">options</span> <span class="nl">progress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">,</span> <span class="bp">NSURL</span> <span class="o">*</span><span class="n">imageURL</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">wself</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>            <span class="n">dispatch_main_sync_safe</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">wself</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">image</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageAvoidAutoSetImage</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">completedBlock</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">{</span>
+</span><span class='line'>                    <span class="n">completedBlock</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+</span><span class='line'>                    <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="n">wself</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">;</span>
+</span><span class='line'>                    <span class="p">[</span><span class="n">wself</span> <span class="n">setNeedsLayout</span><span class="p">];</span>
+</span><span class='line'>                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="k">if</span> <span class="p">((</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageDelayPlaceholder</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="n">wself</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">placeholder</span><span class="p">;</span>
+</span><span class='line'>                        <span class="p">[</span><span class="n">wself</span> <span class="n">setNeedsLayout</span><span class="p">];</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">completedBlock</span> <span class="o">&amp;&amp;</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="n">completedBlock</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">cacheType</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'><span class="p">}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>利用一个全局的SDWebImageManager来进行下载缓存操作的管理和调度。SDWebImageManager由两部分构成，由SDImageCache缓存器和SDWebImageDownloader下载器构成。同步上面加载过程的回调，在completed里除了同步加载完成的回调外，还将block回调的image加载在控件上面。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="p">[</span><span class="nb">self</span> <span class="nl">sd_setImageLoadOperation</span><span class="p">:</span><span class="n">operation</span> <span class="nl">forKey</span><span class="p">:</span><span class="s">@&quot;UIImageViewImageLoad&quot;</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个函数是为了判断当前是否有重复的网络图片加载操作，如果有，就取消，key作为判断加载操作的标识。</p>
+
+<h2>点进去看downloadImageWithURL源码</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">__block</span> <span class="n">SDWebImageCombinedOperation</span> <span class="o">*</span><span class="n">operation</span> <span class="o">=</span> <span class="p">[</span><span class="n">SDWebImageCombinedOperation</span> <span class="n">new</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先，先new一个新的operation，operation是遵守SDWebImageOperation协议的一个对象，协议有个cancle方法，利用cancle可以取消当前操作</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">@synchronized</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">isFailedUrl</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">failedURLs</span> <span class="nl">containsObject</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">url</span> <span class="o">||</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">options</span> <span class="o">&amp;</span> <span class="n">SDWebImageRetryFailed</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">isFailedUrl</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">dispatch_main_sync_safe</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+</span><span class='line'>        <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span> <span class="o">=</span> <span class="p">[</span><span class="bp">NSError</span> <span class="nl">errorWithDomain</span><span class="p">:</span><span class="n">NSURLErrorDomain</span> <span class="nl">code</span><span class="p">:</span><span class="n">NSURLErrorFileDoesNotExist</span> <span class="nl">userInfo</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span><span class='line'>        <span class="n">completedBlock</span><span class="p">(</span><span class="nb">nil</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">SDImageCacheTypeNone</span><span class="p">,</span> <span class="nb">YES</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">operation</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">@synchronized</span> <span class="p">(</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">runningOperations</span> <span class="nl">addObject</span><span class="p">:</span><span class="n">operation</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接着我们可以看到一个实现的亮点，它用一个failedURLs集合来记录失败或者无效的url，如果传进来的url是failedURLs这个集合里的或者是为空，则完成操作并回调,否则将operation添加到运行的operation数组中。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'> <span class="bp">NSString</span> <span class="o">*</span><span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">cacheKeyForURL</span><span class="p">:</span><span class="n">url</span><span class="p">];</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>它将url缓存起来,给他一个key值</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="n">operation</span><span class="p">.</span><span class="n">cacheOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageCache</span> <span class="nl">queryDiskCacheForKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">done</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">,</span> <span class="n">SDImageCacheType</span> <span class="n">cacheType</span><span class="p">)</span> <span class="p">{}];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>SDWebImageManager的缓存器根据缓存的url的key值来寻找是否有对应的缓存</p>
+
+<h2>点进去看queryDiskCacheForKey源码</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">key</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">doneBlock</span><span class="p">(</span><span class="nb">nil</span><span class="p">,</span> <span class="n">SDImageCacheTypeNone</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果相关的缓存记录则doneBlock回调，标识为SDImageCacheTypeNone</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="bp">UIImage</span> <span class="o">*</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">imageFromMemoryCacheForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">doneBlock</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">SDImageCacheTypeMemory</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nb">nil</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>先在内存里寻找，SDImage用的内存缓存是用NSCache实现的，如果有就是doneBlock回调，标志为SDImageCacheTypeMemory</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'>  <span class="bp">UIImage</span> <span class="o">*</span><span class="n">diskImage</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span> <span class="nl">diskImageForKey</span><span class="p">:</span><span class="n">key</span><span class="p">];</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">diskImage</span> <span class="o">&amp;&amp;</span> <span class="nb">self</span><span class="p">.</span><span class="n">shouldCacheImagesInMemory</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                <span class="bp">NSUInteger</span> <span class="n">cost</span> <span class="o">=</span> <span class="n">SDCacheCostForImage</span><span class="p">(</span><span class="n">diskImage</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">memCache</span> <span class="nl">setObject</span><span class="p">:</span><span class="n">diskImage</span> <span class="nl">forKey</span><span class="p">:</span><span class="n">key</span> <span class="nl">cost</span><span class="p">:</span><span class="n">cost</span><span class="p">];</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+</span><span class='line'>                <span class="n">doneBlock</span><span class="p">(</span><span class="n">diskImage</span><span class="p">,</span> <span class="n">SDImageCacheTypeDisk</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果没有，就从磁盘缓存里找，如果找到了，就将他缓存到内存中，doneBlock回调，标志为SDImageCacheTypeDisk</p>
+
+<h2>返回上层函数查看done:^(UIImage *image, SDImageCacheType cacheType) {}这个block的主体</h2>
+
+<p>我们只看如果没有图片缓存该如何做</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="kt">id</span> <span class="o">&lt;</span><span class="n">SDWebImageOperation</span><span class="o">&gt;</span> <span class="n">subOperation</span> <span class="o">=</span> <span class="p">[</span><span class="nb">self</span><span class="p">.</span><span class="n">imageDownloader</span> <span class="nl">downloadImageWithURL</span><span class="p">:</span><span class="n">url</span> <span class="nl">options</span><span class="p">:</span><span class="n">downloaderOptions</span> <span class="nl">progress</span><span class="p">:</span><span class="n">progressBlock</span> <span class="nl">completed</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="bp">UIImage</span> <span class="o">*</span><span class="n">downloadedImage</span><span class="p">,</span> <span class="bp">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="bp">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span> <span class="kt">BOOL</span> <span class="n">finished</span><span class="p">)</span> <span class="p">{};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>SDWebImageManager的下载器开启下载operation来下载图片</p>
+
+<h2>点进去看downloadImageWithURL源码</h2>
+
+<p>下载的实现就不展开讲了，它利用的苹果提供的NSURLConnection来实现。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='objC'><span class='line'><span class="n">wself</span><span class="p">.</span><span class="n">lastAddedOperation</span> <span class="o">=</span> <span class="n">operation</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>同时记录最后一个下载操作，最后block回调。
+图片下载完成后，利用SDWebImageManager的缓冲器将图片缓存到内存和磁盘中，并将operation从运行的operation数组移除，如果失败则记录他是一个失败的url，成功则block回调。</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-26T17:37:00+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/c/'>c</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/02/26/ios65/" itemprop="url">整形与字符串互转</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h2>前言</h2>
+
+<p>C提供了把字符串转化为整形数的函数atoi()和把整形数转化为字符串的函数itoa()</p>
+
+<h4>itoa()函数的原型为： char <em>itoa( int value, char </em>string,int radix);</h4>
+
+<p>itoa()函数有3个参数：第一个参数是要转换的数字，第二个参数是要写入转换结果的目标字符串，第三个参数是转换数字时所用的基数。在例中，转换基数为10。10：十进制&hellip;&hellip;</p>
+
+<h4>itoa并不是一个标准的C函数，它是Windows特有的，如果要写跨平台的程序，请用sprintf。</h4>
+
+<p>是Windows平台下扩展的，标准库中有sprintf，功能比这个更强，用法跟printf类似：</p>
+
+<p>char str[255];
+sprintf(str, &ldquo;%x&rdquo;, 100); //将100转为16进制表示的字符串。</p>
+
+<h4>atoi()函数的原型为：int atoi(const char * string)</h4>
+
+<p>atoi()函数有1个参数，就是源字符串，返回值为转化结果</p>
+
+<h2>实现自己的itoa()和atoi()</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;math.h&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * string 转化为 int</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">Atoi</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">string</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">size_t</span> <span class="n">wei</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">string</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">wei</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">num</span> <span class="o">=</span> <span class="n">num</span><span class="o">*</span><span class="mi">10</span><span class="o">+</span><span class="p">(</span><span class="n">string</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="sc">&#39;0&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">num</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * 计算位数</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">wei</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">,</span><span class="kt">int</span> <span class="n">radix</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="n">num</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">num</span> <span class="o">=</span> <span class="n">num</span><span class="o">/</span><span class="n">radix</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">count</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * int 转化为 string</span>
+</span><span class='line'><span class="cm"> * num 待转化的数字</span>
+</span><span class='line'><span class="cm"> * str 写入转化结果的目标字符串</span>
+</span><span class='line'><span class="cm"> * radix 转换数字时所用的基数（进制）</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">Itoa</span><span class="p">(</span><span class="kt">int</span> <span class="n">num</span><span class="p">,</span><span class="kt">char</span> <span class="n">str</span><span class="p">[],</span><span class="kt">int</span> <span class="n">radix</span><span class="p">){</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">wei</span><span class="p">(</span><span class="n">num</span><span class="p">,</span><span class="n">radix</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">memset</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="sc">&#39;\0&#39;</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="n">pow</span><span class="p">(</span><span class="n">radix</span><span class="p">,</span> <span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">tmp</span>  <span class="o">=</span><span class="n">num</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">size</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">/</span><span class="n">a</span><span class="o">%</span><span class="n">radix</span><span class="o">+</span><span class="sc">&#39;0&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">/</span><span class="n">radix</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//cout&lt;&lt;Atoi(&quot;1234&quot;)&lt;&lt;endl;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str</span><span class="p">[</span><span class="mi">1000</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">Itoa</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">str</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">str</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="n">str2</span><span class="p">[</span><span class="mi">1000</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">sprintf</span><span class="p">(</span><span class="n">str2</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">str2</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1581,617 +2046,6 @@ unordered_map 容器支持正向迭代。</p>
 </span><span class='line'>        <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-22T20:28:12+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/c-plus-plus/'>c++</a>, <a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/02/22/ios56/" itemprop="url">C++中的set和unordered_set</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h1>set</h1>
-
-<h2>简介</h2>
-
-<p>集合（Set）容器是一个按特定顺序存储唯一元素的关联容器。</p>
-
-<h2>类模板</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="k">template</span> <span class="o">&lt;</span> <span class="k">class</span> <span class="nc">T</span><span class="p">,</span>
-</span><span class='line'>           <span class="k">class</span> <span class="nc">Compare</span> <span class="o">=</span> <span class="n">less</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span>
-</span><span class='line'>           <span class="k">class</span> <span class="nc">Alloc</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">&gt;</span>
-</span><span class='line'><span class="o">&gt;</span> <span class="k">class</span> <span class="nc">set</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>模板参数</h3>
-
-<p><code>1.</code> T：元素的类型。  <br/>
-<code>2.</code> Compare：一个二元谓词，以两个元素为参数返回一个 bool 值。(比较函数)  <br/>
-<code>3.</code> Alloc：容器内部用来管理内存分配及释放的内存分配器的类型。这个参数是可选的，它的默认值是 std::allocator<T>.</p>
-
-<h2>详细说明</h2>
-
-<p>在一个集合中，元素的值同时可以用来标志对应的元素（即值是自身的主键），每个值必须是唯一的。主键是不可修改的，因此在 set 中的元素不能被逐个修改（所有元素保持恒定），但是可以删除某个元素或插入新的元素。  <br/>
-set 容器中的所有元素都是按由类型为 Compare 的比较对象指定的严格弱序规则排序的。  <br/>
-在用主键访问单个元素时，set 容器通常比 unordered_set 容器低效，但 set 容器允许按顺序直接对某个子集进行迭代。  <br/>
-set 容器通常被实现为一个二叉搜索树（及其变型），该数据结构具有对数据自动排序的功能。
-支持双向迭代</p>
-
-<h2>相关函数使用说明</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;set&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;unordered_set&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">Node</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">id</span><span class="p">,</span><span class="kt">int</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>    <span class="o">:</span><span class="n">val</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="n">id</span><span class="p">(</span><span class="n">id</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="kt">bool</span> <span class="k">operator</span><span class="o">&lt;</span><span class="p">(</span><span class="k">const</span> <span class="n">Node</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span><span class="k">const</span> <span class="n">Node</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">val</span><span class="o">&lt;</span><span class="n">b</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;初始化一个set&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">test_set</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;删除一个元素&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">test_set</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="mi">19</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;遍历set里面的元素&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">test_set</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">test_set</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;*</span><span class="n">pos</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;查找元素的个数，如果为1就是找到，为0就是找不到&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">test_set</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;have find&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;no find&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;查找元素的迭代器，找不到则返回最后一个元素的迭代器，找得到就返回元素的迭代器&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">test_set</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">!=</span><span class="n">test_set</span><span class="p">.</span><span class="n">end</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;have find&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;no find&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;有效元素个数&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">test_set</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;自定义类型的set，默认是less函数(&lt;),所以必须重载&lt;操作符,其他用法跟标准的set一样&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">Node</span> <span class="nf">n1</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Node</span> <span class="nf">n2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Node</span> <span class="nf">n3</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">9</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">set</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">node_set</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">node_set</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">node_set</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n2</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">node_set</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n3</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;遍历自定义类型set里面的元素&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">node_set</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">node_set</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">pos</span><span class="o">-&gt;</span><span class="n">id</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<h1>unordered_set</h1>
-
-<h2>简介</h2>
-
-<p>无序集合（Unordered Set）容器是一个存储唯一元素的关联容器，容器中的元素无特别的次序关系。该容器允许基于值地快速元素检索。</p>
-
-<h2>类模板</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="c1">// &lt;unordered_set&gt;</span>
-</span><span class='line'><span class="k">template</span> <span class="o">&lt;</span> <span class="k">class</span> <span class="nc">Key</span><span class="p">,</span>
-</span><span class='line'>    <span class="k">class</span> <span class="nc">Hash</span> <span class="o">=</span> <span class="n">hash</span><span class="o">&lt;</span><span class="n">Key</span><span class="o">&gt;</span><span class="p">,</span>
-</span><span class='line'>    <span class="k">class</span> <span class="nc">Pred</span> <span class="o">=</span> <span class="n">equal_to</span><span class="o">&lt;</span><span class="n">Key</span><span class="o">&gt;</span><span class="p">,</span>
-</span><span class='line'>    <span class="k">class</span> <span class="nc">Alloc</span> <span class="o">=</span> <span class="n">allocator</span><span class="o">&lt;</span><span class="n">Key</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&gt;</span> <span class="k">class</span> <span class="nc">unordered_set</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>模板参数</h3>
-
-<p><code>1.</code> Key：元素的类型。  <br/>
-<code>2.</code> Hash：一元谓词，以一个 Key 类型的对象为参数，返回一个基于该对象的 size_t 类型的唯一值（哈希函数）。  <br/>
-<code>3.</code> Pred：二元谓词，以两个 Key 类型的对象为参数，返回一个 bool 值，如果第一个参数等价于第二个参数，该 bool 值为 true，否则为 false。默认为 std::equal_to。      <br/>
-<code>4.</code> Alloc：容器内部用来管理内存分配及释放的内存分配器的类型。这个参数是可选的，它的默认值是 std::allocator<T>。</p>
-
-<h2>详细说明</h2>
-
-<p>在一个 unordered_set 容器中，元素的值同时可以用来标志对应的元素（即值是自身的主键），每个值必须是唯一的。主键是不可修改的，因此在 unordered_set 中的元素不能被逐个修改（所有元素保持恒定），但是可以删除某个元素或插入新的元素。  <br/>
-在 unordered_set 内部，元素不会按任何顺序排序，而是通过元素值的 hash 值将元素分组放置到各个槽（Bucket，也可译成“桶”）中，这样就能通过元素值快速地访问各个对应的元素（平均耗时为一个常量，即时间复杂度为 O(1)）。  <br/>
-在访问容器中的某个元素时，unordered_set 容器比 set 容器高效，而在迭代容器元素的某个子集时，前者比后者稍微低效了一点。  <br/>
-unordered_set 容器支持正向迭代</p>
-
-<h2>相关函数说明</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;set&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;unordered_set&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">Node</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">Node</span><span class="p">(</span><span class="kt">int</span> <span class="n">id</span><span class="p">,</span><span class="kt">int</span> <span class="n">val</span><span class="p">)</span>
-</span><span class='line'>    <span class="o">:</span><span class="n">val</span><span class="p">(</span><span class="n">val</span><span class="p">),</span><span class="n">id</span><span class="p">(</span><span class="n">id</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">node_hash_fun</span><span class="p">{</span>
-</span><span class='line'>    <span class="kt">size_t</span> <span class="k">operator</span><span class="p">()(</span><span class="k">const</span> <span class="n">Node</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">)</span><span class="k">const</span><span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">n</span><span class="p">.</span><span class="n">id</span><span class="o">*</span><span class="mi">50</span><span class="o">+</span><span class="n">n</span><span class="p">.</span><span class="n">val</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">struct</span> <span class="n">node_equal_fun</span><span class="p">{</span>
-</span><span class='line'>    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="k">const</span> <span class="n">Node</span> <span class="o">&amp;</span><span class="n">n</span><span class="p">,</span><span class="k">const</span> <span class="n">Node</span><span class="o">&amp;</span><span class="n">m</span><span class="p">)</span><span class="k">const</span><span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">n</span><span class="p">.</span><span class="n">id</span><span class="o">==</span><span class="n">m</span><span class="p">.</span><span class="n">id</span><span class="o">&amp;&amp;</span><span class="n">n</span><span class="p">.</span><span class="n">val</span><span class="o">==</span><span class="n">m</span><span class="p">.</span><span class="n">val</span><span class="o">?</span><span class="nb">true</span><span class="o">:</span><span class="nb">false</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;相当于java的hashSet,里面存放的元素是无序的,其他用法跟set大同小异&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">unordered_set</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">test_unordered_set</span> <span class="o">=</span> <span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;遍历unordered_set&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">test_unordered_set</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">test_unordered_set</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;*</span><span class="n">pos</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">Node</span> <span class="n">n1</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Node</span> <span class="n">n2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">Node</span> <span class="n">n3</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">9</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;自定义类型unordered_set，必须重载hash_func和==操作符,其他用法跟标准的unordered_set一样&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>   <span class="n">unordered_set</span><span class="o">&lt;</span><span class="n">Node</span><span class="p">,</span><span class="n">node_hash_fun</span><span class="p">,</span><span class="n">node_equal_fun</span><span class="p">,</span><span class="n">allocator</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;&gt;</span> <span class="n">node_unordered_set</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">node_unordered_set</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">node_unordered_set</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n2</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">node_unordered_set</span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="n">n3</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;遍历自定义类型unordered_set&quot;</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">node_unordered_set</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">node_unordered_set</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">).</span><span class="n">id</span><span class="o">&lt;&lt;</span><span class="s">&quot; &quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-02-19T15:36:10+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/tu/'>图</a>, <a class='category' href='/blog/categories/shu-ju-jie-gou/'>数据结构</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/02/19/ios55/" itemprop="url">图单源最短路径问题(Dijkstra算法)</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>算法思路</h2>
-
-<p><code>1.</code> 图用邻接表表达（ <a href="http://caixindong.github.io/blog/2016/02/19/ios53/">http://caixindong.github.io/blog/2016/02/19/ios53/</a> ），每个图结点都储存一个值，记录源结点到结点的距离，一开始初始化为不可达，即距离设置为无穷大，而源结点的值为0，因为源结点到源结点的距离为0；  <br/>
-<code>2.</code> 从源结点开始，遍历从源结点出发的所有路径，某结点可达，它的值更新为源结点的值加上之间路径的值，不可达的结点保持原来的值；      <br/>
-<code>3.</code> 从那些未遍历的结点中取值最小的结点作为下一个遍历的结点；      <br/>
-<code>4.</code> 遍历从当前遍历结点出发的所有路径，某结点可达，比较当前遍历结点的值加上路径值的和与某结点的值的大小，哪个小就更新为哪个值；
-<code>5.</code> 继续从那些未遍历的结点中取值最小的结点作为下一个遍历的结点，继续步骤4的做法，直到所有结点都被遍历。</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="cp">#include &quot;graph.hpp&quot;</span>
-</span><span class='line'><span class="cp">#include &lt;climits&gt;</span>
-</span><span class='line'><span class="cp">#include &lt;queue&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * 用于记录图结点数据</span>
-</span><span class='line'><span class="cm"> * id   结点id</span>
-</span><span class='line'><span class="cm"> * dist 源结点到当前结点的最短距离</span>
-</span><span class='line'><span class="cm"> * prev 最短路径的前一个结点</span>
-</span><span class='line'><span class="cm"> * processed 是否遍历过</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">node</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">id</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">dist</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">prev</span><span class="p">;</span>
-</span><span class='line'>    <span class="kt">bool</span> <span class="n">processed</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">node</span><span class="p">()</span><span class="o">:</span><span class="n">dist</span><span class="p">(</span><span class="n">INT_MAX</span><span class="p">),</span><span class="n">prev</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">processed</span><span class="p">(</span><span class="nb">false</span><span class="p">){</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm">* 用于比较距离大小的仿函数</span>
-</span><span class='line'><span class="cm">**/</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">compare_node</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="n">node</span><span class="o">&amp;</span> <span class="n">a</span><span class="p">,</span><span class="n">node</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">a</span><span class="p">.</span><span class="n">dist</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">.</span><span class="n">dist</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Dijkstra算法</span>
-</span><span class='line'><span class="cm"> * g 操作的图</span>
-</span><span class='line'><span class="cm"> * source 源结点</span>
-</span><span class='line'><span class="cm"> **/</span>
-</span><span class='line'><span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;</span> <span class="n">Dijkstra</span><span class="p">(</span><span class="n">Graph</span> <span class="o">&amp;</span><span class="n">g</span><span class="p">,</span><span class="kt">int</span> <span class="n">source</span><span class="p">){</span>
-</span><span class='line'>    <span class="c1">//获取图结点个数</span>
-</span><span class='line'>    <span class="kt">int</span> <span class="n">node_count</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">g</span><span class="p">.</span><span class="n">ad_vector</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">//将遍历每个结点的结果存放在nodes容器</span>
-</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;</span> <span class="n">nodes</span><span class="p">(</span><span class="n">node_count</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span> <span class="n">node_count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">id</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">nodes</span><span class="p">[</span><span class="n">source</span><span class="p">].</span><span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">//优先队列，dist小的先出队</span>
-</span><span class='line'>    <span class="n">priority_queue</span><span class="o">&lt;</span><span class="n">node</span><span class="p">,</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;</span><span class="p">,</span><span class="n">compare_node</span><span class="o">&gt;</span> <span class="n">node_pq</span><span class="p">;</span>
-</span><span class='line'>    <span class="n">node_pq</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">source</span><span class="p">]);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">node_pq</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">node</span> <span class="n">current_node</span> <span class="o">=</span> <span class="n">node_pq</span><span class="p">.</span><span class="n">top</span><span class="p">();</span>
-</span><span class='line'>        <span class="n">node_pq</span><span class="p">.</span><span class="n">pop</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">current_node</span><span class="p">.</span><span class="n">processed</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">continue</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">list</span><span class="o">&lt;</span><span class="n">edge_node</span><span class="o">&gt;</span> <span class="n">edge_nodes</span> <span class="o">=</span> <span class="n">g</span><span class="p">.</span><span class="n">ad_vector</span><span class="p">[</span><span class="n">current_node</span><span class="p">.</span><span class="n">id</span><span class="p">];</span>
-</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">edge_nodes</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span> <span class="n">pos</span><span class="o">!=</span><span class="n">edge_nodes</span><span class="p">.</span><span class="n">end</span><span class="p">();</span> <span class="n">pos</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">node</span><span class="o">&amp;</span> <span class="n">dest_node</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">pos</span><span class="o">-&gt;</span><span class="n">dest_id</span><span class="p">];</span>
-</span><span class='line'>                <span class="k">if</span> <span class="p">(</span><span class="n">current_node</span><span class="p">.</span><span class="n">dist</span><span class="o">+</span><span class="n">pos</span><span class="o">-&gt;</span><span class="n">weight</span><span class="o">&lt;</span><span class="n">dest_node</span><span class="p">.</span><span class="n">dist</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                    <span class="n">dest_node</span><span class="p">.</span><span class="n">dist</span> <span class="o">=</span> <span class="n">current_node</span><span class="p">.</span><span class="n">dist</span><span class="o">+</span><span class="n">pos</span><span class="o">-&gt;</span><span class="n">weight</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">dest_node</span><span class="p">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">current_node</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</span><span class='line'>                    <span class="n">node_pq</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">dest_node</span><span class="p">);</span>
-</span><span class='line'>                <span class="p">}</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="n">current_node</span><span class="p">.</span><span class="n">processed</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">return</span> <span class="n">nodes</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">void</span> <span class="n">print_path</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;&amp;</span> <span class="n">nodes</span><span class="p">,</span><span class="kt">int</span> <span class="n">node_id</span><span class="p">){</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">].</span><span class="n">prev</span><span class="o">==-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&quot;path: &quot;</span><span class="o">&lt;&lt;</span><span class="n">node_id</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">print_path</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">].</span><span class="n">prev</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">cout</span><span class="o">&lt;&lt;</span> <span class="s">&quot;-&gt;&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">node_id</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="n">Graph</span> <span class="n">g</span><span class="p">(</span><span class="mi">7</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">);</span>
-</span><span class='line'>    <span class="n">g</span><span class="p">.</span><span class="n">add_edge</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">vector</span><span class="o">&lt;</span><span class="n">node</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">Dijkstra</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">result</span><span class="p">.</span><span class="n">size</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
-</span><span class='line'>        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Print path and dist for node:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">id</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">print_path</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">id</span><span class="p">);</span>
-</span><span class='line'>        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Dist:&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">dist</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
