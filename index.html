@@ -7,19 +7,7 @@
 	<meta name="author" content="Xindong">
 
 	
-	<meta name="description" content="ios 多级展开列表的实现 多级展开列表的实现 效果图 用法（类似UITableView） 初始化XDMultTableView 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-#import &quot;XDMultTableView.h&quot;
-...
-@property(nonatomic &hellip;">
+	<meta name="description" content="ios 解决iOS8以下UIAlertController无法使用的问题 XDAlertController 最近在一个项目中遇到的这样的一个问题iOS8以下UIAlertController无法使用，XDAlertController我的一个解决方案 实现原理 &hellip;">
 	
 
   <!-- http://t.co/dKP3o1e -->
@@ -113,6 +101,99 @@
   
 
 
+<time datetime="2016-07-27T22:33:08+08:00" data-updated="true" itemprop="datePublished"></time></div>
+		<div class="tags">
+
+
+	<a class='category' href='/blog/categories/ios/'>ios</a>
+
+
+</div>
+		
+	</div>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/07/27/ios94/" itemprop="url">解决iOS8以下UIAlertController无法使用的问题</a></h1>
+	<div class="entry-content" itemprop="articleBody">
+		<h1>XDAlertController</h1>
+
+<p>最近在一个项目中遇到的这样的一个问题iOS8以下UIAlertController无法使用，XDAlertController我的一个解决方案</p>
+
+<h1>实现原理</h1>
+
+<p>在iOS7环境下调用UIAlertController会崩溃，所以通过判断系统的版本号来调用不同的API；        
+通过Method Swizzling替换原生的presentViewController和提供近似于原生API接口，让开发者感觉不出与原生API有什么差别。（Method Swizzling通过method_exchangeImplementations交换方法，交换时期在调用load的时候，里面涉及runtime相关知识，如果理解起来吃力，可以移步到<a href="http://www.jianshu.com/p/43a0d64b0dbf">这边文章</a>了解
+）       </p>
+
+<h1>使用</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="cp">#import &quot;XDAlertController.h&quot;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="n">XDAlertController</span> <span class="o">*</span><span class="n">alert</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertController</span> <span class="nl">alertControllerWithTitle</span><span class="p">:</span><span class="s">@&quot;我是actionsheet&quot;</span> <span class="nl">message</span><span class="p">:</span><span class="s">@&quot;123&quot;</span> <span class="nl">preferredStyle</span><span class="p">:</span><span class="n">XDAlertControllerStyleActionSheet</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action1</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;default&quot;</span> <span class="nl">style</span><span class="p">:</span> <span class="n">XDAlertActionStyleDefault</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span> <span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action2</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;取消&quot;</span> <span class="nl">style</span><span class="p">:</span><span class="n">XDAlertActionStyleCancel</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action3</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;destructive&quot;</span> <span class="nl">style</span><span class="p">:</span><span class="n">XDAlertActionStyleDestructive</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action1</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action2</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action3</span><span class="p">];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="nb">self</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="n">alert</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>github地址</h1>
+
+<p><a href="https://github.com/caixindong/XDAlertController">https://github.com/caixindong/XDAlertController</a>
+大家觉得喜欢就赏个star，有什么问题可以issue我或者在评论指出，相互学习</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="meta">
+		<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2016-07-17T14:38:50+08:00" data-updated="true" itemprop="datePublished"></time></div>
 		<div class="tags">
 
@@ -123,9 +204,9 @@
 </div>
 		
 	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/07/17/ios93/" itemprop="url">多级展开列表的实现</a></h1>
+	<h1 class="title" itemprop="name"><a href="/blog/2016/07/17/ios93/" itemprop="url">iOS多级展开列表的实现</a></h1>
 	<div class="entry-content" itemprop="articleBody">
-		<h1>多级展开列表的实现</h1>
+		<h1>iOS多级展开列表的实现</h1>
 
 <h2>效果图</h2>
 
@@ -3631,72 +3712,6 @@ cameraIrisHollowClose 镜头快门开</p>
 
 
 
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-	<div class="meta">
-		<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-04-06T22:37:36+08:00" data-updated="true" itemprop="datePublished"></time></div>
-		<div class="tags">
-
-
-	<a class='category' href='/blog/categories/ios/'>ios</a>
-
-
-</div>
-		
-	</div>
-	<h1 class="title" itemprop="name"><a href="/blog/2016/04/06/ios84/" itemprop="url">浅谈GCD的内部实现</a></h1>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>CGD</h2>
-
-<p>GCD是苹果开发的多线程编程的解决方案，通过简单的API就可以实现创建新线程去执行我们需要执行的任务，不需要我们手动地创建和管理线程。它的API包含在libdispatch库中。</p>
-
-<h2>Dispatch Queue</h2>
-
-<p>Dispatch Queue是GCD中很重要的一部分，它是负责执行处理的队列，它的内部主要由三部分构成：  <br/>
-1、一个管理追加block的C语言实现的FIFO的队列；   <br/>
-2、处理信号量的原子操作；  <br/>
-3、用于管理线程的C语言实现的一些容器。</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
-</span><span class='line'>        <span class="n">NSLog</span><span class="p">(</span><span class="s">@&quot;我的操作&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>dispatch queue 通过 dispatch_async等函数将block追加到队列上，block不是直接追加到队列，而是先构成一个dispatch continuation构造体，构造体包含了这个block还有一些上下文信息，例如block所属的dispatch group等等。</p>
-
-<h2>Dispatch Queue执行过程是怎么的呢？</h2>
-
-<h2>workqueue</h2>
-
-<p>工作队列，是一个用于创建内核线程的接口，通过它创建的内核线程来执行内核其他模块排列到队列里的工作。不同优先级的dispatch queue对应着对应优先级的workqueue。GCD初始化的时候，使用pthread_workqueue_create_np创建pthread_workqueue</p>
-
-<h2>执行过程</h2>
-
-<p>dispatch queue执行block时，先从dispatch queue自身的FIFO队列中取出dispatch continuation，接着调用pthread_workqueue_additem_np函数，传入这些参数：dispatch queue自身、一个符合其优先级workqueue,dispatch continuation。  <br/>
-调用该函数后，会通知对应的workqueue增加执行项目，XNU内核生成线程，线程执行pthread_workqueue函数执行block。</p>
 
 		
 		

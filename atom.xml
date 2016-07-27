@@ -4,7 +4,7 @@
   <title><![CDATA[Cool Guy]]></title>
   <link href="http://caixindong.github.io/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-07-17T14:59:17+08:00</updated>
+  <updated>2016-07-27T22:35:39+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -14,11 +14,78 @@
 
   
   <entry>
-    <title type="html"><![CDATA[多级展开列表的实现]]></title>
+    <title type="html"><![CDATA[解决iOS8以下UIAlertController无法使用的问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/07/27/ios94/"/>
+    <updated>2016-07-27T22:33:08+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/07/27/ios94</id>
+    <content type="html"><![CDATA[<h1>XDAlertController</h1>
+
+<p>最近在一个项目中遇到的这样的一个问题iOS8以下UIAlertController无法使用，XDAlertController我的一个解决方案</p>
+
+<h1>实现原理</h1>
+
+<p>在iOS7环境下调用UIAlertController会崩溃，所以通过判断系统的版本号来调用不同的API；        
+通过Method Swizzling替换原生的presentViewController和提供近似于原生API接口，让开发者感觉不出与原生API有什么差别。（Method Swizzling通过method_exchangeImplementations交换方法，交换时期在调用load的时候，里面涉及runtime相关知识，如果理解起来吃力，可以移步到<a href="http://www.jianshu.com/p/43a0d64b0dbf">这边文章</a>了解
+）       </p>
+
+<h1>使用</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="cp">#import &quot;XDAlertController.h&quot;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="n">XDAlertController</span> <span class="o">*</span><span class="n">alert</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertController</span> <span class="nl">alertControllerWithTitle</span><span class="p">:</span><span class="s">@&quot;我是actionsheet&quot;</span> <span class="nl">message</span><span class="p">:</span><span class="s">@&quot;123&quot;</span> <span class="nl">preferredStyle</span><span class="p">:</span><span class="n">XDAlertControllerStyleActionSheet</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action1</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;default&quot;</span> <span class="nl">style</span><span class="p">:</span> <span class="n">XDAlertActionStyleDefault</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span> <span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action2</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;取消&quot;</span> <span class="nl">style</span><span class="p">:</span><span class="n">XDAlertActionStyleCancel</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action3</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;destructive&quot;</span> <span class="nl">style</span><span class="p">:</span><span class="n">XDAlertActionStyleDestructive</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action1</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action2</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action3</span><span class="p">];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="nb">self</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="n">alert</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>github地址</h1>
+
+<p><a href="https://github.com/caixindong/XDAlertController">https://github.com/caixindong/XDAlertController</a>
+大家觉得喜欢就赏个star，有什么问题可以issue我或者在评论指出，相互学习</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS多级展开列表的实现]]></title>
     <link href="http://caixindong.github.io/blog/2016/07/17/ios93/"/>
     <updated>2016-07-17T14:38:50+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/07/17/ios93</id>
-    <content type="html"><![CDATA[<h1>多级展开列表的实现</h1>
+    <content type="html"><![CDATA[<h1>iOS多级展开列表的实现</h1>
 
 <h2>效果图</h2>
 
@@ -4425,94 +4492,6 @@ The problem appears to be that Xcode was trying to create dSYM files for Debug  
 </span><span class='line'>                <span class="p">}</span>
 </span><span class='line'>            <span class="p">}</span>
 </span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// insert code here...</span>
-</span><span class='line'>    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Hello, World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[删除链表中倒数第n个元素]]></title>
-    <link href="http://caixindong.github.io/blog/2016/03/05/ios74/"/>
-    <updated>2016-03-05T20:48:54+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/03/05/ios74</id>
-    <content type="html"><![CDATA[<h2>要求</h2>
-
-<p>删除链表中倒数第n个元素，例如1->2->3->4->5->6,n=2,返回1->2->3->4->6</p>
-
-<h2>代码实现</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class='C++'><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
-</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
-</span><span class='line'><span class="k">struct</span> <span class="n">ListNode</span> <span class="p">{</span>
-</span><span class='line'>         <span class="kt">int</span> <span class="n">val</span><span class="p">;</span>
-</span><span class='line'>         <span class="n">ListNode</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>         <span class="n">ListNode</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">:</span> <span class="n">val</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">next</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">class</span> <span class="nc">Solution</span> <span class="p">{</span>
-</span><span class='line'><span class="k">public</span><span class="o">:</span>
-</span><span class='line'>    <span class="n">ListNode</span><span class="o">*</span> <span class="n">removeNthFromEnd</span><span class="p">(</span><span class="n">ListNode</span><span class="o">*</span> <span class="n">head</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">head</span><span class="o">==</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">newHead</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'>            <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">newHead</span><span class="p">;</span>
-</span><span class='line'>            <span class="n">ListNode</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">newHead</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="k">while</span> <span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                <span class="n">pre</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>                <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">pre</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">newHead</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
 </span><span class='line'><span class="p">};</span>

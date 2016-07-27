@@ -1,0 +1,216 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>解决iOS8以下UIAlertController无法使用的问题 - Cool Guy</title>
+	<meta name="author" content="Xindong">
+
+	
+	<meta name="description" content="解决iOS8以下UIAlertController无法使用的问题 XDAlertController 最近在一个项目中遇到的这样的一个问题iOS8以下UIAlertController无法使用，XDAlertController我的一个解决方案 实现原理 &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Cool Guy" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://caixindong.github.io/blog/2016/07/27/ios94/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<script src="/javascripts/md5.js"></script>
+	<script type="text/javascript">
+		document.write("<img alt='Profile Picture' src='/images/touxiang.jpeg' style='width: 160px;'>");
+	</script>
+</div>
+<h1><a href="/">Cool Guy</a></h1>
+<p class="subtitle">Blog like a hacker.</p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/aboutme">AboutMe</a></li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+		<a class="weibo" href="http://www.weibo.com/3872004666/profile?topnav=1&wvr=6" title="Weibo">Weibo</a>
+		
+		
+		
+		
+		
+		<a class="github" href="https://github.com/caixindong" title="GitHub">GitHub</a>
+		
+		
+		<a class="dribbble" href="http://www.dribbble.com/allenhsu" title="Dribbble">Dribbble</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+<hgroup>
+
+</hgroup>
+
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+	<h1 class="title" itemprop="name">解决iOS8以下UIAlertController无法使用的问题</h1>
+	<div class="entry-content" itemprop="articleBody"><h1>XDAlertController</h1>
+
+<p>最近在一个项目中遇到的这样的一个问题iOS8以下UIAlertController无法使用，XDAlertController我的一个解决方案</p>
+
+<h1>实现原理</h1>
+
+<p>在iOS7环境下调用UIAlertController会崩溃，所以通过判断系统的版本号来调用不同的API；        
+通过Method Swizzling替换原生的presentViewController和提供近似于原生API接口，让开发者感觉不出与原生API有什么差别。（Method Swizzling通过method_exchangeImplementations交换方法，交换时期在调用load的时候，里面涉及runtime相关知识，如果理解起来吃力，可以移步到<a href="http://www.jianshu.com/p/43a0d64b0dbf">这边文章</a>了解
+）       </p>
+
+<h1>使用</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ObjC'><span class='line'><span class="cp">#import &quot;XDAlertController.h&quot;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="n">XDAlertController</span> <span class="o">*</span><span class="n">alert</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertController</span> <span class="nl">alertControllerWithTitle</span><span class="p">:</span><span class="s">@&quot;我是actionsheet&quot;</span> <span class="nl">message</span><span class="p">:</span><span class="s">@&quot;123&quot;</span> <span class="nl">preferredStyle</span><span class="p">:</span><span class="n">XDAlertControllerStyleActionSheet</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action1</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;default&quot;</span> <span class="nl">style</span><span class="p">:</span> <span class="n">XDAlertActionStyleDefault</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span> <span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action2</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;取消&quot;</span> <span class="nl">style</span><span class="p">:</span><span class="n">XDAlertActionStyleCancel</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="n">XDAlertAction</span> <span class="o">*</span><span class="n">action3</span> <span class="o">=</span> <span class="p">[</span><span class="n">XDAlertAction</span> <span class="nl">actionWithTitle</span><span class="p">:</span><span class="s">@&quot;destructive&quot;</span> <span class="nl">style</span><span class="p">:</span><span class="n">XDAlertActionStyleDestructive</span> <span class="nl">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">XDAlertAction</span> <span class="o">*</span> <span class="n">_Nonnull</span> <span class="n">action</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span> <span class="err"> </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">}];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action1</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action2</span><span class="p">];</span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="n">alert</span> <span class="nl">addAction</span><span class="p">:</span><span class="n">action3</span><span class="p">];</span>
+</span><span class='line'><span class="err">  </span> <span class="err"> </span>
+</span><span class='line'><span class="err"> </span> <span class="err"> </span> <span class="p">[</span><span class="nb">self</span> <span class="nl">presentViewController</span><span class="p">:</span><span class="n">alert</span> <span class="nl">animated</span><span class="p">:</span><span class="nb">YES</span> <span class="nl">completion</span><span class="p">:</span><span class="nb">nil</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>github地址</h1>
+
+<p><a href="https://github.com/caixindong/XDAlertController">https://github.com/caixindong/XDAlertController</a>
+大家觉得喜欢就赏个star，有什么问题可以issue我或者在评论指出，相互学习</p>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+	
+	<a class="addthis_button_sinaweibo"></a>
+	
+	
+	
+	<a class="addthis_button_twitter"></a>
+	
+	
+	
+ 
+	<a class="addthis_button_compact"></a>
+	<a class="addthis_counter addthis_bubble_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="/blog/2016/07/27/ios94" data-title="解决iOS8以下UIAlertController无法使用的问题" data-url="http://caixindong.github.io/blog/2016/07/27/ios94/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"xindong"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Xindong -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

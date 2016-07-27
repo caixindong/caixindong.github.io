@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ios | Cool Guy]]></title>
   <link href="http://caixindong.github.io/blog/categories/ios/atom.xml" rel="self"/>
   <link href="http://caixindong.github.io/"/>
-  <updated>2016-07-17T14:59:17+08:00</updated>
+  <updated>2016-07-27T22:35:39+08:00</updated>
   <id>http://caixindong.github.io/</id>
   <author>
     <name><![CDATA[Xindong]]></name>
@@ -14,11 +14,57 @@
 
   
   <entry>
-    <title type="html"><![CDATA[多级展开列表的实现]]></title>
+    <title type="html"><![CDATA[解决iOS8以下UIAlertController无法使用的问题]]></title>
+    <link href="http://caixindong.github.io/blog/2016/07/27/ios94/"/>
+    <updated>2016-07-27T22:33:08+08:00</updated>
+    <id>http://caixindong.github.io/blog/2016/07/27/ios94</id>
+    <content type="html"><![CDATA[<h1>XDAlertController</h1>
+
+<p>最近在一个项目中遇到的这样的一个问题iOS8以下UIAlertController无法使用，XDAlertController我的一个解决方案</p>
+
+<h1>实现原理</h1>
+
+<p>在iOS7环境下调用UIAlertController会崩溃，所以通过判断系统的版本号来调用不同的API；        
+通过Method Swizzling替换原生的presentViewController和提供近似于原生API接口，让开发者感觉不出与原生API有什么差别。（Method Swizzling通过method_exchangeImplementations交换方法，交换时期在调用load的时候，里面涉及runtime相关知识，如果理解起来吃力，可以移步到<a href="http://www.jianshu.com/p/43a0d64b0dbf">这边文章</a>了解
+）       </p>
+
+<h1>使用</h1>
+
+<pre><code class="ObjC">#import "XDAlertController.h"
+...
+XDAlertController *alert = [XDAlertController alertControllerWithTitle:@"我是actionsheet" message:@"123" preferredStyle:XDAlertControllerStyleActionSheet];
+    XDAlertAction *action1 = [XDAlertAction actionWithTitle:@"default" style: XDAlertActionStyleDefault handler:^( XDAlertAction * _Nonnull action) {
+        
+    }];
+    
+    XDAlertAction *action2 = [XDAlertAction actionWithTitle:@"取消" style:XDAlertActionStyleCancel handler:^(XDAlertAction * _Nonnull action) {
+        
+    }];
+    
+    XDAlertAction *action3 = [XDAlertAction actionWithTitle:@"destructive" style:XDAlertActionStyleDestructive handler:^(XDAlertAction * _Nonnull action) {
+        
+    }];
+    
+    [alert addAction:action1];
+    [alert addAction:action2];
+    [alert addAction:action3];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+</code></pre>
+
+<h1>github地址</h1>
+
+<p><a href="https://github.com/caixindong/XDAlertController">https://github.com/caixindong/XDAlertController</a>
+大家觉得喜欢就赏个star，有什么问题可以issue我或者在评论指出，相互学习</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[iOS多级展开列表的实现]]></title>
     <link href="http://caixindong.github.io/blog/2016/07/17/ios93/"/>
     <updated>2016-07-17T14:38:50+08:00</updated>
     <id>http://caixindong.github.io/blog/2016/07/17/ios93</id>
-    <content type="html"><![CDATA[<h1>多级展开列表的实现</h1>
+    <content type="html"><![CDATA[<h1>iOS多级展开列表的实现</h1>
 
 <h2>效果图</h2>
 
@@ -643,108 +689,6 @@ __Block_byref_a_0 *__forwarding;
 <h2>小小总结</h2>
 
 <p>block可以引用局部变量，但是不能修改它，不然就是编译错误，如果想修改它，可以加上__block关键字。但是可以改变全局变量、静态变量、全局静态变量。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Block 之 Block的底层实现]]></title>
-    <link href="http://caixindong.github.io/blog/2016/05/14/ios89/"/>
-    <updated>2016-05-14T10:57:07+08:00</updated>
-    <id>http://caixindong.github.io/blog/2016/05/14/ios89</id>
-    <content type="html"><![CDATA[<h2>前言</h2>
-
-<p>最近在总结关于block的东西，可能会写几篇关于block的博客，语法那些就不说，这里提供一个<a href="http://fuckingblocksyntax.com">语法的入口</a>，我们主要探究block的底层实现、block引用局部变量、block的内存管理，今天先讲下block的底层实现。</p>
-
-<h2>block实例</h2>
-
-<pre><code class="ObjC">#import &lt;Foundation/Foundation.h&gt;
-
-void hello_(){
-    int i = 2;
-    int j = 3;
-    long (^myBlock)(void) = ^long(){
-        return i*j*10;
-    };
-}
-
-int main(int argc, const char * argv[]) {
-    @autoreleasepool {
-
-
-    }
-    return 0;
-}
-</code></pre>
-
-<p>定义hello方法是方便我们等下查看编译代码的时候准确定位myBlock的实现。用clang将objected-C 代码编译为C++代码。</p>
-
-<pre><code>控制台命令：clang -rewrite-objc main.m 
-</code></pre>
-
-<p>我们打开main.cpp文件，定位到以下代码：</p>
-
-<pre><code class="ObjC">struct __block_impl {
-  void *isa;
-  int Flags;
-  int Reserved;
-  void *FuncPtr;
-};
-</code></pre>
-
-<p>这是block基类的定义，所有block都继承于它，拥有它以下那些属性：  <br/>
-isa是指向该block的类型的类，也就是我们理解的对象指针；  <br/>
-Flags包含了引用计数；  <br/>
-Reserved：保留变量,我的理解是表示block内部的变量数；      <br/>
-FuncPtr：函数指针，指向具体block实现的函数的调用地址；</p>
-
-<pre><code class="ObjC">struct __hello__block_impl_0 {
-  struct __block_impl impl;
-  struct __hello__block_desc_0* Desc;
-  int i;
-  int j;
-  __hello__block_impl_0(void *fp, struct __hello__block_desc_0 *desc, int _i, int _j, int flags=0) : i(_i), j(_j) {
-    impl.isa = &amp;_NSConcreteStackBlock;
-    impl.Flags = flags;
-    impl.FuncPtr = fp;
-    Desc = desc;
-  }
-};
-</code></pre>
-
-<p>这是myBlock的定义，它的结构体以hello打头，代表myBlock位于hello函数里，这是block的命名方式。<strong>hello</strong>block_desc_0指的是myBlock的描述。</p>
-
-<pre><code class="ObjC">static long __hello__block_func_0(struct __hello__block_impl_0 *__cself) {
-  int i = __cself-&gt;i; // bound by copy
-  int j = __cself-&gt;j; // bound by copy
-
-        return i*j*10;
-    }
-</code></pre>
-
-<p> myBlock内函数的具体实现，注意<strong>bound by copy</strong>，block对外部引用变量做只读拷贝，还有另外的一种情况，在以后讲到关于block引用局部变量的时候会说。</p>
-
-<pre><code class="ObjC">static struct __hello__block_desc_0 {
-  size_t reserved;
-  size_t Block_size;
-} __hello__block_desc_0_DATA = { 0, sizeof(struct __hello__block_impl_0)};
-</code></pre>
-
-<p>这是myBlock的描述</p>
-
-<pre><code class="ObjC">void hello_(){
-    int i = 2;
-    int j = 3;
-    long (*myBlock)(void) = ((long (*)())&amp;__hello__block_impl_0((void *)__hello__block_func_0, &amp;__hello__block_desc_0_DATA, i, j));
-}
-</code></pre>
-
-<p>myBlock实例变量的定义</p>
-
-<h2>做下小小总结</h2>
-
-<p>block是对象；  <br/>
-编译器会根据block捕获的局部变量，生成具体的结构体定义。block内部的代码将会提取出来，成为一个单独的C函数(eg：<strong>hello</strong>block_func_0)。创建block时，实际就是在方法中声明一个struct，并且初始化该struct的成员。而执行block时，就是调用那个单独的C函数，并把该struct指针传递过去；          <br/>
-block中包含了被引用的局部变量(由struct持有)，也包含了控制成分的代码块(由函数指针持有)，符合闭包(closure)的概念。</p>
 ]]></content>
   </entry>
   
